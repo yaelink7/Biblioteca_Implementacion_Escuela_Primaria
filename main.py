@@ -1,29 +1,32 @@
 """Punto de entrada del sistema de biblioteca.
 
-Equivale a GUIBiblia/VentanaMani.java del proyecto original.
-Por ahora solo verifica la conexion con Supabase (historia INF-07).
+Sustituye a la ventana principal VentanaMani.java del sistema Java, con una
+diferencia: aqui se pide identificarse antes de mostrar nada, porque las
+politicas de seguridad de la base no responden a usuarios sin sesion.
 """
 
-from biblioteca.core.supabase_cliente import obtener_cliente
+import sys
+
+from PySide6.QtWidgets import QApplication
+
+from biblioteca.ui.estilo import HOJA_DE_ESTILO
+from biblioteca.ui.login import pedir_sesion
+from biblioteca.ui.ventana_principal import VentanaPrincipal
 
 
-def main() -> None:
-    cliente = obtener_cliente()
-    respuesta = cliente.table("v_catalogo").select("id, titulo, autor").limit(5).execute()
+def main() -> int:
+    app = QApplication(sys.argv)
+    app.setApplicationName("Biblioteca Escolar Adalberto Tejeda")
+    app.setStyleSheet(HOJA_DE_ESTILO)
 
-    print("Conexion establecida con Supabase.")
+    sesion = pedir_sesion()
+    if sesion is None:
+        return 0  # el usuario cerro el dialogo sin entrar
 
-    if not respuesta.data:
-        print()
-        print("El catalogo se ve vacio porque todavia no has iniciado sesion:")
-        print("las politicas RLS solo muestran los libros a usuarios autenticados.")
-        print("Eso es justo lo que debe pasar (historia USU-06).")
-        return
-
-    print(f"Libros en el catalogo (primeros {len(respuesta.data)}):")
-    for libro in respuesta.data:
-        print(f"  [{libro['id']}] {libro['titulo']} - {libro['autor']}")
+    ventana = VentanaPrincipal(sesion)
+    ventana.show()
+    return app.exec()
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

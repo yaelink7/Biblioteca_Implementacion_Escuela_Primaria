@@ -1,0 +1,2 @@
+Los archivos .ui de Qt Designer van en esta carpeta.
+Despues de editarlos, ejecutar: python herramientas/compilar_ui.py

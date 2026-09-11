@@ -1,7 +1,7 @@
 """Configuracion del sistema, leida del archivo .env.
 
 Sustituye a las credenciales que en el proyecto Java estaban escritas
-directamente dentro de DAOBiblia/ConexionBD.java.
+directamente dentro de ConexionBD.java en el sistema Java.
 """
 
 import os

@@ -1,4 +1,4 @@
-"""Acceso a datos. Migra el paquete DAOBiblia del proyecto Java."""
+"""Acceso a datos. Sustituye al paquete de acceso a datos del sistema Java."""
 
 from biblioteca.repositorios import libros, personas, prestamos
 

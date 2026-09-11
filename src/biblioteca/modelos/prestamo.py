@@ -1,4 +1,4 @@
-"""Prestamos y devoluciones. Migra DAOBiblia/PrestamoDao.java.
+"""Prestamos y devoluciones. Migra PrestamoDao.java del sistema Java.
 
 La fecha limite y el movimiento de inventario los calcula Postgres, no este
 codigo: asi la app movil de los alumnos hereda las mismas reglas.
