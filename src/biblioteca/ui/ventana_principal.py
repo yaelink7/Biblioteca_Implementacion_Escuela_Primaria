@@ -12,6 +12,7 @@ from biblioteca.core.sesion import Sesion, cerrar_sesion
 from biblioteca.ui.alumnos import PantallaAlumnos
 from biblioteca.ui.catalogo import PantallaCatalogo
 from biblioteca.ui.deudores import PantallaDeudores
+from biblioteca.ui.empleados import PantallaEmpleados
 from biblioteca.ui.prestamos import PantallaPrestamos
 from biblioteca.ui.estilo import COLOR_TENUE
 
@@ -29,6 +30,7 @@ class VentanaPrincipal(QMainWindow):
         self.pestanas.addTab(PantallaPrestamos(self), "Préstamos")
         self.pestanas.addTab(PantallaAlumnos(self), "Alumnos")
         self.pestanas.addTab(PantallaDeudores(self), "Deudores")
+        self.pestanas.addTab(PantallaEmpleados(self), "Empleados")
         self.setCentralWidget(self.pestanas)
 
         barra = QStatusBar()
