@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QDialog, QWidget
 
+from biblioteca.core.sesion import sesion_actual
 from biblioteca.modelos.persona import Empleado, Rol
 from biblioteca.repositorios import personas as repo_personas
 from biblioteca.servicios import validador_persona
@@ -44,6 +45,13 @@ class FormularioEmpleado(QDialog):
         if empleado is not None:
             self._cargar(empleado)
             self.ui.campoCodigo.setEnabled(False)
+
+        # Cambiar el perfil de acceso queda reservado al administrador; la
+        # regla la impone la base, esto solo evita ofrecer lo que sera
+        # rechazado. Al dar de alta, el perfil forma parte del registro.
+        if not self.es_alta and sesion_actual().perfil.rol != Rol.ADMINISTRADOR:
+            self.ui.campoRol.setEnabled(False)
+            self.ui.etiquetaRol.setText("Perfil en el sistema (solo administrador)")
 
         self.ui.botonGuardar.clicked.connect(self._guardar)
         self.ui.botonCancelar.clicked.connect(self.reject)

@@ -85,8 +85,7 @@ class FormularioAlumno(QDialog):
             if self.es_alta:
                 self.guardado = repo_personas.dar_de_alta_alumno(alumno)
             else:
-                repo_personas.actualizar(alumno)
-                repo_personas.actualizar_datos_de_alumno(alumno)
+                repo_personas.actualizar_alumno(alumno)
                 self.guardado = alumno
         except repo_personas.ErrorDePersona as error:
             self.ui.etiquetaError.setText(str(error))

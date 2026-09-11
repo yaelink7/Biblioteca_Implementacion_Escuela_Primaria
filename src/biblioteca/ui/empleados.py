@@ -55,16 +55,16 @@ class PantallaEmpleados(QWidget):
         """Dice de entrada quien puede dar de alta, en vez de fallar al final."""
         if self._es_administrador:
             self.ui.etiquetaAviso.setText(
-                "Como administrador puedes registrar y modificar al personal."
+                "Como administrador puedes registrar personal y cambiar su "
+                "perfil de acceso."
             )
             self.ui.etiquetaAviso.setStyleSheet(f"color: {COLOR_PRINCIPAL};")
         else:
             self.ui.etiquetaAviso.setText(
-                "Solo un administrador puede registrar o modificar personal. "
-                "Puedes consultar la plantilla."
+                "Puedes registrar y modificar personal. Cambiar el perfil de "
+                "acceso de alguien queda reservado al administrador."
             )
             self.ui.etiquetaAviso.setStyleSheet(f"color: {COLOR_TENUE};")
-            self.ui.botonNuevo.setEnabled(False)
 
     # ------------------------------------------------------------------
     # Datos
@@ -135,9 +135,7 @@ class PantallaEmpleados(QWidget):
         return self._empleados[indice] if indice is not None else None
 
     def _cambio_seleccion(self) -> None:
-        self.ui.botonEditar.setEnabled(
-            self._es_administrador and self._seleccionado() is not None
-        )
+        self.ui.botonEditar.setEnabled(self._seleccionado() is not None)
 
     def _registrar(self) -> None:
         formulario = FormularioEmpleado(self)

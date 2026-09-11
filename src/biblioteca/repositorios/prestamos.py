@@ -15,6 +15,7 @@ from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.prestamo import EstadoPrestamo, Prestamo
 
 TABLA = "prestamos"
+VISTA = "v_prestamos"   # incluye el plazo calculado por la base
 
 
 class ErrorDePrestamo(Exception):
@@ -66,17 +67,17 @@ def registrar(libro_id: int, alumno_id: str, registrado_por: str | None = None) 
 
 
 def devolver(prestamo_id: int) -> Prestamo:
-    """Cierra un prestamo y reintegra el ejemplar al inventario."""
+    """Cierra un prestamo y reintegra el ejemplar al inventario.
+
+    Solo se marca como devuelto: la fecha la pone el disparador de la base,
+    con el mismo reloj que calculo el plazo. Enviarla desde aqui la ponia
+    con la hora del equipo, que no coincide con la de la base.
+    """
     try:
         filas = (
             obtener_cliente()
             .table(TABLA)
-            .update(
-                {
-                    "estado": str(EstadoPrestamo.DEVUELTO),
-                    "fecha_devolucion": date.today().isoformat(),
-                }
-            )
+            .update({"estado": str(EstadoPrestamo.DEVUELTO)})
             .eq("id", prestamo_id)
             .execute()
         )
@@ -89,45 +90,34 @@ def devolver(prestamo_id: int) -> Prestamo:
 
 
 def activos() -> list[Prestamo]:
-    """Prestamos sin devolver, con el titulo y el nombre ya resueltos."""
+    """Prestamos sin devolver, con el titulo, el nombre y el plazo resueltos.
+
+    Va por la vista v_prestamos para que los dias de retraso los calcule la
+    base: si se calcularan aqui, el reloj del equipo y el de la base darian
+    respuestas distintas seis horas de cada dia.
+    """
     filas = (
         obtener_cliente()
-        .table(TABLA)
-        .select("*, libros(titulo), perfiles!prestamos_usuario_id_fkey(nombre, apellido)")
+        .table(VISTA)
+        .select("*")
         .in_("estado", [str(EstadoPrestamo.ACTIVO), str(EstadoPrestamo.VENCIDO)])
         .order("fecha_limite")
         .execute()
     )
-
-    prestamos = []
-    for fila in filas.data:
-        libro = fila.pop("libros", None) or {}
-        persona = fila.pop("perfiles", None) or {}
-        fila["titulo_libro"] = libro.get("titulo")
-        fila["nombre_alumno"] = (
-            f"{persona.get('nombre', '')} {persona.get('apellido', '')}".strip() or None
-        )
-        prestamos.append(Prestamo.desde_fila(fila))
-    return prestamos
+    return [Prestamo.desde_fila(f) for f in filas.data]
 
 
 def historial_de(alumno_id: str) -> list[Prestamo]:
     """Todos los movimientos de un alumno, incluso los ya concluidos (REQ-PRE-03)."""
     filas = (
         obtener_cliente()
-        .table(TABLA)
-        .select("*, libros(titulo)")
+        .table(VISTA)
+        .select("*")
         .eq("usuario_id", alumno_id)
         .order("fecha_prestamo", desc=True)
         .execute()
     )
-
-    prestamos = []
-    for fila in filas.data:
-        libro = fila.pop("libros", None) or {}
-        fila["titulo_libro"] = libro.get("titulo")
-        prestamos.append(Prestamo.desde_fila(fila))
-    return prestamos
+    return [Prestamo.desde_fila(f) for f in filas.data]
 
 
 def deudores() -> list[Deudor]:
