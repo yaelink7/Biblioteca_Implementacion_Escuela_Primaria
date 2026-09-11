@@ -9,6 +9,7 @@ from __future__ import annotations
 from PySide6.QtWidgets import QLabel, QMainWindow, QStatusBar, QTabWidget
 
 from biblioteca.core.sesion import Sesion, cerrar_sesion
+from biblioteca.ui.alumnos import PantallaAlumnos
 from biblioteca.ui.catalogo import PantallaCatalogo
 from biblioteca.ui.deudores import PantallaDeudores
 from biblioteca.ui.prestamos import PantallaPrestamos
@@ -26,6 +27,7 @@ class VentanaPrincipal(QMainWindow):
         self.pestanas = QTabWidget()
         self.pestanas.addTab(PantallaCatalogo(self), "Catálogo")
         self.pestanas.addTab(PantallaPrestamos(self), "Préstamos")
+        self.pestanas.addTab(PantallaAlumnos(self), "Alumnos")
         self.pestanas.addTab(PantallaDeudores(self), "Deudores")
         self.setCentralWidget(self.pestanas)
 

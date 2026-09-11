@@ -127,6 +127,27 @@ def dar_de_alta_empleado(empleado: Empleado) -> Empleado:
     return empleado
 
 
+def actualizar_datos_de_alumno(alumno: Alumno) -> None:
+    """Actualiza grado y grupo, que viven en la tabla usuarios.
+
+    Va aparte de actualizar() porque los datos de una persona estan
+    repartidos en dos tablas: lo comun en perfiles y lo propio en usuarios.
+    """
+    if not alumno.id:
+        raise ErrorDePersona("No se puede actualizar un alumno sin identificador.")
+
+    try:
+        (
+            obtener_cliente()
+            .table("usuarios")
+            .update(alumno.datos_propios())
+            .eq("perfil_id", alumno.id)
+            .execute()
+        )
+    except Exception as error:
+        raise ErrorDePersona(_mensaje_claro(error)) from error
+
+
 def actualizar(perfil: Perfil) -> Perfil:
     """Consulta y actualizacion de datos personales (REQ-USU-03)."""
     if not perfil.id:

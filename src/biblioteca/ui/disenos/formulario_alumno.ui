@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>FormularioAlumno</class>
+ <widget class="QDialog" name="FormularioAlumno">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>500</width>
+    <height>560</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Alumno</string>
+  </property>
+  <layout class="QVBoxLayout" name="disposicion">
+   <property name="leftMargin"><number>24</number></property>
+   <property name="topMargin"><number>24</number></property>
+   <property name="rightMargin"><number>24</number></property>
+   <property name="bottomMargin"><number>24</number></property>
+   <property name="spacing"><number>12</number></property>
+
+   <item>
+    <layout class="QFormLayout" name="formulario">
+     <property name="horizontalSpacing"><number>14</number></property>
+     <property name="verticalSpacing"><number>10</number></property>
+
+     <item row="0" column="0">
+      <widget class="QLabel" name="etiquetaCodigo">
+       <property name="text"><string>Código *</string></property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLineEdit" name="campoCodigo">
+       <property name="placeholderText"><string>A-0401</string></property>
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="1" column="0">
+      <widget class="QLabel" name="etiquetaNombre">
+       <property name="text"><string>Nombre *</string></property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLineEdit" name="campoNombre">
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="2" column="0">
+      <widget class="QLabel" name="etiquetaApellido">
+       <property name="text"><string>Apellidos *</string></property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLineEdit" name="campoApellido">
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="3" column="0">
+      <widget class="QLabel" name="etiquetaGrado">
+       <property name="text"><string>Grado</string></property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="campoGrado">
+       <property name="minimum"><number>0</number></property>
+       <property name="maximum"><number>6</number></property>
+       <property name="value"><number>0</number></property>
+       <property name="specialValueText"><string>Sin asignar</string></property>
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="4" column="0">
+      <widget class="QLabel" name="etiquetaGrupo">
+       <property name="text"><string>Grupo</string></property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="campoGrupo">
+       <property name="editable"><bool>true</bool></property>
+       <property name="minimumHeight"><number>32</number></property>
+       <item><property name="text"><string/></property></item>
+       <item><property name="text"><string>A</string></property></item>
+       <item><property name="text"><string>B</string></property></item>
+       <item><property name="text"><string>C</string></property></item>
+       <item><property name="text"><string>D</string></property></item>
+      </widget>
+     </item>
+
+     <item row="5" column="0">
+      <widget class="QLabel" name="etiquetaCorreo">
+       <property name="text"><string>Correo del tutor</string></property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLineEdit" name="campoCorreo">
+       <property name="placeholderText"><string>tutor@ejemplo.com</string></property>
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="6" column="0">
+      <widget class="QLabel" name="etiquetaTelefono">
+       <property name="text"><string>Teléfono</string></property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLineEdit" name="campoTelefono">
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="7" column="0">
+      <widget class="QLabel" name="etiquetaCalle">
+       <property name="text"><string>Calle y número</string></property>
+      </widget>
+     </item>
+     <item row="7" column="1">
+      <widget class="QLineEdit" name="campoCalle">
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+     <item row="8" column="0">
+      <widget class="QLabel" name="etiquetaColonia">
+       <property name="text"><string>Colonia</string></property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QLineEdit" name="campoColonia">
+       <property name="minimumHeight"><number>32</number></property>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="etiquetaAviso">
+     <property name="text">
+      <string>* Campos obligatorios. Los datos del tutor sirven para avisar de préstamos vencidos.</string>
+     </property>
+     <property name="wordWrap"><bool>true</bool></property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QLabel" name="etiquetaError">
+     <property name="text"><string/></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="minimumHeight"><number>40</number></property>
+     <property name="alignment"><set>Qt::AlignTop</set></property>
+    </widget>
+   </item>
+
+   <item>
+    <spacer name="espacio">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeHint" stdset="0">
+      <size><width>20</width><height>10</height></size>
+     </property>
+    </spacer>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout" name="filaBotones">
+     <item>
+      <spacer name="espacioBotones">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0">
+        <size><width>40</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="botonCancelar">
+       <property name="text"><string>Cancelar</string></property>
+       <property name="minimumHeight"><number>34</number></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="botonGuardar">
+       <property name="text"><string>Guardar</string></property>
+       <property name="minimumHeight"><number>34</number></property>
+       <property name="default"><bool>true</bool></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
