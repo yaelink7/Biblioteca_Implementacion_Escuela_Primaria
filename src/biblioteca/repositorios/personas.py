@@ -92,38 +92,81 @@ def alumnos_del_salon(grado: int, grupo: str) -> list[Alumno]:
 
 
 def dar_de_alta_alumno(alumno: Alumno) -> Alumno:
-    """Crea el perfil y su ficha de alumno.
+    """Crea el perfil y su ficha de alumno en una sola transaccion.
+
+    Los datos viven en dos tablas, y hacer los dos INSERT por separado dejaba
+    un perfil huerfano cuando el segundo fallaba. La funcion registrar_alumno
+    de Postgres los agrupa: o entran ambos, o ninguno.
 
     No crea cuenta de acceso: la bibliotecaria registra a un nino de primaria
     sin darle correo ni contrasena.
     """
-    cliente = obtener_cliente()
     try:
-        perfil = cliente.table(TABLA_PERFILES).insert(alumno.a_fila()).execute()
-        perfil_id = perfil.data[0]["id"]
-        cliente.table("usuarios").insert(
-            {"perfil_id": perfil_id, **alumno.datos_propios()}
+        respuesta = obtener_cliente().rpc(
+            "registrar_alumno",
+            {
+                "p_codigo": alumno.codigo,
+                "p_nombre": alumno.nombre,
+                "p_apellido": alumno.apellido,
+                "p_grado": alumno.grado,
+                "p_grupo": alumno.grupo,
+                "p_correo": alumno.correo,
+                "p_telefono": alumno.telefono,
+                "p_calle": alumno.calle,
+                "p_colonia": alumno.colonia,
+                "p_codigo_postal": alumno.codigo_postal,
+                "p_numero": alumno.numero,
+            },
         ).execute()
     except Exception as error:
         raise ErrorDePersona(_mensaje_claro(error)) from error
 
-    alumno.id = perfil_id
+    alumno.id = respuesta.data
     return alumno
 
 
+def listar_empleados() -> list[Empleado]:
+    """Plantilla de la biblioteca. Solo el personal puede consultarla (RLS)."""
+    filas = (
+        obtener_cliente()
+        .table(TABLA_PERFILES)
+        .select("*, empleados(tipo_empleado, fecha_ingreso)")
+        .neq("rol", str(Rol.ALUMNO))
+        .eq("activo", True)
+        .order("apellido")
+        .execute()
+    )
+    return [Empleado.desde_fila(_aplanar(f, "empleados")) for f in filas.data]
+
+
 def dar_de_alta_empleado(empleado: Empleado) -> Empleado:
-    """Alta de personal, restringida a administradores por RLS (REQ-EMP-01)."""
-    cliente = obtener_cliente()
+    """Alta de personal, restringida a administradores por RLS (REQ-EMP-01).
+
+    Va por la funcion registrar_empleado para que el perfil y la ficha entren
+    juntos: cuando un bibliotecario lo intenta, RLS rechaza el segundo INSERT
+    y ahora el primero se revierte con el.
+    """
     try:
-        perfil = cliente.table(TABLA_PERFILES).insert(empleado.a_fila()).execute()
-        perfil_id = perfil.data[0]["id"]
-        cliente.table("empleados").insert(
-            {"perfil_id": perfil_id, **empleado.datos_propios()}
+        respuesta = obtener_cliente().rpc(
+            "registrar_empleado",
+            {
+                "p_codigo": empleado.codigo,
+                "p_nombre": empleado.nombre,
+                "p_apellido": empleado.apellido,
+                "p_tipo_empleado": empleado.tipo_empleado,
+                "p_rol": str(empleado.rol),
+                "p_correo": empleado.correo,
+                "p_telefono": empleado.telefono,
+                "p_calle": empleado.calle,
+                "p_colonia": empleado.colonia,
+                "p_codigo_postal": empleado.codigo_postal,
+                "p_numero": empleado.numero,
+            },
         ).execute()
     except Exception as error:
         raise ErrorDePersona(_mensaje_claro(error)) from error
 
-    empleado.id = perfil_id
+    empleado.id = respuesta.data
     return empleado
 
 
