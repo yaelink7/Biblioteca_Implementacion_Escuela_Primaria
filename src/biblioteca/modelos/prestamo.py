@@ -31,18 +31,23 @@ class Prestamo:
 
     id: int | None = None
 
-    # Campos que llegan de la vista de deudores, no de la tabla
+    # Campos que llegan de las vistas, no de la tabla
     titulo_libro: str | None = None
     nombre_alumno: str | None = None
     salon: str | None = None
 
+    # Lo calcula la base, no este codigo: positivo si faltan dias, negativo
+    # si ya vencio, cero si vence hoy. Antes se calculaba aqui con el reloj
+    # del equipo mientras la base usaba el suyo, que corre en UTC; durante
+    # seis horas cada dia las dos respuestas diferian en uno.
+    dias_restantes: int = 0
+
     @property
     def dias_de_retraso(self) -> int:
-        """Dias vencidos al dia de hoy. Cero si esta en plazo o ya se devolvio."""
-        if self.estado == EstadoPrestamo.DEVUELTO or not self.fecha_limite:
+        """Dias vencidos. Cero si esta en plazo o ya se devolvio."""
+        if self.estado == EstadoPrestamo.DEVUELTO:
             return 0
-        atraso = (date.today() - self.fecha_limite).days
-        return max(0, atraso)
+        return max(0, -self.dias_restantes)
 
     @property
     def esta_vencido(self) -> bool:
@@ -56,10 +61,10 @@ class Prestamo:
         if self.esta_vencido:
             dias = self.dias_de_retraso
             return f"Vencido hace {dias} día{'s' if dias != 1 else ''}"
-        if self.fecha_limite:
-            faltan = (self.fecha_limite - date.today()).days
-            return f"Vence en {faltan} día{'s' if faltan != 1 else ''}"
-        return "Activo"
+        if self.dias_restantes == 0:
+            return "Vence hoy"
+        faltan = self.dias_restantes
+        return f"Vence en {faltan} día{'s' if faltan != 1 else ''}"
 
     @classmethod
     def desde_fila(cls, fila: dict[str, Any]) -> Self:
@@ -77,5 +82,14 @@ class Prestamo:
             registrado_por=fila.get("registrado_por"),
             titulo_libro=fila.get("titulo_libro") or fila.get("titulo"),
             nombre_alumno=fila.get("nombre_alumno"),
-            salon=fila.get("salon"),
+            salon=_salon(fila),
+            dias_restantes=fila.get("dias_restantes", 0),
         )
+
+
+def _salon(fila: dict[str, Any]) -> str | None:
+    """Arma el salon cuando la vista trae grado y grupo por separado."""
+    if fila.get("salon"):
+        return fila["salon"]
+    grado, grupo = fila.get("grado"), fila.get("grupo")
+    return f"{grado}{grupo}" if grado and grupo else None

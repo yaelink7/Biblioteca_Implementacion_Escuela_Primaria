@@ -170,23 +170,34 @@ def dar_de_alta_empleado(empleado: Empleado) -> Empleado:
     return empleado
 
 
-def actualizar_datos_de_alumno(alumno: Alumno) -> None:
-    """Actualiza grado y grupo, que viven en la tabla usuarios.
+def actualizar_alumno(alumno: Alumno) -> None:
+    """Actualiza los datos de un alumno en una sola transaccion.
 
-    Va aparte de actualizar() porque los datos de una persona estan
-    repartidos en dos tablas: lo comun en perfiles y lo propio en usuarios.
+    Los datos viven en dos tablas y actualizarlas por separado dejaba los
+    datos personales nuevos junto al grado y grupo viejos cuando la segunda
+    fallaba. La funcion actualizar_alumno de Postgres las agrupa: o entran
+    ambas, o ninguna.
     """
     if not alumno.id:
         raise ErrorDePersona("No se puede actualizar un alumno sin identificador.")
 
     try:
-        (
-            obtener_cliente()
-            .table("usuarios")
-            .update(alumno.datos_propios())
-            .eq("perfil_id", alumno.id)
-            .execute()
-        )
+        obtener_cliente().rpc(
+            "actualizar_alumno",
+            {
+                "p_id": alumno.id,
+                "p_nombre": alumno.nombre,
+                "p_apellido": alumno.apellido,
+                "p_grado": alumno.grado,
+                "p_grupo": alumno.grupo,
+                "p_correo": alumno.correo,
+                "p_telefono": alumno.telefono,
+                "p_calle": alumno.calle,
+                "p_colonia": alumno.colonia,
+                "p_codigo_postal": alumno.codigo_postal,
+                "p_numero": alumno.numero,
+            },
+        ).execute()
     except Exception as error:
         raise ErrorDePersona(_mensaje_claro(error)) from error
 
@@ -224,6 +235,13 @@ def _aplanar(fila: dict, anidada: str) -> dict:
 
 def _mensaje_claro(error: Exception) -> str:
     texto = str(error)
+
+    # Las funciones de Postgres lanzan su propio mensaje ya redactado para
+    # el usuario; se devuelve tal cual en lugar de envolverlo en ruido.
+    for propio in ("No se encontró", "no puede tener perfil"):
+        if propio in texto:
+            inicio = texto.index(propio)
+            return texto[inicio:].split("'")[0].split('"')[0].strip()
 
     if "perfiles_codigo_key" in texto or ("duplicate key" in texto and "codigo" in texto):
         return "Ya existe una persona registrada con ese código."
