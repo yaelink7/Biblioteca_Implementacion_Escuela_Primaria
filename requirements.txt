@@ -3,7 +3,9 @@ supabase>=2.31,<3
 python-dotenv>=1.0
 
 # --- Interfaz de escritorio ---
-PyQt6>=6.11,<7
+# PySide6 en lugar de PyQt6: incluye Qt Designer y el compilador de .ui
+# en el mismo paquete. Sustituye al editor de formularios de NetBeans.
+PySide6>=6.11,<7
 
 # --- Pruebas (modulo de calidad) ---
 pytest>=8.0

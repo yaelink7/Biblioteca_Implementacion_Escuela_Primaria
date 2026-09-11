@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.libro import Libro
+from biblioteca.servicios import validador_libro
 
 TABLA = "libros"
 _COLUMNAS = (
@@ -57,9 +58,14 @@ def obtener(libro_id: int) -> Libro | None:
 def dar_de_alta(libro: Libro) -> Libro:
     """Registra un libro nuevo (REQ-LIB-01).
 
-    Postgres valida el ano de publicacion y los campos obligatorios; aqui
-    solo se traduce el error a algo que el bibliotecario entienda.
+    Valida antes de tocar la base: el validador atrapa los defectos D-06,
+    D-07 y D-08 del Reporte Tecnico de Calidad y explica los tres de una vez,
+    en lugar de que Postgres rechace solo el primero que encuentre.
     """
+    revision = validador_libro.validar(libro, es_alta=True)
+    if not revision.es_valido:
+        raise ErrorDeCatalogo(revision.mensaje)
+
     datos = libro.a_fila()
     datos.pop("id", None)  # lo genera la base
 
@@ -75,6 +81,12 @@ def modificar(libro: Libro) -> Libro:
     """Actualiza un libro existente (REQ-LIB-02)."""
     if libro.id is None:
         raise ErrorDeCatalogo("No se puede modificar un libro sin identificador.")
+
+    # es_alta=False: un libro ya registrado si puede quedar en cero ejemplares
+    # cuando todos estan prestados.
+    revision = validador_libro.validar(libro, es_alta=False)
+    if not revision.es_valido:
+        raise ErrorDeCatalogo(revision.mensaje)
 
     datos = libro.a_fila()
     datos.pop("id")
