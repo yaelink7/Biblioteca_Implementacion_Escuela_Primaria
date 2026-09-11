@@ -294,12 +294,20 @@ más clara de explicar el control de acceso sin hablar de tecnología.
 
 | Correo | Contraseña | Perfil |
 |---|---|---|
-| `bibliotecaria@demo.com` | `Biblioteca2026!` | administrador |
+| `bibliotecaria@demo.com` | `123456` | administrador |
 | `auxiliar@demo.com` | `Auxiliar2026!` | bibliotecario |
 | `alumno.prueba@demo.com` | `AlumnoPrueba2026!` | alumno |
 
-Son cuentas de prueba en el proyecto propio, no de personas reales. **Cambiar
-las contraseñas antes de cargar datos reales de alumnos.**
+Son cuentas de prueba en el proyecto propio, no de personas reales. La
+primera usa una contraseña corta a propósito, para teclearla rápido durante
+la demostración.
+
+**Antes de cargar datos reales de alumnos hay que cambiar las tres.** El
+REQ-USU-01 exige «criterios mínimos de seguridad», y una contraseña de seis
+dígitos no los cumple: es aceptable mientras la base solo tiene datos de
+ejemplo, no cuando contenga el padrón de una escuela. Conviene además activar
+en el panel de Supabase la protección contra contraseñas filtradas, que hoy
+está desactivada.
 
 Permisos vigentes:
 
