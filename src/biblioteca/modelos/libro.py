@@ -1,6 +1,6 @@
 """Catalogo de la biblioteca.
 
-Migra ClasesBiblia/Publicacion.java y Libro.java, conservando la herencia
+Migra Publicacion.java y Libro.java del sistema Java, conservando la herencia
 del diseno original: Libro extiende Publicacion.
 """
 
@@ -31,7 +31,7 @@ class Publicacion:
 
 @dataclass
 class Libro(Publicacion):
-    """Un titulo del acervo. Migra ClasesBiblia/Libro.java."""
+    """Un titulo del acervo. Migra Libro.java del sistema Java."""
 
     tipo_libro: str | None = None
     editorial: str | None = None

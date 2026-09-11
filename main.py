@@ -1,6 +1,6 @@
 """Punto de entrada del sistema de biblioteca.
 
-Equivale a GUIBiblia/VentanaMani.java del proyecto original.
+Equivale a la ventana principal VentanaMani.java del sistema Java.
 Por ahora solo verifica la conexion con Supabase (historia INF-07).
 """
 

@@ -2,7 +2,7 @@
 
 Cada prueba cita el defecto que cierra y el caso de prueba original de la
 matriz. No tocan la base de datos: se ejecutan sin red ni credenciales, que
-era una de las carencias senaladas en la auditoria (DAOBiblia quedo en 36 %
+era una de las carencias senaladas en la auditoria (la capa de acceso a datos quedo en 36 %
 de cobertura porque sus pruebas exigian MySQL activo).
 
     pytest tests/test_defectos_auditoria.py -v

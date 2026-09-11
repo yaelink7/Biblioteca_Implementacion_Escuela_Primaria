@@ -1,4 +1,4 @@
-"""Acceso a alumnos y empleados. Migra DAOBiblia/UsuarioDao.java y EmpleadoDao.java.
+"""Acceso a alumnos y empleados. Migra UsuarioDao.java y EmpleadoDao.java del sistema Java.
 
 Perfil guarda los datos comunes; usuarios y empleados, lo propio de cada uno.
 Por eso cada alta escribe en dos tablas.

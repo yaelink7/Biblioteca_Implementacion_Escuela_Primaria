@@ -1,6 +1,6 @@
 """Prestamos, devoluciones y reporte de deudores.
 
-Migra DAOBiblia/PrestamoDao.java. Las reglas de negocio (limite de un libro
+Migra PrestamoDao.java del sistema Java. Las reglas de negocio (limite de un libro
 por alumno, plazo de siete dias, movimiento de inventario) las aplica
 Postgres mediante disparadores; aqui solo se invocan y se traducen sus
 errores a mensajes que el bibliotecario entienda.

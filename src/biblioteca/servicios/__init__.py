@@ -2,7 +2,7 @@
 
 Capa nueva que no existia en el proyecto Java: alli las validaciones vivian
 dentro de los formularios Swing, lo que dejaba la cobertura de ramas de
-GUIBiblia en 14 %. El Reporte Tecnico de Calidad lo senala como la
+la capa grafica en 14 %. El Reporte Tecnico de Calidad lo senala como la
 recomendacion de prioridad mas alta.
 """
 

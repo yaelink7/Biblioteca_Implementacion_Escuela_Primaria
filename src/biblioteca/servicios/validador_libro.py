@@ -3,7 +3,7 @@
 Responde a la recomendacion de prioridad alta del Reporte Tecnico de Calidad:
 "extraer las validaciones de GUILibro a una clase ValidadorLibro independiente
 de Swing". En el proyecto Java estas reglas vivian dentro de metodos privados
-del formulario, lo que dejaba la cobertura de ramas de GUIBiblia en 14 %.
+del formulario, lo que dejaba la cobertura de ramas de la capa grafica en 14 %.
 
 Aqui no dependen de ninguna ventana, asi que se prueban sin abrir la interfaz.
 

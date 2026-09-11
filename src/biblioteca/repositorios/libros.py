@@ -1,4 +1,4 @@
-"""Acceso al catalogo. Migra DAOBiblia/LibroDao.java."""
+"""Acceso al catalogo. Migra LibroDao.java del sistema Java."""
 
 from __future__ import annotations
 
