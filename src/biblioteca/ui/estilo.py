@@ -107,6 +107,35 @@ QHeaderView::section {{
 QCheckBox {{
     color: {TEXTO};
 }}
+QListWidget {{
+    background-color: {SUPERFICIE};
+    color: {TEXTO};
+    border: 1px solid {BORDE};
+    border-radius: 4px;
+    padding: 2px;
+}}
+QListWidget::item {{
+    padding: 7px 8px;
+    border-radius: 3px;
+}}
+QListWidget::item:selected {{
+    background-color: {COLOR_PRINCIPAL};
+    color: white;
+}}
+QListWidget::item:disabled {{
+    color: #A8ADB5;
+}}
+/* Recuadro del resumen antes de confirmar un prestamo.
+   Se apunta por nombre y no por frameShape: QListWidget tambien es un
+   QFrame y el selector generico le robaba el fondo blanco. */
+QFrame#marcoResumen {{
+    background-color: #EEF2F7;
+    border: 1px solid {BORDE_TENUE};
+    border-radius: 4px;
+}}
+QFrame#marcoResumen QLabel {{
+    background: transparent;
+}}
 /* Boton secundario: acompana a la accion principal sin competir con ella */
 QPushButton[secundario="true"] {{
     background-color: transparent;

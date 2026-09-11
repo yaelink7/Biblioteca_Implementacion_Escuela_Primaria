@@ -6,6 +6,8 @@ Por eso cada alta escribe en dos tablas.
 
 from __future__ import annotations
 
+import re
+
 from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.persona import Alumno, Empleado, Perfil, Rol
 
@@ -51,6 +53,23 @@ def buscar_alumnos(texto: str) -> list[Alumno]:
         .execute()
     )
     return [Alumno.desde_fila(_aplanar(f, "usuarios")) for f in filas.data]
+
+
+def buscar_alumnos_o_salon(texto: str) -> list[Alumno]:
+    """Busca por nombre, codigo o salon, segun lo que el usuario escriba.
+
+    La Factibilidad Operativa pide registrar un prestamo en menos de treinta
+    segundos "buscando al alumno por nombre o grupo". Que el bibliotecario
+    tenga que elegir antes en que campo busca le cuesta tiempo, asi que se
+    deduce: "4B" es un salon, "Ana" es un nombre.
+    """
+    texto = texto.strip()
+    salon = re.fullmatch(r"([1-6])\s*([A-Za-z])", texto)
+    if salon:
+        grado = int(salon.group(1))
+        grupo = salon.group(2).upper()
+        return alumnos_del_salon(grado, grupo)
+    return buscar_alumnos(texto)
 
 
 def alumnos_del_salon(grado: int, grupo: str) -> list[Alumno]:
