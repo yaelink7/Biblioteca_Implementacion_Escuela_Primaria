@@ -1,10 +1,32 @@
 {
+  // Interprete del entorno virtual del proyecto. Fijarlo evita que cada
+  // integrante tenga que seleccionarlo a mano tras clonar, y que alguien
+  // ejecute con el Python global, donde no estan las dependencias.
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/Scripts/python.exe",
+
+  // src/ en la ruta de analisis: sin esto Pylance marca en rojo los
+  // "from biblioteca..." aunque el codigo corra bien.
   "python.analysis.extraPaths": ["./src"],
+
   "python.testing.pytestEnabled": true,
   "python.testing.pytestArgs": ["tests"],
+  "python.testing.unittestEnabled": false,
+
   "editor.formatOnSave": true,
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff"
   },
-  "files.encoding": "utf8"
+
+  "files.encoding": "utf8",
+
+  // Los ui_*.py los produce el compilador y se sobrescriben: se ocultan
+  // del explorador para que nadie los edite por error.
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true
+  },
+  "files.readonlyInclude": {
+    "src/biblioteca/ui/generado/**": true
+  }
 }

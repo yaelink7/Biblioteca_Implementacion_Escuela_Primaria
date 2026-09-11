@@ -1,0 +1,43 @@
+{
+  // Configuraciones para ejecutar y depurar con F5.
+  //
+  // PYTHONPATH apunta a src/ en las tres: asi el proyecto corre aunque
+  // alguien todavia no haya hecho "pip install -e .", que es lo que hace
+  // que "import biblioteca" funcione desde cualquier carpeta.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Biblioteca (escritorio)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/main.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" },
+      "justMyCode": true
+    },
+    {
+      "name": "Pruebas (pytest)",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": ["tests/", "-v"],
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" },
+      // false para poder entrar tambien al codigo de las bibliotecas
+      // cuando una prueba falla por algo que no esta en este proyecto
+      "justMyCode": false
+    },
+    {
+      "name": "Compilar diseños .ui",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/herramientas/compilar_ui.py",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}",
+      "env": { "PYTHONPATH": "${workspaceFolder}/src" },
+      "justMyCode": true
+    }
+  ]
+}
