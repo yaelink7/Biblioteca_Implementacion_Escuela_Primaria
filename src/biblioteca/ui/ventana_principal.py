@@ -1,7 +1,7 @@
 """Ventana principal del sistema.
 
-Sustituye a VentanaMani.java. Aloja el catalogo y los prestamos; la
-pestana de deudores se agrega en la siguiente pantalla.
+Sustituye a VentanaMani.java. Aloja las tres pantallas que opera el
+bibliotecario: catalogo, prestamos y reporte de deudores.
 """
 
 from __future__ import annotations
@@ -10,6 +10,7 @@ from PySide6.QtWidgets import QLabel, QMainWindow, QStatusBar, QTabWidget
 
 from biblioteca.core.sesion import Sesion, cerrar_sesion
 from biblioteca.ui.catalogo import PantallaCatalogo
+from biblioteca.ui.deudores import PantallaDeudores
 from biblioteca.ui.prestamos import PantallaPrestamos
 from biblioteca.ui.estilo import COLOR_TENUE
 
@@ -25,6 +26,7 @@ class VentanaPrincipal(QMainWindow):
         self.pestanas = QTabWidget()
         self.pestanas.addTab(PantallaCatalogo(self), "Catálogo")
         self.pestanas.addTab(PantallaPrestamos(self), "Préstamos")
+        self.pestanas.addTab(PantallaDeudores(self), "Deudores")
         self.setCentralWidget(self.pestanas)
 
         barra = QStatusBar()
