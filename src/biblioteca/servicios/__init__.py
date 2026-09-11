@@ -6,6 +6,6 @@ la capa grafica en 14 %. El Reporte Tecnico de Calidad lo senala como la
 recomendacion de prioridad mas alta.
 """
 
-from biblioteca.servicios import validador_libro
+from biblioteca.servicios import validador_libro, validador_persona
 
-__all__ = ["validador_libro"]
+__all__ = ["validador_libro", "validador_persona"]
