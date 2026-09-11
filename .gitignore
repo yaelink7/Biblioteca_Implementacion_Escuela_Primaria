@@ -18,9 +18,12 @@ htmlcov/
 .ruff_cache/
 
 # --- Editor ---
+# Se versiona la configuracion compartida del equipo, no las preferencias
+# personales que VS Code guarda en esta misma carpeta.
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json
+!.vscode/launch.json
 .idea/
 
 # --- Sistema operativo ---
