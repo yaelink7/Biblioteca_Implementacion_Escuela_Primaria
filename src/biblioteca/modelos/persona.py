@@ -1,6 +1,6 @@
 """Personas del sistema: perfil base, alumnos y empleados.
 
-Migra ClasesBiblia/Persona.java, Usuario.java y Empleado.java.
+Migra Persona.java, Usuario.java y Empleado.java del sistema Java.
 La herencia del proyecto original se conserva: Alumno y Empleado
 heredan de Perfil igual que Usuario y Empleado heredaban de Persona.
 """
@@ -97,7 +97,7 @@ class Perfil:
 
 @dataclass
 class Alumno(Perfil):
-    """Alumno lector. Migra ClasesBiblia/Usuario.java.
+    """Alumno lector. Migra Usuario.java del sistema Java.
 
     grado y grupo permiten la busqueda "por nombre o grupo" que exige la
     Factibilidad Operativa del Avance 1.
@@ -129,7 +129,7 @@ class Alumno(Perfil):
 
 @dataclass
 class Empleado(Perfil):
-    """Bibliotecaria o auxiliar. Migra ClasesBiblia/Empleado.java."""
+    """Bibliotecaria o auxiliar. Migra Empleado.java del sistema Java."""
 
     tipo_empleado: str = "Bibliotecario"
     fecha_ingreso: date | None = None

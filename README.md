@@ -60,16 +60,40 @@ Al abrir la carpeta, VS Code ofrece instalar las extensiones recomendadas
 
 ```
 src/biblioteca/
-  core/          Configuración y cliente de Supabase   (era DAOBiblia/ConexionBD)
-  modelos/       Clases del dominio                    (era ClasesBiblia/)
-  repositorios/  Acceso a datos                        (era DAOBiblia/)
-  servicios/     Reglas de negocio                     (nuevo)
-  ui/            Ventanas PyQt6                        (era GUIBiblia/)
+  core/            Configuración, conexión y sesión del usuario
+    config.py        Lee el .env
+    supabase_cliente.py
+    sesion.py        Inicio y cierre de sesión, perfil en curso
+  modelos/         Clases del dominio, sin lógica de acceso a datos
+    persona.py       Perfil, Alumno, Empleado
+    libro.py         Publicacion, Libro
+    prestamo.py      Prestamo, EstadoPrestamo
+  repositorios/    Acceso a datos: una consulta por operación
+    libros.py        Catálogo
+    personas.py      Alumnos y empleados
+    prestamos.py     Préstamos, devoluciones y deudores
+  servicios/       Reglas de negocio independientes de la interfaz
+    validador_libro.py
+  ui/              Interfaz de escritorio
+    disenos/         Archivos .ui que se abren en Qt Designer
+    generado/        ui_*.py que produce el compilador. NO editar a mano
+herramientas/
+  compilar_ui.py   Convierte los .ui en módulos de Python
 database/
-  migraciones/   Esquema de la base, versionado
-tests/           Pruebas con pytest                    (era test/)
-Documentacion/   Entregables de la materia
+  migraciones/     Esquema de la base, versionado
+tests/             Pruebas con pytest
+Documentacion/     Entregables de la materia
 ```
+
+Equivalencias con el sistema Java, por si hay que consultar el original:
+
+| Sistema Java | Aquí |
+|---|---|
+| Paquete de entidades | `modelos/` |
+| Paquete de acceso a datos | `repositorios/` |
+| Paquete de ventanas Swing | `ui/` |
+| `ConexionBD.java` | `core/supabase_cliente.py` |
+| Validaciones dentro de cada formulario | `servicios/` (capa nueva) |
 
 ## Base de datos
 

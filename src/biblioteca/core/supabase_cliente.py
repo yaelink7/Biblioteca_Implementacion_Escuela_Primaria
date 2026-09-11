@@ -1,6 +1,6 @@
 """Punto unico de acceso a Supabase.
 
-Equivale a DAOBiblia/ConexionBD.java, pero en lugar de abrir una conexion
+Equivale a ConexionBD.java del sistema Java, pero en lugar de abrir una conexion
 nueva en cada llamada se reutiliza un solo cliente.
 """
 

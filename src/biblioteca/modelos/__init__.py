@@ -1,4 +1,4 @@
-"""Modelos del dominio. Migra el paquete ClasesBiblia del proyecto Java."""
+"""Modelos del dominio. Sustituye al paquete de entidades del sistema Java."""
 
 from biblioteca.modelos.libro import Libro, Publicacion
 from biblioteca.modelos.persona import Alumno, Empleado, Perfil, Rol
