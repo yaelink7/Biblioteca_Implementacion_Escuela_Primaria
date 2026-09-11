@@ -140,11 +140,15 @@ def listar_empleados() -> list[Empleado]:
 
 
 def dar_de_alta_empleado(empleado: Empleado) -> Empleado:
-    """Alta de personal, restringida a administradores por RLS (REQ-EMP-01).
+    """Alta de personal (REQ-EMP-01).
 
-    Va por la funcion registrar_empleado para que el perfil y la ficha entren
-    juntos: cuando un bibliotecario lo intenta, RLS rechaza el segundo INSERT
-    y ahora el primero se revierte con el.
+    La puede hacer cualquier miembro del personal: en una primaria la
+    biblioteca la atiende una sola persona, y exigir un segundo perfil para
+    registrar a un auxiliar la dejaba bloqueada. Lo que sigue reservado al
+    administrador es cambiar el perfil de acceso de alguien.
+
+    Va por la funcion registrar_empleado para que el perfil y la ficha
+    entren juntos: si el segundo INSERT falla, el primero se revierte.
     """
     try:
         respuesta = obtener_cliente().rpc(
@@ -209,7 +213,9 @@ def actualizar(perfil: Perfil) -> Perfil:
 
     datos = perfil.a_fila()
     datos.pop("id")
-    datos.pop("rol", None)  # el rol solo lo cambia un administrador
+    # El rol se envia: quien decide si puede cambiarse es el disparador
+    # proteger_rol de la base. Descartarlo aqui ocultaba el rechazo, y
+    # ademas dejaba la regla en el cliente, donde cualquiera podia saltarla.
 
     try:
         filas = (
@@ -238,7 +244,8 @@ def _mensaje_claro(error: Exception) -> str:
 
     # Las funciones de Postgres lanzan su propio mensaje ya redactado para
     # el usuario; se devuelve tal cual en lugar de envolverlo en ruido.
-    for propio in ("No se encontró", "no puede tener perfil"):
+    for propio in ("No se encontró", "no puede tener perfil",
+                   "No puedes cambiar tu propio", "Solo un administrador"):
         if propio in texto:
             inicio = texto.index(propio)
             return texto[inicio:].split("'")[0].split('"')[0].strip()
