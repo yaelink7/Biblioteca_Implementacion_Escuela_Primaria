@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogoLogin</class>
+ <widget class="QDialog" name="DialogoLogin">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>420</width>
+    <height>380</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Iniciar sesión</string>
+  </property>
+  <layout class="QVBoxLayout" name="disposicion">
+   <property name="leftMargin"><number>36</number></property>
+   <property name="topMargin"><number>36</number></property>
+   <property name="rightMargin"><number>36</number></property>
+   <property name="bottomMargin"><number>36</number></property>
+   <property name="spacing"><number>12</number></property>
+   <item>
+    <widget class="QLabel" name="etiquetaTitulo">
+     <property name="text">
+      <string>Biblioteca Escolar</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="etiquetaEscuela">
+     <property name="text">
+      <string>Escuela Primaria Adalberto Tejeda</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="espacioSuperior">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+     <property name="sizeHint" stdset="0">
+      <size><width>20</width><height>24</height></size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QLabel" name="etiquetaCorreo">
+     <property name="text"><string>Correo electrónico</string></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="campoCorreo">
+     <property name="placeholderText">
+      <string>usuario@ejemplo.com</string>
+     </property>
+     <property name="minimumHeight"><number>34</number></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="etiquetaContrasena">
+     <property name="text"><string>Contraseña</string></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="campoContrasena">
+     <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+     <property name="minimumHeight"><number>34</number></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="etiquetaError">
+     <property name="text"><string/></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="alignment"><set>Qt::AlignCenter</set></property>
+     <property name="minimumHeight"><number>34</number></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QPushButton" name="botonEntrar">
+     <property name="text"><string>Entrar</string></property>
+     <property name="minimumHeight"><number>38</number></property>
+     <property name="default"><bool>true</bool></property>
+    </widget>
+   </item>
+   <item>
+    <spacer name="espacioInferior">
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeHint" stdset="0">
+      <size><width>20</width><height>10</height></size>
+     </property>
+    </spacer>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>campoCorreo</tabstop>
+  <tabstop>campoContrasena</tabstop>
+  <tabstop>botonEntrar</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
