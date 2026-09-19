@@ -4,7 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 18 de septiembre de 2026 — cronograma rehecho.
+**Última actualización:** 19 de septiembre de 2026 — requerimientos
+completados en el Avance 1.2; historial de PR y backlog al día.
 
 ---
 
@@ -348,6 +349,9 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #54 | PR de rescate: integró #53 a `main` |
 | #55 | Tres defectos de la auditoría interna + protección de roles |
 | #56 | Contexto del proyecto y configuración de VS Code |
+| #57 | Archivo de contexto completo del proyecto — este documento |
+| #58 | Avance 1.2: sistemas bibliotecarios revisados y requisitos completos |
+| #68 | Cronograma rehecho: la migración pasa a trabajo preliminar |
 
 ## La migración del Java está terminada
 
@@ -414,8 +418,11 @@ corregidos** (PR #55):
 
 # 7. LO SIGUIENTE QUE SE DEBE HACER
 
-Tres tareas, en este orden. Las tres son de documentación y planeación, no de
-código: el sistema funciona, lo que está desalineado son los entregables.
+El sistema funciona; lo que estaba desalineado eran los entregables. De las
+tres tareas que esta sección listaba, **dos ya se cerraron**: el cronograma
+se rehízo (7.1) y los requerimientos se completaron en el Avance 1.2 (7.2).
+Lo que queda abierto son **los ocho diagramas** (7.3) —el contenido del
+Sprint 1— más dos correcciones menores al Avance 1.2.
 
 ## 7.1 Cronograma — rehecho el 18 de septiembre
 
@@ -463,51 +470,37 @@ tres diagramas: el profesor pide ocho.
 El Sprint 1 lleva además la documentación que quedó pendiente: `INF-02`,
 `DOC-01`, `DOC-02`, `QA-01` y el registro de los acuerdos de la reunión.
 
-## 7.2 Completar los requerimientos del Avance 1.1
+## 7.2 Requerimientos — completados en el Avance 1.2
 
-El Avance 1 declara **12 requerimientos funcionales** (REQ-USU-01 a 03,
-REQ-EMP-01, REQ-LIB-01 a 03, REQ-BUS-01, REQ-PRE-01 a 04) y **ningún
-requerimiento no funcional**. La norma ISO/IEC/IEEE 29148 que el propio
-documento cita exige ambos.
+**Ya está hecho.** El Avance 1 y el 1.1 declaraban doce requerimientos
+funcionales y ningún requerimiento no funcional, pese a citar la norma
+ISO/IEC/IEEE 29148, que exige ambos. El Avance 1.2 (PR #58) lo corrigió:
 
-### Funcionales que faltan declarar
-
-Todos están implementados o planeados, pero no figuran como requisito:
-
-| Propuesto | Qué cubre | Estado |
-|---|---|---|
-| REQ-REP-01 | Reporte de alumnos deudores con un clic | implementado |
-| REQ-REP-02 | Registro de libros faltantes o dados de baja | vista lista, falta pantalla |
-| REQ-REP-03 | Exportación a CSV como respaldo | pendiente |
-| REQ-USU-04 | Alta de alumno sin cuenta de acceso, con datos del tutor | implementado |
-| REQ-USU-05 | Consulta del historial de préstamos de un alumno | implementado |
-| REQ-EMP-02 | Consulta de la plantilla de personal | implementado |
-| REQ-BUS-02 | Filtrado y ordenamiento de resultados | implementado |
-| REQ-PRE-05 | Registro de devolución con reintegro al inventario | implementado |
-| REQ-LIB-04 | Bitácora de trazabilidad consultable | tabla lista, falta el disparador |
-
-### No funcionales que faltan por completo
-
-| Propuesto | Enunciado |
+| Capítulo | Qué contiene ahora |
 |---|---|
-| RNF-USA-01 | Registrar un préstamo debe tomar menos de 30 segundos, buscando al alumno por nombre o grupo, sin llenar más de tres campos |
-| RNF-USA-02 | La interfaz debe ser operable por personal sin formación en sistemas, con un manual de una página por rol |
-| RNF-SEG-01 | Ninguna operación debe ser posible sin sesión iniciada |
-| RNF-SEG-02 | El control de acceso debe aplicarse en la base de datos, no solo en la interfaz |
-| RNF-SEG-03 | Las credenciales no deben residir en el código fuente |
-| RNF-SEG-04 | Un usuario no puede modificar su propio perfil de acceso |
-| RNF-LEG-01 | Los datos completos del alumno solo son visibles al personal; el alumno ve únicamente los suyos |
-| RNF-LEG-02 | Debe existir aviso de privacidad firmado antes de registrar datos reales de menores |
-| RNF-LEG-03 | Debe definirse un periodo de conservación y borrado al concluir el ciclo escolar |
-| RNF-DIS-01 | El sistema depende de conexión a internet; debe existir respaldo exportable como contingencia |
-| RNF-REN-01 | Las consultas de catálogo y préstamos deben responder en menos de dos segundos con el acervo completo |
-| RNF-MAN-01 | Las reglas de negocio deben residir en un solo lugar, verificable por pruebas automatizadas |
-| RNF-MAN-02 | El código y la documentación se mantienen en español |
-| RNF-POR-01 | El sistema debe ejecutarse en Windows 10 o superior sin instalación de servidor local |
+| 3.1 | **21 requerimientos funcionales**: los 12 originales más 9 que ya estaban implementados sin declarar — REQ-REP-01 a 03, REQ-USU-04 y 05, REQ-EMP-02, REQ-BUS-02, REQ-PRE-05 y REQ-LIB-04 |
+| 3.2 | **16 requerimientos no funcionales** en siete categorías —usabilidad, seguridad, legales, disponibilidad, rendimiento, mantenibilidad y portabilidad—, cada uno con su medio de verificación |
+| 3.3 | **Matriz de trazabilidad**: cada requisito cruzado con la historia que lo implementa, la prueba que lo verifica y su estado (cumplido, parcial o pendiente) |
 
-Conviene además añadir al Avance 1.1 una **matriz de trazabilidad** que cruce
-cada requisito con la historia del backlog que lo implementa y la prueba que
-lo verifica. Es lo que la norma citada espera y hoy no existe.
+La matriz deja ver de un vistazo lo que falta: `REQ-USU-03`, `REQ-LIB-04`,
+`REQ-PRE-04`, `REQ-REP-02` y `REQ-REP-03` siguen pendientes, y `REQ-PRE-02`
+y `RNF-MAN-01` están parciales. Coincide con el backlog de la sección 8.
+
+### Lo que sí queda pendiente del Avance 1.2
+
+Dos correcciones, ninguna urgente. **No se editan dentro del 1.2**: como con
+las versiones anteriores, los cambios van en un Avance 1.3.
+
+1. **El capítulo 2 conserva el cronograma viejo.** Las secciones 2.1 y 2.3.2
+   describen cinco sprints —«Sprint 0 Cimientos», «Sprint 1 Identidad»,
+   «Sprint 2 Catálogo»…— que ya no existen. El documento se generó el 18 de
+   septiembre y el cronograma se rehízo ese mismo día, después (PR #68). Hoy
+   el capítulo 2 contradice a los hitos de GitHub y a la sección 7.1 de este
+   archivo. Es la corrección de fondo.
+2. **Un error de conteo propio.** La tabla de cambios del documento anuncia
+   «catorce requerimientos no funcionales» y la sección 3.2 lista dieciséis.
+   Es el mismo tipo de error que el 1.2 corrigió del 1.1, donde se decía
+   siete fuentes y se listaban cinco.
 
 ## 7.3 Diagramas que pide el profesor
 
@@ -545,13 +538,14 @@ diagramas y el profesor pide ocho entregables.
 
 # 8. Estado del backlog
 
-**26 de 51 historias cerradas** al 18 de septiembre de 2026. El total subió de
-43 a 51 porque los ocho diagramas se abrieron como historias propias.
+**27 de 52 historias cerradas** al 19 de septiembre de 2026. El total subió de
+43 a 52 porque los ocho diagramas se abrieron como historias propias y la
+reunión con la escuela dejó un issue de seguimiento.
 
 | Hito | Cerradas | Abiertas |
 |---|---|---|
-| Trabajo preliminar — Migración a Python | 26 | 0 |
-| Sprint 1 — Diagramas y diseño | 0 | 13 |
+| Trabajo preliminar — Migración a Python | 27 | 0 |
+| Sprint 1 — Diagramas y diseño | 0 | 14 |
 | Sprint 2 — Por definir | 0 | 4 |
 | Sprint 3 — Por definir | 0 | 5 |
 | Sprint 4 — Por definir | 0 | 0 |
@@ -561,12 +555,12 @@ Todo lo terminado quedó agrupado en el hito de trabajo preliminar: es la
 migración completa del sistema Java, concluida antes de que el Sprint 1
 empezara.
 
-## Las 24 historias abiertas
+## Las 25 historias abiertas
 
 | Issue | Historia | Qué falta |
 |---|---|---|
 | #3 | `INF-02` | Confirmar que los cinco integrantes ejecutan el proyecto |
-| #9 | `DOC-01` | Actualizar la Factibilidad Técnica (hecho en el Avance 1.1, falta cerrarlo) |
+| #9 | `DOC-01` | Actualizar la Factibilidad Técnica (resuelto en el Avance 1.1 y 1.2, falta cerrar el issue) |
 | #10 | `QA-01` | Acordar la Definición de Terminado del equipo |
 | #13 | `USU-03` | Registro de cuentas con contraseña propia |
 | #19 | `QA-02` | Traducir la suite JUnit a pytest |
@@ -600,12 +594,17 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
 # 9. Documentos de la materia
 
 - `Documentacion/Avance_Biblioteca_1.docx` — entrega original, 19 páginas
-- **Avance 1.1** — actualiza el anterior. Llena las secciones de metodología y
-  herramientas que el Avance 1 dejó con las preguntas del profesor sin
-  responder, reescribe la Factibilidad Técnica (la premisa de conectividad
-  cambió al verificarla en sitio) y agrega tres capítulos: migración del
-  sistema Java, arquitectura y estado de avance. **Le faltan los
-  requerimientos de la sección 7.2 y los diagramas de la 7.3.**
+- `Documentacion/Avance_Biblioteca_1.1.docx` — actualiza el anterior. Llena las
+  secciones de metodología y herramientas que el Avance 1 dejó con las
+  preguntas del profesor sin responder, reescribe la Factibilidad Técnica —la
+  premisa de conectividad cambió al verificarla en sitio— y agrega tres
+  capítulos: migración del sistema Java, arquitectura y estado de avance
+- `Documentacion/Avance_Biblioteca_1.2.docx` — **la versión vigente**. Clona el
+  1.1 y agrega la revisión de sistemas bibliotecarios existentes (Koha, SIABUC,
+  SLiMS, OpenBiblio) que justifica construir en vez de adoptar, el alcance y
+  las exclusiones del sistema, y el capítulo 3 completo: 21 requerimientos
+  funcionales, 16 no funcionales y la matriz de trazabilidad. **Su capítulo 2
+  quedó con el cronograma viejo**; ver 7.2
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
 - El **Reporte Técnico de Calidad** del sistema Java (de otra asignatura) vive
@@ -614,8 +613,12 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
 
 ## La reunión con la escuela
 
-Está registrada como issue #44 y sigue **abierta**. Ahí se confirman cuatro
-cosas que condicionan el código:
+**Ya se realizó.** El issue #44 está cerrado y agrupado en el trabajo
+preliminar. Lo que sigue abierto es el **#67**, dentro del Sprint 1:
+documentar los acuerdos y ajustar con ellos los sprints 2, 3 y 4.
+
+Son cuatro los puntos que esos acuerdos deben dejar por escrito, porque
+condicionan el código:
 
 1. Si el límite de un libro por alumno corresponde a su práctica real.
 2. Si el plazo de siete días es el que aplican hoy.
