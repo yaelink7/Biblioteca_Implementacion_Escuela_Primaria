@@ -4,7 +4,7 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 18 de septiembre de 2026.
+**Última actualización:** 18 de septiembre de 2026 — cronograma rehecho.
 
 ---
 
@@ -37,7 +37,7 @@ usar esto todos los días, y datos personales de menores de edad de por medio.
 | Pedro Cabrera Barrios Ángel | `Pedro20-amd` | Desarrollo · calidad |
 | Roberto Ellyan Vázquez Arriaga | `robertovaz573` | Calidad y pruebas |
 
-Los 43 issues del backlog están asignados nominalmente a estas cuentas.
+Los 51 issues del backlog están asignados nominalmente a estas cuentas.
 
 ## Contexto del cliente
 
@@ -79,6 +79,9 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
    empujar a una rama cuyo PR ya se mergeó.
 5. **El código y los comentarios van en español**, sin el sufijo `Biblia` que
    usaban los paquetes del sistema Java (`GUIBiblia`, `DAOBiblia`).
+6. **Este archivo se actualiza con cada cambio del proyecto**, en la misma
+   entrega. Si queda desfasado deja de servir para lo que existe: que una
+   sesión nueva continúe el trabajo sin preguntar nada.
 
 ## Errores ya cometidos, para no repetirlos
 
@@ -414,30 +417,51 @@ corregidos** (PR #55):
 Tres tareas, en este orden. Las tres son de documentación y planeación, no de
 código: el sistema funciona, lo que está desalineado son los entregables.
 
-## 7.1 Rehacer el cronograma — está mal hecho
+## 7.1 Cronograma — rehecho el 18 de septiembre
 
-**Decisión de Yael: el cronograma actual está mal y hay que rehacerlo.**
+El cronograma anterior no reflejaba la realidad: daba la migración como
+trabajo de los sprints 2 y 3, cuando ya estaba terminada antes de que el
+Sprint 1 empezara. Se rehízo con esta estructura:
 
-Problemas concretos que lo sostienen:
+| Periodo | Fechas | Contenido |
+|---|---|---|
+| **Trabajo preliminar** | hasta el 13 sep | Migración completa a Python — **concluido** |
+| **Sprint 1** | 14 – 27 sep | Los ocho diagramas y la documentación pendiente |
+| **Sprint 2** | 28 sep – 11 oct | **Por definir** tras los acuerdos de la reunión |
+| **Sprint 3** | 12 – 25 oct | **Por definir** |
+| **Sprint 4** | 26 oct – 8 nov | **Por definir** |
+| **Cierre** | 9 – 28 nov | Aceptación con el docente, correcciones, manuales, entrega |
 
-- **No refleja la realidad.** Los sprints 2 y 3 estaban planeados para octubre
-  y noviembre, y hoy están al 75 % y 85 %. El trabajo se adelantó porque situar
-  las reglas en la base permitió construir las pantallas sobre lógica ya
-  probada, pero el cronograma sigue diciendo lo contrario.
-- **Sprint 1 desbalanceado:** 53 puntos contra un promedio de 36. Es el único
-  fuera de rango y nadie lo ha ajustado.
-- **El Sprint 0 arrancó tarde en el papel.** Figura del 14 al 27 de septiembre,
-  pero buena parte de su contenido ya estaba hecho antes de esa fecha.
-- **El cronograma del Avance 1 original** (el de actividades por semana de
-  agosto a noviembre) nunca se alineó con los sprints: son dos planes
-  distintos conviviendo en el mismo documento.
-- **El Sprint 4 concentra 6 de las 17 historias abiertas** y casi todo lo que
-  el sistema Java no tenía. Es el de mayor riesgo y está planeado al final.
+**Los sprints 2, 3 y 4 están deliberadamente sin contenido definido.** La
+reunión con la escuela ya se realizó, pero sus acuerdos aún no se documentan
+(issue #67). Definir el contenido antes de conocerlos sería planear sobre
+supuestos, y de ellos depende si las reglas implementadas —un libro por
+alumno, siete días de plazo— siguen siendo válidas.
 
-Al rehacerlo conviene: partir del avance real (26 de 43 historias), redistribuir
-lo que queda, equilibrar los puntos por sprint, y fijar fechas que el equipo
-pueda sostener con su dedicación real (la Factibilidad de Calendario habla de
-ritmo escolar, no de tiempo completo).
+Los hitos de GitHub llevan esos nombres literalmente: «Sprint 2 — Por definir
+tras la reunión». Al documentarse los acuerdos hay que renombrarlos con su
+contenido real y repartir ahí el trabajo pendiente listado en la sección 8.
+
+### Sprint 1: los ocho diagramas
+
+Cada entregable gráfico es un issue propio, para poder repartirlos:
+
+| Issue | Entregable | Responsable |
+|---|---|---|
+| #59 | DIA-01 Diagrama de casos de uso | Pedro Cabrera |
+| #60 | DIA-02 Casos de uso extendido | Rey David Montes |
+| #61 | DIA-03 Diagrama de proceso | Yael Arenas |
+| #62 | DIA-04 Diagrama de flujo de datos | Yahir Reyes |
+| #63 | DIA-05 Modelado de base de datos | Pedro Cabrera |
+| #64 | DIA-06 Modelo E-R y relacional | Pedro Cabrera |
+| #65 | DIA-07 Documentación de la base de datos | Roberto Vázquez |
+| #66 | DIA-08 Diagramas de interfaces | Roberto Vázquez |
+
+El issue #28 quedó como paraguas de los ocho. Su alcance original mencionaba
+tres diagramas: el profesor pide ocho.
+
+El Sprint 1 lleva además la documentación que quedó pendiente: `INF-02`,
+`DOC-01`, `DOC-02`, `QA-01` y el registro de los acuerdos de la reunión.
 
 ## 7.2 Completar los requerimientos del Avance 1.1
 
@@ -521,17 +545,23 @@ diagramas y el profesor pide ocho entregables.
 
 # 8. Estado del backlog
 
-**26 de 43 historias cerradas (60 %)** al 18 de septiembre de 2026.
+**26 de 51 historias cerradas** al 18 de septiembre de 2026. El total subió de
+43 a 51 porque los ocho diagramas se abrieron como historias propias.
 
-| Sprint | Cerradas | Abiertas |
+| Hito | Cerradas | Abiertas |
 |---|---|---|
-| Sprint 0 · Cimientos | 6 | 4 |
-| Sprint 1 · Identidad y personas | 7 | 4 |
-| Sprint 2 · Catálogo y búsqueda | 6 | 2 |
-| Sprint 3 · Préstamos | 6 | 1 |
-| Sprint 4 · Reportes y avisos | 1 | 6 |
+| Trabajo preliminar — Migración a Python | 26 | 0 |
+| Sprint 1 — Diagramas y diseño | 0 | 13 |
+| Sprint 2 — Por definir | 0 | 4 |
+| Sprint 3 — Por definir | 0 | 5 |
+| Sprint 4 — Por definir | 0 | 0 |
+| Cierre — Entrega final | 0 | 2 |
 
-## Las 17 historias abiertas
+Todo lo terminado quedó agrupado en el hito de trabajo preliminar: es la
+migración completa del sistema Java, concluida antes de que el Sprint 1
+empezara.
+
+## Las 24 historias abiertas
 
 | Issue | Historia | Qué falta |
 |---|---|---|
@@ -551,7 +581,8 @@ diagramas y el profesor pide ocho entregables.
 | #41 | `QA-04` | Pruebas de aceptación con el docente |
 | #42 | `DOC-04` | Manuales de una página por rol |
 | #43 | `QA-03` | Casos de prueba por módulo |
-| #44 | Reunión | Primer acercamiento con la escuela |
+| #59 a #66 | `DIA-01` a `DIA-08` | Los ocho entregables gráficos (Sprint 1) |
+| #67 | Reunión | Documentar los acuerdos de la escuela y ajustar los sprints |
 
 ## Lo más rápido de cerrar
 
