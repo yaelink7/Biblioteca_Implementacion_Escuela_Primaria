@@ -4,8 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 19 de septiembre de 2026 — requerimientos
-completados en el Avance 1.2; historial de PR y backlog al día.
+**Última actualización:** 19 de septiembre de 2026 — Avance 1.3: el
+cronograma del documento vuelve a coincidir con el del proyecto.
 
 ---
 
@@ -352,6 +352,7 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #57 | Archivo de contexto completo del proyecto — este documento |
 | #58 | Avance 1.2: sistemas bibliotecarios revisados y requisitos completos |
 | #68 | Cronograma rehecho: la migración pasa a trabajo preliminar |
+| #69 | Archivo de contexto al día tras el Avance 1.2 y el cronograma |
 
 ## La migración del Java está terminada
 
@@ -486,21 +487,27 @@ La matriz deja ver de un vistazo lo que falta: `REQ-USU-03`, `REQ-LIB-04`,
 `REQ-PRE-04`, `REQ-REP-02` y `REQ-REP-03` siguen pendientes, y `REQ-PRE-02`
 y `RNF-MAN-01` están parciales. Coincide con el backlog de la sección 8.
 
-### Lo que sí queda pendiente del Avance 1.2
+### Las correcciones al Avance 1.2, resueltas en el 1.3
 
-Dos correcciones, ninguna urgente. **No se editan dentro del 1.2**: como con
-las versiones anteriores, los cambios van en un Avance 1.3.
+El Avance 1.2 se generó el 18 de septiembre y el cronograma se rehízo ese
+mismo día, unas horas después (PR #68). El documento quedó describiendo
+sprints que ya no existían. El **Avance 1.3** lo corrige:
 
-1. **El capítulo 2 conserva el cronograma viejo.** Las secciones 2.1 y 2.3.2
-   describen cinco sprints —«Sprint 0 Cimientos», «Sprint 1 Identidad»,
-   «Sprint 2 Catálogo»…— que ya no existen. El documento se generó el 18 de
-   septiembre y el cronograma se rehízo ese mismo día, después (PR #68). Hoy
-   el capítulo 2 contradice a los hitos de GitHub y a la sección 7.1 de este
-   archivo. Es la corrección de fondo.
-2. **Un error de conteo propio.** La tabla de cambios del documento anuncia
-   «catorce requerimientos no funcionales» y la sección 3.2 lista dieciséis.
-   Es el mismo tipo de error que el 1.2 corrigió del 1.1, donde se decía
-   siete fuentes y se listaban cinco.
+| Sección | Qué se corrigió |
+|---|---|
+| 2.1 | Cronograma rehecho: trabajo preliminar, cuatro sprints y cierre |
+| 2.3.1 | Product Backlog actualizado: 52 historias y 222 puntos, con el módulo `DIA` |
+| 2.3.2 | Contenido de cada periodo reescrito |
+| 2.5 | Factibilidad de Calendario: ya no habla de cinco sprints quincenales |
+| 1.4 | La reunión pasa de prevista a realizada |
+| 3 | Conteo corregido: dieciséis requerimientos no funcionales, no catorce |
+| 6 | Estado de avance rehecho: 27 de 52 historias, 111 de 222 puntos |
+| 6.2 | Dos riesgos actualizados: uno citaba una reunión ya celebrada |
+| Índice | 2.2.2 y 2.2.3 estaban invertidos y faltaba 2.2.4 |
+| Cierre | El Avance 1.2 se llamaba a sí mismo «Avance 1.1» |
+
+Las cifras del capítulo 6 salen de consultar los issues, no de estimarlas:
+cada historia aporta los puntos que declara su cuerpo.
 
 ## 7.3 Diagramas que pide el profesor
 
@@ -599,12 +606,14 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
   preguntas del profesor sin responder, reescribe la Factibilidad Técnica —la
   premisa de conectividad cambió al verificarla en sitio— y agrega tres
   capítulos: migración del sistema Java, arquitectura y estado de avance
-- `Documentacion/Avance_Biblioteca_1.2.docx` — **la versión vigente**. Clona el
-  1.1 y agrega la revisión de sistemas bibliotecarios existentes (Koha, SIABUC,
-  SLiMS, OpenBiblio) que justifica construir en vez de adoptar, el alcance y
-  las exclusiones del sistema, y el capítulo 3 completo: 21 requerimientos
-  funcionales, 16 no funcionales y la matriz de trazabilidad. **Su capítulo 2
-  quedó con el cronograma viejo**; ver 7.2
+- `Documentacion/Avance_Biblioteca_1.2.docx` — clona el 1.1 y agrega la
+  revisión de sistemas bibliotecarios existentes (Koha, SIABUC, SLiMS,
+  OpenBiblio) que justifica construir en vez de adoptar, el alcance y las
+  exclusiones del sistema, y el capítulo 3 completo: 21 requerimientos
+  funcionales, 16 no funcionales y la matriz de trazabilidad
+- `Documentacion/Avance_Biblioteca_1.3.docx` — **la versión vigente**. Clona el
+  1.2 y pone su capítulo 2 al día con el cronograma real, más ocho
+  correcciones menores de conteo y redacción; ver 7.2
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
 - El **Reporte Técnico de Calidad** del sistema Java (de otra asignatura) vive
