@@ -353,6 +353,7 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #58 | Avance 1.2: sistemas bibliotecarios revisados y requisitos completos |
 | #68 | Cronograma rehecho: la migración pasa a trabajo preliminar |
 | #69 | Archivo de contexto al día tras el Avance 1.2 y el cronograma |
+| #70 | Avance 1.3: cronograma del documento alineado con el del proyecto |
 
 ## La migración del Java está terminada
 
