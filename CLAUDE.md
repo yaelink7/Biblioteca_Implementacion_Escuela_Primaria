@@ -5,7 +5,8 @@ abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
 **Última actualización:** 20 de septiembre de 2026 — Avance 1.3, mensajes de
-error por causa real, y los insumos de los ocho diagramas (sección 10).
+error por causa real, insumos de los diagramas (sección 10) y el tablero
+sincronizado con los hitos.
 
 ---
 
@@ -99,6 +100,16 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
 - **Verificar nombres de archivo con acentos.** `git ls-tree` escapa `ó` como
   `\303\263`; comparar esa cadena contra el sistema de archivos da falsos
   «archivo faltante». Usar `git ls-tree -z` o `core.quotepath false`.
+- **El tablero no se llena solo.** Crear un issue con `--milestone` lo mete en
+  el hito, **no en el tablero de Projects**: son dos cosas distintas. Las
+  diecisiete historias creadas después de armar el tablero (#59 a #67 y #72 a
+  #79) se quedaron fuera, de modo que el Sprint 1 mostraba cinco tarjetas
+  cuando el hito ya tenía veintidós. Al crear un issue hay que agregarlo con
+  `gh project item-add 3 --owner yaelink7 --url <url>` y fijarle Status,
+  Puntos, Responsable, Inicio y Fin.
+- **Puntos duplicados en un issue paraguas.** `DOC-03` (#28) agrupa los ocho
+  diagramas y además llevaba 5 puntos propios, que se sumaban a los 46 de sus
+  hijas. Quedó en 0: un paraguas no estima trabajo, lo agrupa.
 - **Requerimientos inventados.** En el Avance 1.2 se declararon 25 requisitos
   deducidos de leer el código: 9 funcionales y los 16 no funcionales completos.
   Ninguno pasó por el Product Owner. Varios describían cosas que no existen
@@ -493,8 +504,10 @@ código y del esquema reales. No hay que inventar nada: hay que representarlo.
 El issue #28 quedó como paraguas de los ocho. Su alcance original mencionaba
 tres diagramas: el profesor pide ocho.
 
-El Sprint 1 lleva además la documentación que quedó pendiente: `INF-02`,
-`DOC-01`, `DOC-02`, `QA-01` y el registro de los acuerdos de la reunión.
+El Sprint 1 lleva además la documentación que quedó pendiente: `DOC-01`,
+`DOC-02`, `QA-01` y el registro de los acuerdos de la reunión. `INF-02`
+—configurar VS Code para todo el equipo— **ya se cerró**: los cinco integrantes
+ejecutan el proyecto desde VS Code.
 
 ### Sprint 1: lo que pidió la escuela
 
@@ -602,29 +615,32 @@ diagramas y el profesor pide ocho entregables.
 
 # 8. Estado del backlog
 
-**27 de 60 historias cerradas** al 20 de septiembre de 2026, sobre 261 puntos
-estimados. El total subió de 43 a 60 en tres pasos: los ocho diagramas se
+**28 de 60 historias cerradas** al 20 de septiembre de 2026, y 113 de los 261
+puntos estimados. El total subió de 43 a 60 en tres pasos: los ocho diagramas se
 abrieron como historias propias, la reunión dejó un issue de seguimiento, y
 los acuerdos de la escuela agregaron ocho historias más.
 
-| Hito | Cerradas | Abiertas |
-|---|---|---|
-| Trabajo preliminar — Migración a Python | 27 | 0 |
-| Sprint 1 — Diagramas y diseño | 0 | 22 |
-| Sprint 2 — Por definir | 0 | 4 |
-| Sprint 3 — Por definir | 0 | 5 |
-| Sprint 4 — Por definir | 0 | 0 |
-| Cierre — Entrega final | 0 | 2 |
+| Hito | Cerradas | Abiertas | Puntos |
+|---|---|---|---|
+| Trabajo preliminar — Migración a Python | 27 | 0 | 111 de 111 |
+| Sprint 1 — Diagramas, diseño y acuerdos | 1 | 21 | 2 de 95 |
+| Sprint 2 — Por definir | 0 | 4 | 0 de 20 |
+| Sprint 3 — Por definir | 0 | 5 | 0 de 27 |
+| Sprint 4 — Por definir | 0 | 0 | — |
+| Cierre — Entrega final | 0 | 2 | 0 de 8 |
+
+**El tablero (`github.com/users/yaelink7/projects/3`) ya coincide con los
+hitos:** 60 tarjetas, 261 puntos. Si alguna vez no coinciden, lo más probable
+es que falte agregar issues al tablero, no que falten en el hito.
 
 Todo lo terminado quedó agrupado en el hito de trabajo preliminar: es la
 migración completa del sistema Java, concluida antes de que el Sprint 1
 empezara.
 
-## Las 33 historias abiertas
+## Las 32 historias abiertas
 
 | Issue | Historia | Qué falta |
 |---|---|---|
-| #3 | `INF-02` | Confirmar que los cinco integrantes ejecutan el proyecto |
 | #9 | `DOC-01` | Actualizar la Factibilidad Técnica (resuelto en el Avance 1.1 y 1.2, falta cerrar el issue) |
 | #10 | `QA-01` | Acordar la Definición de Terminado del equipo |
 | #13 | `USU-03` | Registro de cuentas con contraseña propia |
