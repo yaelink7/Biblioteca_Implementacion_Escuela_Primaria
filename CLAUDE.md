@@ -4,8 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 19 de septiembre de 2026 — requerimientos
-completados en el Avance 1.2; historial de PR y backlog al día.
+**Última actualización:** 20 de septiembre de 2026 — acuerdos de la reunión
+incorporados al Sprint 1; el equipo corrigió los requerimientos del 1.2.
 
 ---
 
@@ -83,6 +83,10 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
 6. **Este archivo se actualiza con cada cambio del proyecto**, en la misma
    entrega. Si queda desfasado deja de servir para lo que existe: que una
    sesión nueva continúe el trabajo sin preguntar nada.
+7. **No agregar requerimientos por cuenta propia.** Si algo parece faltar como
+   requisito funcional o no funcional, **proponerlo y esperar respuesta**. Un
+   requisito lo define el cliente y lo aprueba el Product Owner; deducirlo del
+   código va al revés y ya causó un problema (ver abajo).
 
 ## Errores ya cometidos, para no repetirlos
 
@@ -95,6 +99,13 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
 - **Verificar nombres de archivo con acentos.** `git ls-tree` escapa `ó` como
   `\303\263`; comparar esa cadena contra el sistema de archivos da falsos
   «archivo faltante». Usar `git ls-tree -z` o `core.quotepath false`.
+- **Requerimientos inventados.** En el Avance 1.2 se declararon 25 requisitos
+  deducidos de leer el código: 9 funcionales y los 16 no funcionales completos.
+  Ninguno pasó por el Product Owner. Varios describían cosas que no existen
+  —exportación a CSV, bitácora, manuales, aviso de privacidad— y uno,
+  `RNF-LEG-03`, comprometía al equipo a definir un periodo de borrado de datos
+  de menores. El equipo corrigió los funcionales (PR #71) y los no funcionales
+  siguen en revisión. De ahí la regla 7.
 
 ---
 
@@ -352,6 +363,9 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #57 | Archivo de contexto completo del proyecto — este documento |
 | #58 | Avance 1.2: sistemas bibliotecarios revisados y requisitos completos |
 | #68 | Cronograma rehecho: la migración pasa a trabajo preliminar |
+| #69 | Archivo de contexto al día tras el Avance 1.2 y el cronograma |
+| #70 | Avance 1.3 — **cerrado sin mergear**, se rehará sobre el 1.2 corregido |
+| #71 | Corrección de los requerimientos funcionales del 1.2, por el equipo |
 
 ## La migración del Java está terminada
 
@@ -470,37 +484,58 @@ tres diagramas: el profesor pide ocho.
 El Sprint 1 lleva además la documentación que quedó pendiente: `INF-02`,
 `DOC-01`, `DOC-02`, `QA-01` y el registro de los acuerdos de la reunión.
 
-## 7.2 Requerimientos — completados en el Avance 1.2
+### Sprint 1: lo que pidió la escuela
 
-**Ya está hecho.** El Avance 1 y el 1.1 declaraban doce requerimientos
-funcionales y ningún requerimiento no funcional, pese a citar la norma
-ISO/IEC/IEEE 29148, que exige ambos. El Avance 1.2 (PR #58) lo corrigió:
+Por decisión de la Scrum Master, los acuerdos de la reunión entran también al
+Sprint 1. Son ocho historias más, 39 puntos:
 
-| Capítulo | Qué contiene ahora |
+| Issue | Historia | Puntos | Responsable |
+|---|---|---|---|
+| #72 | `LIB-06` Géneros según las colecciones de la SEP | 5 | Pedro Cabrera |
+| #73 | `LIB-07` Asignatura o área del libro | 3 | Pedro Cabrera |
+| #74 | `USU-07` CURP del alumno | 5 | Yahir Reyes |
+| #75 | `USU-08` Teléfono y dirección del tutor; quitar el correo | 5 | Yahir Reyes |
+| #76 | `USU-09` Maestro de grupo del alumno | 3 | Yael Arenas |
+| #77 | `PRE-08` Adeudo por libro no devuelto | 8 | Rey David Montes |
+| #78 | `REP-04` Vistas de estadísticas del padrón | 5 | Roberto Vázquez |
+| #79 | `REP-05` Pantalla de estadísticas del padrón | 5 | Roberto Vázquez |
+
+**El Sprint 1 queda con 22 historias y 95 puntos, y cierra el 27 de
+septiembre.** El promedio de los sprints anteriores era 36. Está sobrecargado
+y conviene saberlo.
+
+**Orden importante:** siete de estas ocho historias cambian el esquema de la
+base. Los diagramas `DIA-05`, `DIA-06` y `DIA-07` documentan ese mismo
+esquema. **Hacer los diagramas antes que las migraciones significa dibujar una
+base que está por cambiar.** Conviene aplicar primero la migración 10 y
+después documentarla.
+
+## 7.2 Requerimientos — corregidos por el equipo en el PR #71
+
+El Avance 1.2 quedó con **19 requerimientos funcionales**, no 21. Roberto
+Vázquez revisó los que se habían agregado sin aprobación y corrigió:
+
+| Requisito | Qué pasó |
 |---|---|
-| 3.1 | **21 requerimientos funcionales**: los 12 originales más 9 que ya estaban implementados sin declarar — REQ-REP-01 a 03, REQ-USU-04 y 05, REQ-EMP-02, REQ-BUS-02, REQ-PRE-05 y REQ-LIB-04 |
-| 3.2 | **16 requerimientos no funcionales** en siete categorías —usabilidad, seguridad, legales, disponibilidad, rendimiento, mantenibilidad y portabilidad—, cada uno con su medio de verificación |
-| 3.3 | **Matriz de trazabilidad**: cada requisito cruzado con la historia que lo implementa, la prueba que lo verifica y su estado (cumplido, parcial o pendiente) |
+| `REQ-USU-03` (el usuario actualiza sus propios datos) | Eliminado, sustituido por `REQ-EMP-03`: es **el empleado** quien actualiza los datos del alumno |
+| `REQ-USU-04` (ficha de alumno sin cuenta, con contacto del tutor) | Eliminado |
+| `REQ-USU-05` (historial de préstamos) | Renumerado a `REQ-USU-03` |
+| `REQ-PRE-04` (notificaciones por correo) | Eliminado — la escuela confirmó que el correo no funciona |
+| `REQ-EMP-03` | Nuevo |
 
-La matriz deja ver de un vistazo lo que falta: `REQ-USU-03`, `REQ-LIB-04`,
-`REQ-PRE-04`, `REQ-REP-02` y `REQ-REP-03` siguen pendientes, y `REQ-PRE-02`
-y `RNF-MAN-01` están parciales. Coincide con el backlog de la sección 8.
+El cambio de fondo es correcto: en una primaria el niño no administra su
+cuenta, la maestra administra sus datos.
 
-### Lo que sí queda pendiente del Avance 1.2
+**Dos cabos sueltos que dejó la corrección:**
 
-Dos correcciones, ninguna urgente. **No se editan dentro del 1.2**: como con
-las versiones anteriores, los cambios van en un Avance 1.3.
+1. `REQ-PRE-04` ya no está en el capítulo 3, pero **sigue citado** en la matriz
+   de trazabilidad (3.3) y en el capítulo 6. Los issues `NOT-01` y `NOT-02`
+   (#39 y #40, 11 puntos) implementan un requisito que ya no existe.
+2. La numeración quedó con hueco: `REQ-PRE-01, 02, 03, 05`.
 
-1. **El capítulo 2 conserva el cronograma viejo.** Las secciones 2.1 y 2.3.2
-   describen cinco sprints —«Sprint 0 Cimientos», «Sprint 1 Identidad»,
-   «Sprint 2 Catálogo»…— que ya no existen. El documento se generó el 18 de
-   septiembre y el cronograma se rehízo ese mismo día, después (PR #68). Hoy
-   el capítulo 2 contradice a los hitos de GitHub y a la sección 7.1 de este
-   archivo. Es la corrección de fondo.
-2. **Un error de conteo propio.** La tabla de cambios del documento anuncia
-   «catorce requerimientos no funcionales» y la sección 3.2 lista dieciséis.
-   Es el mismo tipo de error que el 1.2 corrigió del 1.1, donde se decía
-   siete fuentes y se listaban cinco.
+**Los 16 requerimientos no funcionales siguen sin revisar.** Son los que se
+inventaron completos. Está pendiente decidir cuáles se conservan; ver la
+regla 7.
 
 ## 7.3 Diagramas que pide el profesor
 
@@ -538,14 +573,15 @@ diagramas y el profesor pide ocho entregables.
 
 # 8. Estado del backlog
 
-**27 de 52 historias cerradas** al 19 de septiembre de 2026. El total subió de
-43 a 52 porque los ocho diagramas se abrieron como historias propias y la
-reunión con la escuela dejó un issue de seguimiento.
+**27 de 60 historias cerradas** al 20 de septiembre de 2026, sobre 261 puntos
+estimados. El total subió de 43 a 60 en tres pasos: los ocho diagramas se
+abrieron como historias propias, la reunión dejó un issue de seguimiento, y
+los acuerdos de la escuela agregaron ocho historias más.
 
 | Hito | Cerradas | Abiertas |
 |---|---|---|
 | Trabajo preliminar — Migración a Python | 27 | 0 |
-| Sprint 1 — Diagramas y diseño | 0 | 14 |
+| Sprint 1 — Diagramas y diseño | 0 | 22 |
 | Sprint 2 — Por definir | 0 | 4 |
 | Sprint 3 — Por definir | 0 | 5 |
 | Sprint 4 — Por definir | 0 | 0 |
@@ -555,7 +591,7 @@ Todo lo terminado quedó agrupado en el hito de trabajo preliminar: es la
 migración completa del sistema Java, concluida antes de que el Sprint 1
 empezara.
 
-## Las 25 historias abiertas
+## Las 33 historias abiertas
 
 | Issue | Historia | Qué falta |
 |---|---|---|
@@ -577,6 +613,7 @@ empezara.
 | #43 | `QA-03` | Casos de prueba por módulo |
 | #59 a #66 | `DIA-01` a `DIA-08` | Los ocho entregables gráficos (Sprint 1) |
 | #67 | Reunión | Documentar los acuerdos de la escuela y ajustar los sprints |
+| #72 a #79 | `LIB-06`, `LIB-07`, `USU-07` a `USU-09`, `PRE-08`, `REP-04`, `REP-05` | Lo que pidió la escuela (Sprint 1) |
 
 ## Lo más rápido de cerrar
 
@@ -613,19 +650,57 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
 
 ## La reunión con la escuela
 
-**Ya se realizó.** El issue #44 está cerrado y agrupado en el trabajo
-preliminar. Lo que sigue abierto es el **#67**, dentro del Sprint 1:
-documentar los acuerdos y ajustar con ellos los sprints 2, 3 y 4.
+**Ya se realizó** el 14 de septiembre. El issue #44 está cerrado; el #67 sigue
+abierto para el registro formal.
 
-Son cuatro los puntos que esos acuerdos deben dejar por escrito, porque
-condicionan el código:
+### Lo que la escuela pidió
 
-1. Si el límite de un libro por alumno corresponde a su práctica real.
-2. Si el plazo de siete días es el que aplican hoy.
-3. Qué datos del alumno autoriza la dirección, y quién firma el aviso de
-   privacidad.
-4. En qué equipo de cómputo quedará instalado el sistema.
+**El acervo se clasifica por las colecciones de Libros del Rincón**, no por un
+género libre como hoy:
 
-Las dos primeras están implementadas como reglas dentro de la base. **Si la
-escuela usa otras, conviene saberlo antes de darlas por definitivas**, porque
-cambiarlas después cuesta más.
+| Colección | Grados |
+|---|---|
+| Al sol solito | 1.º, los más pequeños |
+| Pasos de luna | 1.º y 2.º |
+| Astrolabio | 3.º y 4.º |
+| Espejo de urania | 5.º y 6.º |
+| Cometas convidados | puede que no haya ninguno en la biblioteca |
+
+Que cada colección tenga grados asociados abre algo que hoy no se puede:
+sugerir al bibliotecario los libros que corresponden al grado del niño que
+tiene enfrente.
+
+**Del alumno:** agregar CURP, agregar teléfono y dirección **del tutor**, y
+**quitar el correo** —la escuela confirmó que no funciona ni con el tutor—.
+El correo se quita solo a los alumnos: los empleados lo conservan porque
+Supabase Auth inicia sesión con correo y sin él no hay acceso.
+
+**Del perfil del niño:** el maestro de grupo actual, y el adeudo si debe un
+libro que no entregó. El botón de editar que pidieron **ya existe**: la
+pantalla de Alumnos tiene `botonEditar` y ya permite cambiar grado y grupo sin
+recapturar al niño cada ciclo.
+
+**Cuatro secciones de estadísticas**, en formato de tabla de posiciones: quién
+se ha llevado más libros, quién ha tardado más veces en devolver, quién debe
+más y quién cumple mejor. Salen de datos que `prestamos` ya guarda.
+
+### Dos consecuencias que hay que atender
+
+**El adeudo es dinero.** Confirmado con la Scrum Master: es el costo del libro
+no devuelto. Eso invalida una exclusión que el Avance 1.2 declara —«Cobro de
+multas por retraso: la escuela no cobra multas a los alumnos»— y hay que
+quitarla del siguiente avance. **Falta preguntar a la escuela desde cuándo un
+libro no devuelto se vuelve deuda**: un niño con tres días de retraso no debe
+el costo del libro; uno que lo perdió en marzo sí.
+
+**El CURP sube la sensibilidad del padrón.** Es un identificador nacional
+único de un menor. Refuerza lo que ya estaba acordado: no cargar datos reales
+hasta que el aviso de privacidad esté firmado (`DOC-02`, #20).
+
+### Lo que sigue sin confirmarse
+
+De los cuatro puntos que la reunión debía resolver, dos siguen abiertos: si el
+límite de un libro por alumno corresponde a su práctica real, y si el plazo de
+siete días es el que aplican hoy. Ambos están implementados como reglas en la
+base. **Conviene saberlo antes de darlos por definitivos**, porque cambiarlos
+después cuesta más.
