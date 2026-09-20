@@ -4,8 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 20 de septiembre de 2026 — acuerdos de la reunión
-incorporados al Sprint 1; el equipo corrigió los requerimientos del 1.2.
+**Última actualización:** 20 de septiembre de 2026 — Avance 1.3, mensajes de
+error por causa real, y los insumos de los ocho diagramas (sección 10).
 
 ---
 
@@ -173,6 +173,7 @@ src/biblioteca/
     config.py              lee el .env; define DIAS_DE_PRESTAMO y LIBROS_POR_USUARIO
     supabase_cliente.py    cliente único, cacheado con lru_cache
     sesion.py              iniciar_sesion, cerrar_sesion, sesion_actual, exigir_personal
+    errores.py             explicar(), mensaje(), causa(): por qué falló de verdad
   modelos/                 entidades del dominio, sin acceso a datos
     persona.py             Rol (enum), Perfil → Alumno, Empleado
     libro.py               Publicacion → Libro
@@ -198,7 +199,7 @@ src/biblioteca/
 herramientas/
   compilar_ui.py           convierte los .ui en módulos de Python
 database/migraciones/      9 migraciones, ya aplicadas en Supabase
-tests/                     28 pruebas con pytest
+tests/                     48 pruebas con pytest
 Documentacion/             entregables de la materia
 .vscode/                   launch.json, settings.json, extensions.json
 ```
@@ -303,7 +304,7 @@ políticas RLS. Lo que nunca debe salir del panel de Supabase es la llave
 
 ```bash
 .venv/Scripts/python.exe main.py                        # ejecutar
-.venv/Scripts/python.exe -m pytest tests/ -v            # 28 pruebas, <1 s
+.venv/Scripts/python.exe -m pytest tests/ -v            # 48 pruebas, <1 s
 .venv/Lib/site-packages/PySide6/designer.exe            # editar pantallas
 .venv/Scripts/python.exe herramientas/compilar_ui.py    # recompilar los .ui
 ```
@@ -422,8 +423,12 @@ corregidos** (PR #55):
 - Código muerto: `sesion.py:exigir_personal()` y `libros.py:obtener()`
 - Diez consultas de los repositorios sin `.limit()`
 - Un `except: pass` silencioso al cerrar sesión
-- Veinte `except Exception` genéricos: un error de programación se muestra al
-  bibliotecario como «revisa tu conexión a internet»
+- ~~Veinte `except Exception` genéricos~~ — **corregido**. Las nueve pantallas
+  usan `core/errores.py`, que distingue la falta de red, la sesión vencida, el
+  permiso faltante, la regla de la base y el defecto de programación. Cada
+  mensaje dice la causa, qué hacer y el detalle técnico. Es lo que exige
+  `RNF-USA-03`, que antes el código contradecía. Los repositorios conservan sus
+  propios `_mensaje_claro()`, que ya traducían bien
 - Sin pruebas de repositorios, sesión ni interfaz
 - Supabase avisa que la protección contra contraseñas filtradas está
   desactivada — es un interruptor en el panel
@@ -467,16 +472,23 @@ contenido real y repartir ahí el trabajo pendiente listado en la sección 8.
 
 Cada entregable gráfico es un issue propio, para poder repartirlos:
 
-| Issue | Entregable | Responsable |
-|---|---|---|
-| #59 | DIA-01 Diagrama de casos de uso | Pedro Cabrera |
-| #60 | DIA-02 Casos de uso extendido | Rey David Montes |
-| #61 | DIA-03 Diagrama de proceso | Yael Arenas |
-| #62 | DIA-04 Diagrama de flujo de datos | Yahir Reyes |
-| #63 | DIA-05 Modelado de base de datos | Pedro Cabrera |
-| #64 | DIA-06 Modelo E-R y relacional | Pedro Cabrera |
-| #65 | DIA-07 Documentación de la base de datos | Roberto Vázquez |
-| #66 | DIA-08 Diagramas de interfaces | Roberto Vázquez |
+Los ocho quedaron a cargo de **Rey David y Pedro**, 23 puntos cada uno. Pedro
+toma los que salen del esquema de la base, que es el módulo en el que ya
+trabajó; Rey David, los de proceso, flujos e interfaces.
+
+| Issue | Entregable | Puntos | Responsable |
+|---|---|---|---|
+| #59 | DIA-01 Diagrama de casos de uso | 5 | Pedro Cabrera |
+| #60 | DIA-02 Casos de uso extendido | 8 | Rey David Montes |
+| #61 | DIA-03 Diagrama de proceso | 5 | Rey David Montes |
+| #62 | DIA-04 Diagrama de flujo de datos | 5 | Rey David Montes |
+| #63 | DIA-05 Modelado de base de datos | 5 | Pedro Cabrera |
+| #64 | DIA-06 Modelo E-R y relacional | 8 | Pedro Cabrera |
+| #65 | DIA-07 Documentación de la base de datos | 5 | Pedro Cabrera |
+| #66 | DIA-08 Diagramas de interfaces | 5 | Rey David Montes |
+
+**Los insumos de los ocho están en la sección 10 de este archivo**, sacados del
+código y del esquema reales. No hay que inventar nada: hay que representarlo.
 
 El issue #28 quedó como paraguas de los ocho. Su alcance original mencionaba
 tres diagramas: el profesor pide ocho.
@@ -533,9 +545,26 @@ cuenta, la maestra administra sus datos.
    (#39 y #40, 11 puntos) implementan un requisito que ya no existe.
 2. La numeración quedó con hueco: `REQ-PRE-01, 02, 03, 05`.
 
-**Los 16 requerimientos no funcionales siguen sin revisar.** Son los que se
-inventaron completos. Está pendiente decidir cuáles se conservan; ver la
-regla 7.
+**Los no funcionales ya se revisaron.** De los 16, la Scrum Master aprobó
+retirar dos, y quedan **14** en el Avance 1.3:
+
+| Retirado | Por qué |
+|---|---|
+| `RNF-LEG-03` | Comprometía al equipo a definir un periodo de borrado de datos de menores que nadie acordó con la dirección |
+| `RNF-REN-01` | El límite de dos segundos no salía de ninguna medición ni de la escuela |
+
+`RNF-USA-03` —los mensajes de error deben decir la causa y qué hacer— **se
+conservó, y se corrigió el código para cumplirlo**. Ver la auditoría interna en
+la sección 6.
+
+De los que quedan, nueve describen el sistema tal como es y cinco respaldan
+historias del backlog que ya estaban aprobadas: `RNF-LEG-02` ← #20,
+`RNF-USA-02` ← #42 y `RNF-DIS-01` ← #38.
+
+`RNF-USA-01` —el préstamo en menos de 30 segundos— se conserva, pero conviene
+saber que **no viene del Avance 1 original**: aparece por primera vez en el
+1.1. Moldeó el diseño real, así que vale la pena confirmarlo con la escuela en
+vez de borrarlo.
 
 ## 7.3 Diagramas que pide el profesor
 
@@ -636,12 +665,17 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
   preguntas del profesor sin responder, reescribe la Factibilidad Técnica —la
   premisa de conectividad cambió al verificarla en sitio— y agrega tres
   capítulos: migración del sistema Java, arquitectura y estado de avance
-- `Documentacion/Avance_Biblioteca_1.2.docx` — **la versión vigente**. Clona el
-  1.1 y agrega la revisión de sistemas bibliotecarios existentes (Koha, SIABUC,
-  SLiMS, OpenBiblio) que justifica construir en vez de adoptar, el alcance y
-  las exclusiones del sistema, y el capítulo 3 completo: 21 requerimientos
-  funcionales, 16 no funcionales y la matriz de trazabilidad. **Su capítulo 2
-  quedó con el cronograma viejo**; ver 7.2
+- `Documentacion/Avance_Biblioteca_1.2.docx` — clona el 1.1 y agrega la
+  revisión de sistemas bibliotecarios existentes (Koha, SIABUC, SLiMS,
+  OpenBiblio) que justifica construir en vez de adoptar, el alcance y las
+  exclusiones del sistema, y el capítulo 3 completo. **Corregido por el equipo
+  en el PR #71**: quedó con 19 requerimientos funcionales
+- `Documentacion/Avance_Biblioteca_1.3.docx` — **la versión vigente**. Clona el
+  1.2 corregido y agrega: el cronograma real en el capítulo 2, la sección 1.4.1
+  con lo que la escuela pidió en la reunión, el retiro de dos requerimientos no
+  funcionales, el estado de avance rehecho y las correcciones de redacción que
+  arrastraban las versiones anteriores. **19 requerimientos funcionales y 14 no
+  funcionales**
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
 - El **Reporte Técnico de Calidad** del sistema Java (de otra asignatura) vive
@@ -704,3 +738,325 @@ límite de un libro por alumno corresponde a su práctica real, y si el plazo de
 siete días es el que aplican hoy. Ambos están implementados como reglas en la
 base. **Conviene saberlo antes de darlos por definitivos**, porque cambiarlos
 después cuesta más.
+
+---
+
+# 10. Insumos para los ocho diagramas
+
+Todo lo que sigue está sacado del esquema y del código que corren hoy, no de
+la documentación. **Los diagramas no hay que inventarlos: hay que
+representarlos.** Si algo aquí no coincide con el sistema, gana el sistema y
+este archivo está mal.
+
+**Antes de dibujar, léase esto:** siete de las ocho historias de la reunión
+(#72 a #79) modifican el esquema. `DIA-05`, `DIA-06` y `DIA-07` documentan ese
+mismo esquema. Conviene aplicar primero la migración 10 y dibujar después, o
+habrá que rehacer los tres.
+
+## 10.1 Actores y casos de uso · `DIA-01` (#59)
+
+Tres actores. El alumno **no necesita cuenta** para recibir un préstamo: la
+bibliotecaria lo registra. El perfil de alumno existe para la fase 2 móvil.
+
+| Actor | Alcance |
+|---|---|
+| **Bibliotecario** | Todo lo operativo: catálogo, préstamos, padrón, reportes y plantilla |
+| **Administrador** | Lo del bibliotecario, más cambiar el perfil de acceso de otras personas |
+| **Alumno** | Solo lo suyo: su ficha y sus propios préstamos |
+
+Casos de uso, cada uno con el requisito que lo respalda:
+
+| Caso de uso | Requisito | Actor |
+|---|---|---|
+| Iniciar sesión | `REQ-USU-02` | los tres |
+| Buscar en el catálogo | `REQ-BUS-01`, `REQ-BUS-02` | los tres |
+| Registrar libro | `REQ-LIB-01` | bibliotecario, administrador |
+| Modificar libro | `REQ-LIB-02` | bibliotecario, administrador |
+| Dar de baja libro | `REQ-LIB-03` | bibliotecario, administrador |
+| Consultar bitácora del catálogo | `REQ-LIB-04` | bibliotecario, administrador |
+| Registrar préstamo | `REQ-PRE-01`, `REQ-PRE-02` | bibliotecario, administrador |
+| Registrar devolución | `REQ-PRE-05` | bibliotecario, administrador |
+| Consultar préstamos e historial | `REQ-PRE-03`, `REQ-USU-03` | bibliotecario, administrador; el alumno solo los suyos |
+| Generar reporte de deudores | `REQ-REP-01` | bibliotecario, administrador |
+| Consultar libros dados de baja | `REQ-REP-02` | bibliotecario, administrador |
+| Exportar respaldo | `REQ-REP-03` | bibliotecario, administrador |
+| Registrar empleado | `REQ-EMP-01` | bibliotecario, administrador |
+| Consultar plantilla | `REQ-EMP-02` | bibliotecario, administrador |
+| Actualizar datos de un alumno | `REQ-EMP-03` | bibliotecario, administrador |
+| Registrar cuenta de acceso | `REQ-USU-01` | administrador |
+| Cambiar el perfil de acceso de alguien | — (disparador `proteger_rol`) | solo administrador |
+
+Tres relaciones que conviene dibujar: *Registrar préstamo* **incluye** *Buscar
+en el catálogo* y *Buscar alumno*; *Registrar devolución* **extiende**
+*Consultar préstamos*; y todos los casos **incluyen** *Iniciar sesión*, porque
+sin sesión las políticas RLS no devuelven ni una fila.
+
+## 10.2 Caminos de excepción · `DIA-02` (#60)
+
+Los rechazos **no son hipotéticos**: cada uno existe hoy en la base y tiene su
+mensaje. Esta es la lista completa, con quién lo aplica.
+
+| Caso de uso | Excepción | Quién la aplica |
+|---|---|---|
+| Registrar préstamo | El alumno ya tiene un préstamo activo | Índice único parcial `prestamo_unico_activo` sobre `prestamos` |
+| Registrar préstamo | No quedan ejemplares | Disparador `mover_inventario` |
+| Registrar préstamo | El libro o el alumno no existe | Llave foránea |
+| Dar de baja libro | Tiene préstamos activos | Disparador `validar_baja_de_libro` |
+| Dar de baja libro | No se indicó motivo | Restricción `baja_con_motivo` |
+| Registrar libro | Año de publicación futuro | Disparador `validar_ano_publicacion` |
+| Registrar libro | Páginas o existencias no positivas | Restricciones `check` |
+| Registrar persona | Código repetido | Restricción `unique` sobre `perfiles.codigo` |
+| Cambiar perfil de acceso | No eres administrador | Disparador `proteger_rol` |
+| Cambiar perfil de acceso | Es tu propio perfil | Disparador `proteger_rol` |
+| Cualquiera | Tu perfil no alcanza esa fila | Las 16 políticas RLS |
+| Cualquiera | Sesión vencida o sin conexión | `core/errores.py` lo distingue y lo explica |
+
+Precondición común a todos: sesión iniciada. Postcondición del préstamo: una
+fila en `prestamos` con su `fecha_limite` ya calculada y una unidad menos en
+`libros.existencias` — las dos las escribe la base, no Python.
+
+## 10.3 Proceso de préstamo y devolución · `DIA-03` (#61)
+
+El flujo tal como ocurre. Lo que está en **negrita** lo hace Postgres solo:
+
+**Préstamo**
+
+1. El bibliotecario escribe parte del nombre, código o salón del alumno.
+2. Escribe parte del título o autor del libro.
+3. Pulsa *Registrar préstamo*. Python envía un `insert` con dos datos:
+   `libro_id` y `usuario_id`.
+4. **El índice único rechaza si el alumno ya tiene uno activo.**
+5. **`calcular_fecha_limite` pone `fecha_limite` = hoy + 7 días.**
+6. **`mover_inventario` descuenta una unidad; si no hay, rechaza.**
+7. La pantalla recarga desde `v_prestamos`.
+
+**Devolución**
+
+1. El bibliotecario elige el préstamo y pulsa *Registrar devolución*.
+2. Python envía `estado = 'devuelto'`. Nada más.
+3. **`sellar_devolucion` pone `fecha_devolucion` con la fecha de la base.**
+4. **`mover_inventario` reintegra la unidad.**
+
+**Vencimiento:** un préstamo pasa a `vencido` cuando `fecha_limite < hoy`. La
+función `marcar_prestamos_vencidos()` existe pero **nadie la llama todavía**
+(`PRE-05`, #33); mientras tanto `v_prestamos` calcula `dias_restantes` en cada
+consulta, así que el reporte de deudores sale correcto igual.
+
+**Por qué importa que los pasos en negrita estén en la base:** el diagrama
+debe mostrarlos dentro del almacén de datos y no dentro de la aplicación. Esa
+es la decisión que ordena el proyecto y la razón de que la app móvil no tenga
+que reimplementar nada.
+
+## 10.4 Flujo de datos · `DIA-04` (#62)
+
+**Entidades externas:** bibliotecario, administrador, alumno. (Los correos
+automáticos ya no son entidad externa: el requisito se retiró.)
+
+**Almacenes** — las 7 tablas: `perfiles`, `usuarios`, `empleados`, `libros`,
+`prestamos`, `bitacora_libros`, `notificaciones`.
+
+**Procesos de nivel 1**, con lo que leen y escriben:
+
+| Proceso | Lee | Escribe |
+|---|---|---|
+| 1. Controlar acceso | `perfiles`, `auth.users` | — |
+| 2. Gestionar catálogo | `libros` | `libros`, `bitacora_libros` |
+| 3. Buscar y filtrar | `v_catalogo` | — |
+| 4. Gestionar padrón | `perfiles`, `usuarios` | `perfiles`, `usuarios` |
+| 5. Gestionar plantilla | `perfiles`, `empleados` | `perfiles`, `empleados` |
+| 6. Operar préstamos | `v_prestamos`, `v_catalogo` | `prestamos`, `libros` |
+| 7. Generar reportes | `v_deudores`, `v_libros_faltantes` | — |
+
+`bitacora_libros` y `notificaciones` aparecen como almacenes **sin flujo de
+escritura**: las tablas existen y nada escribe en ellas (`LIB-04` #24,
+`NOT-01` #39). Dibujarlas así es correcto y además deja ver el hueco.
+
+## 10.5 y 10.6 Modelo de datos · `DIA-05` (#63) y `DIA-06` (#64)
+
+Las 7 tablas con sus columnas reales. **PK** llave primaria, **FK** foránea.
+
+**`perfiles`** — lo común a toda persona
+```
+id              uuid      PK, default gen_random_uuid()
+auth_id         uuid      FK → auth.users(id) ON DELETE SET NULL, unique, NULL
+rol             enum      rol_usuario, not null, default 'alumno'
+codigo          text      not null, unique
+nombre          text      not null, no vacío
+apellido        text      not null, no vacío
+calle           text      · colonia text · numero integer
+codigo_postal   text      texto: conserva ceros a la izquierda
+telefono        text      texto: no es un valor aritmético
+correo          text      NULL, check de formato
+activo          boolean   not null, default true
+creado_en       timestamptz · actualizado_en timestamptz
+```
+`auth_id` admite NULL a propósito: **un alumno tiene ficha sin tener cuenta.**
+
+**`usuarios`** — lo propio del alumno · **`empleados`** — lo propio del empleado
+```
+usuarios:   perfil_id uuid PK, FK → perfiles(id) ON DELETE CASCADE
+            grado smallint check (1..6) · grupo text check (≤ 4 caracteres)
+
+empleados:  perfil_id uuid PK, FK → perfiles(id) ON DELETE CASCADE
+            tipo_empleado text not null · fecha_ingreso date not null
+```
+Ambas comparten la PK con `perfiles`: es **herencia por tabla**, relación 1:1.
+Una persona es alumno o empleado, nunca las dos.
+
+**`libros`**
+```
+id              bigint    PK, generated always as identity
+titulo          text      not null, no vacío
+autor           text      not null, no vacío
+tipo_libro      text      · editorial text
+existencias     integer   not null, default 0, check (>= 0)
+ano_publicacion smallint  · num_paginas integer check (> 0)
+activo          boolean   not null, default true     ← baja lógica
+motivo_baja     text      · dado_baja_en timestamptz
+constraint baja_con_motivo: si no está activo, exige motivo y fecha
+```
+**No hay columna `disponible`**: se deduce de las existencias en `v_catalogo`.
+El sistema Java la almacenaba y podía contradecir al inventario (defecto D-09).
+
+**`prestamos`**
+```
+id              bigint    PK
+libro_id        bigint    FK → libros(id)    ON DELETE RESTRICT
+usuario_id      uuid      FK → perfiles(id)  ON DELETE RESTRICT
+registrado_por  uuid      FK → perfiles(id)  ON DELETE SET NULL, NULL
+fecha_prestamo  date      not null, default current_date
+fecha_limite    date      not null            ← la pone el disparador
+fecha_devolucion date     NULL                ← la pone el disparador
+estado          enum      estado_prestamo, default 'activo'
+constraint devolucion_coherente
+índice único parcial sobre (usuario_id) where estado in ('activo','vencido')
+```
+**`RESTRICT` y no `CASCADE`** es deliberado: `REQ-PRE-03` exige conservar el
+historial. Borrar en cascada lo destruiría, que es lo que hacía el Java.
+Ese índice único parcial **es** la regla de un libro por alumno.
+
+**`bitacora_libros`** · **`notificaciones`** — existen, nadie escribe en ellas
+```
+bitacora_libros: id PK · libro_id FK→libros CASCADE · perfil_id FK→perfiles SET NULL
+                 accion text check ('alta','modificacion','baja')
+                 datos_antes jsonb · datos_despues jsonb · ocurrido_en
+
+notificaciones:  id PK · perfil_id FK→perfiles CASCADE
+                 prestamo_id FK→prestamos SET NULL
+                 tipo   check ('vencimiento_proximo','prestamo_vencido','libro_disponible')
+                 destinatario text not null
+                 estado check ('pendiente','enviada','fallida'), default 'pendiente'
+                 detalle text · enviada_en · creada_en
+```
+`notificaciones` quedó sin requisito que la respalde: `REQ-PRE-04` se retiró
+porque la escuela confirmó que no se comunica por correo con las familias.
+
+**Cardinalidades para el E-R**
+
+| Relación | Cardinalidad | Regla |
+|---|---|---|
+| `perfiles` – `usuarios` | 1 : 0..1 | Un perfil es alumno, o no |
+| `perfiles` – `empleados` | 1 : 0..1 | Un perfil es empleado, o no |
+| `perfiles` – `prestamos` (`usuario_id`) | 1 : 0..N | Pero **solo uno activo a la vez** |
+| `perfiles` – `prestamos` (`registrado_por`) | 1 : 0..N | Quién lo capturó |
+| `libros` – `prestamos` | 1 : 0..N | Historial completo del ejemplar |
+| `libros` – `bitacora_libros` | 1 : 0..N | |
+| `perfiles` – `notificaciones` | 1 : 0..N | |
+
+Dos tipos enumerados: `rol_usuario` (alumno, bibliotecario, administrador) y
+`estado_prestamo` (activo, vencido, devuelto).
+
+**Aviso para el E-R:** los UML del repositorio Java **ya no corresponden**.
+Cambió el esquema, apareció la capa de servicios y las reglas se movieron a la
+base. Partir de ellos produce un diagrama equivocado.
+
+## 10.7 Documentación de la base · `DIA-07` (#65)
+
+**4 vistas**, todas con `security_invoker = on` para que respeten RLS:
+
+| Vista | Qué responde | Quién la usa |
+|---|---|---|
+| `v_catalogo` | El acervo con la disponibilidad deducida de las existencias | Catálogo, Nuevo préstamo |
+| `v_prestamos` | Préstamos con `dias_restantes` calculado **por la base** | Préstamos |
+| `v_deudores` | Quién debe, desde cuándo y cómo localizar al tutor | Deudores |
+| `v_libros_faltantes` | Libros dados de baja, con motivo y fecha | **Nadie todavía** (`REP-02`) |
+
+**8 disparadores**, en orden de aparición:
+
+| Disparador | Sobre | Cuándo | Qué hace |
+|---|---|---|---|
+| `perfiles_actualizacion` | `perfiles` | before update | Sella `actualizado_en` |
+| `perfiles_protege_rol` | `perfiles` | before update **of rol** | Impide cambiar perfiles de acceso sin ser admin, y cambiar el propio |
+| `libros_valida_ano` | `libros` | before insert or update **of ano_publicacion** | Rechaza año futuro |
+| `libros_actualizacion` | `libros` | before update | Sella `actualizado_en` |
+| `libros_valida_baja` | `libros` | before update **of activo** | Impide dar de baja con préstamos activos |
+| `prestamos_fecha_limite` | `prestamos` | before insert | Calcula `fecha_limite` = hoy + 7 |
+| `prestamos_inventario` | `prestamos` | after insert or update **of estado** | Descuenta y reintegra existencias |
+| `prestamos_sella_devolucion` | `prestamos` | before update **of estado** | Pone `fecha_devolucion` con la fecha de la base |
+
+Las cláusulas `of <columna>` importan para el diagrama: el disparador **no se
+dispara en cualquier actualización**, solo cuando cambia esa columna.
+
+**15 funciones:** `es_personal`, `es_administrador`, `mi_perfil`, `mi_rol`
+(apoyan a las políticas); `registrar_alumno`, `registrar_empleado`,
+`actualizar_alumno` (altas y cambios atómicos, para que no queden perfiles a
+medias); las ocho de los disparadores; y `marcar_prestamos_vencidos`, que
+existe pero nadie llama.
+
+**16 políticas RLS** sobre las 7 tablas:
+
+| Tabla | Políticas |
+|---|---|
+| `perfiles` | `perfiles_lectura`, `perfiles_alta`, `perfiles_edicion`, `perfiles_baja` |
+| `usuarios` | `usuarios_lectura`, `usuarios_escritura` |
+| `empleados` | `empleados_lectura`, `empleados_escritura` |
+| `libros` | `libros_lectura`, `libros_escritura` |
+| `prestamos` | `prestamos_lectura`, `prestamos_escritura` |
+| `bitacora_libros` | `bitacora_lectura`, `bitacora_alta` |
+| `notificaciones` | `notificaciones_lectura`, `notificaciones_escritura` |
+
+El patrón: el personal alcanza todo; el alumno, solo las filas que le
+pertenecen. Se verificó con una cuenta real de perfil alumno.
+
+## 10.8 Interfaces · `DIA-08` (#66)
+
+**11 archivos `.ui`** en `src/biblioteca/ui/disenos/`, editables en Qt Designer.
+Los `ui_*.py` de `ui/generado/` los produce el compilador y se sobrescriben.
+
+**Navegación:**
+
+```
+login.ui  ─────────────────────► ventana principal (5 pestañas)
+                                  │
+  ┌───────────────┬───────────────┼───────────────┬───────────────┐
+Catálogo       Préstamos       Alumnos        Deudores       Empleados
+  │               │               │                              │
+formulario_    nuevo_         formulario_                  formulario_
+libro.ui       prestamo.ui    alumno.ui                    empleado.ui
+(alta y            │          historial_
+ edición)          │          alumno.ui
+                   └── dos búsquedas y un botón
+```
+
+Los cinco diálogos son modales; las cinco pestañas conviven en una ventana.
+
+| Pantalla | Controles principales | Origen de los datos |
+|---|---|---|
+| Login | correo, contraseña, entrar | Supabase Auth |
+| Catálogo | búsqueda, casilla *ver bajas*, tabla ordenable, nuevo/editar/baja | `v_catalogo` |
+| Préstamos | tabla, filtro de vencidos, nuevo préstamo, devolución | `v_prestamos` |
+| Alumnos | búsqueda, tabla, nuevo/editar/historial | `perfiles` + `usuarios` |
+| Deudores | tabla ya generada al abrir | `v_deudores` |
+| Empleados | tabla, registrar, modificar | `perfiles` + `empleados` |
+| Nuevo préstamo | dos listas de búsqueda, resumen, confirmar | `v_catalogo`, `perfiles` |
+
+**Detalles que conviene reflejar** porque nacieron de defectos corregidos: el
+diálogo de préstamo **no es un formulario** sino dos búsquedas y un botón, por
+`RNF-USA-01`; la búsqueda del alumno acepta indistintamente nombre, código o
+salón, sin elegir criterio antes; y la paleta se fuerza en claro porque el
+modo oscuro de Windows dejaba ilegibles los encabezados de las tablas.
+
+**Cuando se apliquen las historias de la reunión** cambian tres pantallas: el
+formulario de libro gana colección y asignatura, el de alumno gana CURP,
+maestro y datos del tutor y pierde el correo, y aparece una pantalla nueva de
+estadísticas. Conviene dibujarlas después de #72–#79, no antes.

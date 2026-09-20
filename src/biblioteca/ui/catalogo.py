@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from biblioteca.core.errores import mensaje as mensaje_de_error
 from biblioteca.modelos.libro import Libro
 from biblioteca.repositorios import libros as repo_libros
 from biblioteca.ui.estilo import COLOR_ALERTA, COLOR_TENUE
@@ -81,7 +82,7 @@ class PantallaCatalogo(QWidget):
             QMessageBox.warning(
                 self,
                 "No se pudo consultar el catálogo",
-                f"Revisa tu conexión a internet.\n\n{error}",
+                mensaje_de_error(error),
             )
             return
 

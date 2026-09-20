@@ -13,6 +13,7 @@ from datetime import date, timedelta
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QDialog, QListWidgetItem, QWidget
 
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.config import DIAS_DE_PRESTAMO
 from biblioteca.core.sesion import sesion_actual
 from biblioteca.modelos.libro import Libro
@@ -75,7 +76,7 @@ class DialogoNuevoPrestamo(QDialog):
         try:
             encontrados = repo_personas.buscar_alumnos_o_salon(texto)
         except Exception as error:
-            self._error(f"No se pudo buscar el alumno: {error}")
+            self._error(f"No se pudo buscar el alumno. {causa_del_error(error)}")
             return
 
         elegido = self.alumno.id if self.alumno else None
@@ -99,7 +100,7 @@ class DialogoNuevoPrestamo(QDialog):
         try:
             encontrados = repo_libros.buscar(texto) if texto else repo_libros.listar()
         except Exception as error:
-            self._error(f"No se pudo buscar el libro: {error}")
+            self._error(f"No se pudo buscar el libro. {causa_del_error(error)}")
             return
 
         elegido = self.libro.id if self.libro else None
