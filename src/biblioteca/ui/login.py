@@ -10,6 +10,7 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QApplication, QDialog, QWidget
 
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.sesion import ErrorDeAcceso, Sesion, iniciar_sesion
 from biblioteca.ui.estilo import COLOR_ERROR, aplicar_estilo_titulo
 from biblioteca.ui.generado.ui_login import Ui_DialogoLogin
@@ -50,10 +51,11 @@ class DialogoLogin(QDialog):
             self.ui.campoContrasena.clear()
             self.ui.campoContrasena.setFocus()
             return
-        except Exception:
-            self._mostrar_error(
-                "No se pudo conectar con el servidor. Revisa tu conexión a internet."
-            )
+        except Exception as error:
+            # Un correo mal escrito, una sesion caida y un servidor apagado
+            # no son el mismo problema: decir cual es evita que la persona
+            # revise el cable cuando lo que falla es otra cosa.
+            self._mostrar_error(causa_del_error(error))
             return
         finally:
             self._ocupado(False)

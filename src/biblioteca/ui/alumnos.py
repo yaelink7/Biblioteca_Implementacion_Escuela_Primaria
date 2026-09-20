@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from biblioteca.core.errores import mensaje as mensaje_de_error
 from biblioteca.modelos.persona import Alumno
 from biblioteca.repositorios import personas as repo_personas
 from biblioteca.repositorios import prestamos as repo_prestamos
@@ -86,7 +87,7 @@ class PantallaAlumnos(QWidget):
             QMessageBox.warning(
                 self,
                 "No se pudo consultar el padrón",
-                f"Revisa tu conexión a internet.\n\n{error}",
+                mensaje_de_error(error),
             )
             return
 

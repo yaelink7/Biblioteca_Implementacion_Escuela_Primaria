@@ -21,6 +21,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from biblioteca.core.errores import mensaje as mensaje_de_error
 from biblioteca.repositorios.prestamos import Deudor
 from biblioteca.repositorios import prestamos as repo_prestamos
 from biblioteca.ui.estilo import COLOR_ERROR, COLOR_OK, COLOR_PRINCIPAL, COLOR_TENUE
@@ -98,7 +99,7 @@ class PantallaDeudores(QWidget):
             QMessageBox.warning(
                 self,
                 "No se pudo generar el reporte",
-                f"Revisa tu conexión a internet.\n\n{error}",
+                mensaje_de_error(error),
             )
             return
 
