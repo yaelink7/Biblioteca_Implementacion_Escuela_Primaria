@@ -4,8 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 20 de septiembre de 2026 — Avance 1.3, mensajes de
-error por causa real, y los insumos de los ocho diagramas (sección 10).
+**Última actualización:** 20 de septiembre de 2026 — los ocho diagramas del
+Avance 2, en `Documentacion/diagramas/`.
 
 ---
 
@@ -487,8 +487,13 @@ trabajó; Rey David, los de proceso, flujos e interfaces.
 | #65 | DIA-07 Documentación de la base de datos | 5 | Pedro Cabrera |
 | #66 | DIA-08 Diagramas de interfaces | 5 | Rey David Montes |
 
-**Los insumos de los ocho están en la sección 10 de este archivo**, sacados del
-código y del esquema reales. No hay que inventar nada: hay que representarlo.
+**Los ocho ya están hechos**, en `Documentacion/diagramas/`. Cada uno trae el
+diagrama y su explicación, verificados contra las migraciones y los `.ui`, no
+contra la documentación. Los de Mermaid se ven dibujados en GitHub sin instalar
+nada; el de casos de uso es un SVG hecho a mano.
+
+Lo que falta de esos issues son las **capturas de pantalla** que piden algunos
+criterios de aceptación, y exportar las imágenes para pegarlas en el Avance 2.
 
 El issue #28 quedó como paraguas de los ocho. Su alcance original mencionaba
 tres diagramas: el profesor pide ocho.
@@ -678,6 +683,10 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
   funcionales**
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
+- `Documentacion/diagramas/` — **los ocho entregables gráficos del Avance 2**.
+  Un archivo por diagrama, con su explicación. Los de Mermaid se ven dibujados
+  en GitHub; `DIA-01` es un SVG. El `README.md` de esa carpeta explica cómo
+  exportarlos para pegarlos en el documento
 - El **Reporte Técnico de Calidad** del sistema Java (de otra asignatura) vive
   en `NetBeansProjects/BibliotecaIngeSoftware/Documentacion/` y es la fuente
   de los diez defectos
@@ -742,6 +751,17 @@ después cuesta más.
 ---
 
 # 10. Insumos para los ocho diagramas
+
+> **Esta sección quedó superada por `Documentacion/diagramas/`.** Al construir
+> los diagramas se verificó cada dato contra las migraciones y el código, y
+> aparecieron errores en lo que sigue. Los confirmados: `v_catalogo` **no la
+> consulta nadie** —el catálogo lee la tabla `libros`—; el índice se llama
+> `prestamo_unico_activo_por_usuario`; en 10.3 los pasos 4 y 5 están invertidos
+> y `calcular_fecha_limite` suma sobre `fecha_prestamo`, no sobre hoy, y solo si
+> la fecha viene nula; faltan `creado_en` y `actualizado_en` en `libros` y
+> `prestamos`, y dos llaves foráneas en las cardinalidades; y son siete las
+> funciones de disparador, no ocho, porque `marcar_actualizacion` sirve a dos.
+> **Ante la duda, gana la carpeta de diagramas.**
 
 Todo lo que sigue está sacado del esquema y del código que corren hoy, no de
 la documentación. **Los diagramas no hay que inventarlos: hay que

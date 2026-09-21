@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 1230" width="980" height="1230" font-family="Calibri, Arial, sans-serif">
+  <style>
+    .marco  { fill: #ffffff; stroke: #2D4B73; stroke-width: 2; }
+    .caso   { fill: #EEF2F8; stroke: #2D4B73; stroke-width: 1.5; }
+    .caso-p { fill: #FDF3E7; stroke: #A8621B; stroke-width: 1.5; }
+    .txt    { font-size: 13px; fill: #1B2430; text-anchor: middle; }
+    .txt-s  { font-size: 11px; fill: #5D6675; text-anchor: middle; }
+    .actor  { fill: none; stroke: #1B2430; stroke-width: 2; }
+    .rel    { stroke: #5D6675; stroke-width: 1.2; fill: none; }
+    .est    { stroke: #A8621B; stroke-width: 1.2; fill: none; stroke-dasharray: 5 4; }
+    .gen    { stroke: #1B2430; stroke-width: 1.6; fill: none; }
+    .rot    { font-size: 10px; fill: #A8621B; text-anchor: middle; font-style: italic; }
+    .titulo { font-size: 20px; font-weight: bold; fill: #2D4B73; text-anchor: middle; }
+    .modulo { font-size: 11px; font-weight: bold; fill: #2D4B73; letter-spacing: 1px; }
+  </style>
+
+  <rect width="980" height="1230" fill="#ffffff"/>
+  <text x="490" y="34" class="titulo">DIA-01 · Diagrama de casos de uso</text>
+  <text x="490" y="52" class="txt-s">Sistema de Biblioteca — Escuela Primaria Adalberto Tejeda</text>
+
+  <!-- ============================ FRONTERA DEL SISTEMA -->
+  <rect x="290" y="70" width="400" height="1120" rx="6" class="marco"/>
+  <text x="490" y="92" class="txt" font-weight="bold" fill="#2D4B73">Sistema de Biblioteca</text>
+
+  <!-- ============================ ACTORES -->
+  <!-- Bibliotecario -->
+  <g transform="translate(120,300)">
+    <circle cx="0" cy="-34" r="13" class="actor"/>
+    <line x1="0" y1="-21" x2="0" y2="14" class="actor"/>
+    <line x1="-20" y1="-8" x2="20" y2="-8" class="actor"/>
+    <line x1="0" y1="14" x2="-16" y2="44" class="actor"/>
+    <line x1="0" y1="14" x2="16" y2="44" class="actor"/>
+    <text x="0" y="64" class="txt" font-weight="bold">Bibliotecario</text>
+    <text x="0" y="80" class="txt-s">docente comisionado</text>
+  </g>
+
+  <!-- Administrador -->
+  <g transform="translate(120,700)">
+    <circle cx="0" cy="-34" r="13" class="actor"/>
+    <line x1="0" y1="-21" x2="0" y2="14" class="actor"/>
+    <line x1="-20" y1="-8" x2="20" y2="-8" class="actor"/>
+    <line x1="0" y1="14" x2="-16" y2="44" class="actor"/>
+    <line x1="0" y1="14" x2="16" y2="44" class="actor"/>
+    <text x="0" y="64" class="txt" font-weight="bold">Administrador</text>
+  </g>
+
+  <!-- Alumno -->
+  <g transform="translate(860,300)">
+    <circle cx="0" cy="-34" r="13" class="actor"/>
+    <line x1="0" y1="-21" x2="0" y2="14" class="actor"/>
+    <line x1="-20" y1="-8" x2="20" y2="-8" class="actor"/>
+    <line x1="0" y1="14" x2="-16" y2="44" class="actor"/>
+    <line x1="0" y1="14" x2="16" y2="44" class="actor"/>
+    <text x="0" y="64" class="txt" font-weight="bold">Alumno</text>
+    <text x="0" y="80" class="txt-s">fase 2 · móvil</text>
+  </g>
+
+  <!-- Generalizacion: el Administrador es un Bibliotecario con mas permisos -->
+  <line x1="120" y1="640" x2="120" y2="400" class="gen"/>
+  <polygon points="120,384 112,404 128,404" fill="#ffffff" stroke="#1B2430" stroke-width="1.6"/>
+  <text x="188" y="520" class="txt-s" text-anchor="start">hereda todo</text>
+  <text x="188" y="534" class="txt-s" text-anchor="start">lo del bibliotecario</text>
+
+  <!-- ============================ CASOS DE USO -->
+  <text x="300" y="120" class="modulo">ACCESO</text>
+  <ellipse cx="490" cy="146" rx="150" ry="24" class="caso"/>
+  <text x="490" y="151" class="txt">Iniciar sesión</text>
+
+  <text x="300" y="196" class="modulo">CATÁLOGO</text>
+  <ellipse cx="490" cy="222" rx="150" ry="24" class="caso"/>
+  <text x="490" y="227" class="txt">Buscar en el catálogo</text>
+  <ellipse cx="490" cy="278" rx="150" ry="24" class="caso"/>
+  <text x="490" y="283" class="txt">Registrar libro</text>
+  <ellipse cx="490" cy="334" rx="150" ry="24" class="caso"/>
+  <text x="490" y="339" class="txt">Modificar libro</text>
+  <ellipse cx="490" cy="390" rx="150" ry="24" class="caso"/>
+  <text x="490" y="395" class="txt">Dar de baja libro</text>
+  <ellipse cx="490" cy="446" rx="150" ry="24" class="caso-p"/>
+  <text x="490" y="451" class="txt">Consultar bitácora</text>
+
+  <text x="300" y="496" class="modulo">PRÉSTAMOS</text>
+  <ellipse cx="490" cy="522" rx="150" ry="24" class="caso"/>
+  <text x="490" y="527" class="txt">Registrar préstamo</text>
+  <ellipse cx="490" cy="578" rx="150" ry="24" class="caso"/>
+  <text x="490" y="583" class="txt">Registrar devolución</text>
+  <ellipse cx="490" cy="634" rx="150" ry="24" class="caso"/>
+  <text x="490" y="639" class="txt">Consultar préstamos</text>
+
+  <text x="300" y="684" class="modulo">PERSONAS</text>
+  <ellipse cx="490" cy="710" rx="150" ry="24" class="caso"/>
+  <text x="490" y="715" class="txt">Registrar empleado</text>
+  <ellipse cx="490" cy="766" rx="150" ry="24" class="caso"/>
+  <text x="490" y="771" class="txt">Consultar plantilla</text>
+  <ellipse cx="490" cy="822" rx="150" ry="24" class="caso"/>
+  <text x="490" y="827" class="txt">Actualizar datos de alumno</text>
+  <ellipse cx="490" cy="878" rx="150" ry="24" class="caso-p"/>
+  <text x="490" y="883" class="txt">Registrar cuenta de acceso</text>
+
+  <text x="300" y="928" class="modulo">REPORTES</text>
+  <ellipse cx="490" cy="954" rx="150" ry="24" class="caso"/>
+  <text x="490" y="959" class="txt">Reporte de deudores</text>
+  <ellipse cx="490" cy="1010" rx="150" ry="24" class="caso-p"/>
+  <text x="490" y="1015" class="txt">Consultar libros de baja</text>
+  <ellipse cx="490" cy="1066" rx="150" ry="24" class="caso-p"/>
+  <text x="490" y="1071" class="txt">Exportar respaldo</text>
+
+  <text x="300" y="1116" class="modulo">SEGURIDAD</text>
+  <ellipse cx="490" cy="1142" rx="150" ry="24" class="caso"/>
+  <text x="490" y="1147" class="txt">Cambiar perfil de acceso</text>
+
+  <!-- ============================ ASOCIACIONES DEL BIBLIOTECARIO -->
+  <line x1="150" y1="290" x2="340" y2="146" class="rel"/>
+  <line x1="150" y1="290" x2="340" y2="222" class="rel"/>
+  <line x1="150" y1="292" x2="340" y2="278" class="rel"/>
+  <line x1="152" y1="296" x2="340" y2="334" class="rel"/>
+  <line x1="152" y1="300" x2="340" y2="390" class="rel"/>
+  <line x1="152" y1="304" x2="340" y2="446" class="rel"/>
+  <line x1="152" y1="308" x2="340" y2="522" class="rel"/>
+  <line x1="152" y1="312" x2="340" y2="578" class="rel"/>
+  <line x1="152" y1="316" x2="340" y2="634" class="rel"/>
+  <line x1="152" y1="320" x2="340" y2="710" class="rel"/>
+  <line x1="152" y1="324" x2="340" y2="766" class="rel"/>
+  <line x1="152" y1="328" x2="340" y2="822" class="rel"/>
+  <line x1="152" y1="332" x2="340" y2="954" class="rel"/>
+  <line x1="152" y1="336" x2="340" y2="1010" class="rel"/>
+  <line x1="152" y1="340" x2="340" y2="1066" class="rel"/>
+
+  <!-- ============================ ASOCIACIONES DEL ADMINISTRADOR -->
+  <line x1="152" y1="706" x2="340" y2="878" class="rel"/>
+  <line x1="152" y1="712" x2="340" y2="1142" class="rel"/>
+
+  <!-- ============================ ASOCIACIONES DEL ALUMNO -->
+  <line x1="830" y1="290" x2="640" y2="146" class="rel"/>
+  <line x1="830" y1="294" x2="640" y2="222" class="rel"/>
+  <line x1="830" y1="300" x2="640" y2="634" class="rel"/>
+  <text x="726" y="470" class="txt-s" transform="rotate(72 726 470)">solo los suyos</text>
+
+  <!-- ============================ INCLUDE / EXTEND -->
+  <path d="M 640 522 C 706 522 706 240 640 226" class="est"/>
+  <text x="742" y="380" class="rot">«include»</text>
+  <path d="M 640 578 C 690 590 690 626 640 632" class="est"/>
+  <text x="714" y="608" class="rot">«extend»</text>
+
+  <!-- ============================ LEYENDA -->
+  <rect x="290" y="1198" width="400" height="0" fill="none"/>
+  <g transform="translate(40,1120)">
+    <rect x="0" y="0" width="16" height="12" class="caso"/>
+    <text x="24" y="10" class="txt-s" text-anchor="start">implementado</text>
+    <rect x="0" y="22" width="16" height="12" class="caso-p"/>
+    <text x="24" y="32" class="txt-s" text-anchor="start">pendiente</text>
+  </g>
+</svg>
