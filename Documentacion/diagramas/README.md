@@ -1,8 +1,9 @@
 # Los ocho diagramas del Avance 2
 
-Los ocho entregables gráficos que pidió el profesor, hechos a partir del esquema y
-del código que corren hoy — no de la documentación. **Si algo aquí no coincide con el
-sistema, gana el sistema y estos archivos están mal.**
+Los ocho entregables gráficos que pidió el profesor —**nueve diagramas**, porque el
+sexto son dos—, hechos a partir del esquema y del código que corren hoy, no de la
+documentación. **Si algo aquí no coincide con el sistema, gana el sistema y estos
+archivos están mal.**
 
 | # | Entregable | Archivo | Issue | Responsable |
 |---|---|---|---|---|
@@ -11,7 +12,8 @@ sistema, gana el sistema y estos archivos están mal.**
 | 3 | Diagrama de proceso | [DIA-03](DIA-03_diagrama_de_proceso.md) | [#61](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/61) | Rey David Montes |
 | 4 | Flujo de datos | [DIA-04](DIA-04_flujo_de_datos.md) | [#62](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/62) | Rey David Montes |
 | 5 | Modelado de base de datos | [DIA-05](DIA-05_modelado_de_base_de_datos.md) | [#63](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/63) | Pedro Cabrera |
-| 6 | Modelo E-R y relacional | [DIA-06](DIA-06_entidad_relacion_y_relacional.md) | [#64](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/64) | Pedro Cabrera |
+| 6a | Modelo entidad-relación | [DIA-06a](DIA-06a_modelo_entidad_relacion.md) | [#64](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/64) | Pedro Cabrera |
+| 6b | Modelo relacional | [DIA-06b](DIA-06b_modelo_relacional.md) + [.svg](DIA-06b_modelo_relacional.svg) | [#64](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/64) | Pedro Cabrera |
 | 7 | Documentación de la base | [DIA-07](DIA-07_documentacion_de_la_base.md) | [#65](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/65) | Pedro Cabrera |
 | 8 | Interfaces | [DIA-08](DIA-08_interfaces.md) | [#66](https://github.com/yaelink7/Biblioteca_Implementacion_Escuela_Primaria/issues/66) | Rey David Montes |
 
@@ -28,6 +30,10 @@ para la vista previa.
 [mermaid.live](https://mermaid.live), pega el bloque de código que va entre las
 líneas ` ```mermaid ` y ` ``` `, y descarga el PNG o el SVG. Ahí mismo se puede
 retocar el diagrama antes de exportarlo.
+
+**El entregable 6 son dos diagramas separados**: el entidad-relación es el modelo
+conceptual, y el relacional es su traducción al esquema físico. Van en archivos
+distintos y se exportan como dos imágenes.
 
 El diagrama de casos de uso es un SVG hecho a mano: se abre en el navegador, en
 Inkscape o directamente en Word con *Insertar → Imagen*. Al ser vectorial no se pixela
@@ -60,10 +66,10 @@ deudores que abre ya generado, el diálogo de préstamo que no es un formulario.
 asignatura, CURP, maestro de grupo, datos del tutor, retiro del correo del alumno,
 costo de reposición y cuatro vistas de estadísticas.
 
-`DIA-05`, `DIA-06` y `DIA-07` documentan ese mismo esquema, y `DIA-08` describe tres
-pantallas que van a cambiar. **Conviene aplicar la migración 10 antes de dar por
-buenos esos cuatro**, o habrá que rehacerlos. Los cuatro llevan una nota de vigencia
-al final.
+`DIA-05`, `DIA-06a`, `DIA-06b` y `DIA-07` documentan ese mismo esquema, y `DIA-08`
+describe tres pantallas que van a cambiar. **Conviene aplicar la migración 10 antes
+de dar por buenos esos cinco**, o habrá que rehacerlos. Los cinco llevan una nota de
+vigencia al final.
 
 **Los UML del repositorio Java ya no corresponden.** Cambió el esquema, apareció la
 capa de servicios y las reglas se movieron a la base de datos. Partir de ellos
