@@ -39,6 +39,22 @@ El diagrama de casos de uso es un SVG hecho a mano: se abre en el navegador, en
 Inkscape o directamente en Word con *Insertar → Imagen*. Al ser vectorial no se pixela
 al ampliarlo.
 
+## Para mandárselos a alguien que no va a entrar a GitHub
+
+En la carpeta se genera **`Diagramas_Avance_2.html`**: un solo archivo con los nueve
+diagramas ya dibujados, el índice y todo el texto. Quien lo reciba solo le da doble
+clic — **no necesita internet ni instalar nada**, porque lleva dentro las bibliotecas
+que usa. Pesa 3.5 MB por eso mismo.
+
+No se versiona, porque se regenera en un segundo:
+
+```bash
+python herramientas/armar_html_diagramas.py
+```
+
+Desde el navegador también se imprime a PDF con `Ctrl+P`, y cada diagrama empieza en
+su propia página.
+
 ## Por qué en Markdown y no en Word
 
 Tres razones prácticas:
