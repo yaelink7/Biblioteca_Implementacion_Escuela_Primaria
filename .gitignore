@@ -39,3 +39,6 @@ respaldos/*.csv
 # para mandarlo por correo se regenera con herramientas/armar_html_diagramas.py
 Documentacion/diagramas/Diagramas_Avance_2.html
 .cache_diagramas/
+
+# Archivos temporales que Word deja mientras un documento esta abierto
+~$*
