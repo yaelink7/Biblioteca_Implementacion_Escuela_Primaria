@@ -4,9 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 21 de septiembre de 2026 — corregidos los defectos
-de código que encontró la auditoría profunda. Lo que falta necesita la
-migración 10; ver la sección 6.
+**Última actualización:** 22 de septiembre de 2026 — migración 10 aplicada en
+Supabase: los cuatro defectos de la base que encontró la auditoría.
 
 ---
 
@@ -244,14 +243,17 @@ Equivalencias con el sistema Java, por si hay que consultar el original:
 
 Todas con `security_invoker = on`, para que respeten las políticas RLS.
 
-## 15 funciones
+## 18 funciones
 
 `es_personal`, `es_administrador`, `mi_perfil`, `mi_rol` (apoyo a las políticas);
 `registrar_alumno`, `registrar_empleado`, `actualizar_alumno` (altas atómicas);
 `calcular_fecha_limite`, `mover_inventario`, `validar_baja_de_libro`,
 `validar_ano_publicacion`, `sellar_devolucion`, `proteger_rol`,
-`marcar_actualizacion` (disparadores); `marcar_prestamos_vencidos`
-(**existe pero nadie la llama sola**, ver `PRE-05`).
+`marcar_actualizacion`, `descontar_ejemplar` (disparadores);
+`marcar_prestamos_vencidos` (**existe pero nadie la llama sola**, ver
+`PRE-05`); `actualizar_empleado` (cambio atómico del personal); y `hoy()`,
+**que devuelve la fecha en el huso de Veracruz**. La base corre en UTC: todo
+cálculo de fechas pasa por `hoy()`, nunca por `current_date`.
 
 ## 8 disparadores · 16 políticas RLS
 
@@ -270,7 +272,7 @@ perfil y sus propios préstamos; lo verificamos con una cuenta real.
 07_actualizar_alumno_y_vista_prestamos   modificación atómica y v_prestamos
 08_fecha_de_devolucion_desde_la_base     disparador sellar_devolucion
 09_permisos_de_bibliotecario_y_proteccion_de_rol
-10_correcciones_de_la_auditoria          **escrita, SIN APLICAR todavía**
+10_correcciones_de_la_auditoria          reloj, escalada, inventario, puesto
 ```
 
 **Para cambiar el esquema se crea una migración nueva**, nunca se edita una
@@ -447,11 +449,11 @@ si un disparador cambia su texto y nadie actualiza el traductor, la prueba
 falla. Antes `coverage` reportaba 100 % con siete de las ocho reglas sin
 interrogar.
 
-### Lo que necesita la migración 10
+### Corregido en la base — migración 10, aplicada el 22 de septiembre
 
-El archivo **`database/migraciones/10_correcciones_de_la_auditoria.sql` ya está
-escrito, pero NO se ha aplicado en Supabase.** Hasta que se aplique, estos
-cuatro defectos siguen vivos en producción:
+`database/migraciones/10_correcciones_de_la_auditoria.sql`. Los cuatro
+defectos que no se podían arreglar desde Python, verificados contra la base
+real después de aplicarla:
 
 1. **Escalada de privilegios.** `proteger_rol` es `before update of rol`: no
    corre en el INSERT, `perfiles_alta` solo exige `es_personal()` y
@@ -466,13 +468,32 @@ cuatro defectos siguen vivos en producción:
 4. **El reloj sigue en UTC.** Seis sitios usan `current_date`: en Veracruz un
    libro se marca vencido desde las 18:00 del día que aún no vence.
 
-La migración añade tres funciones —`hoy()`, `actualizar_empleado()` y
-`descontar_ejemplar()`—, rehace `proteger_rol` para que cubra el INSERT y el
-`auth_id`, amplía `mover_inventario` al borrado, la reapertura y el cambio de
-libro, y pasa los seis reloj a la hora de Veracruz. El lado de Python ya está
-hecho: `repositorios/personas.py:actualizar_empleado()` llama a la función
-nueva, así que **el puesto del empleado no se guardará hasta que la migración
-corra**. Cada bloque del archivo lleva su comprobación al inicio.
+**Comprobado en la base, no solo escrito:**
+
+| Prueba | Resultado |
+|---|---|
+| Bibliotecario da de alta un perfil administrador | rechazado |
+| Bibliotecario repunta el `auth_id` del administrador | rechazado |
+| `registrar_empleado(..., 'administrador')` desde bibliotecario | rechazado |
+| Bibliotecario registra a un bibliotecario (REQ-EMP-01) | permitido |
+| Administrador cambia el perfil de acceso de otro | permitido |
+| Administrador cambia **el suyo** | rechazado |
+| Cambiar el puesto de un empleado | **se guarda** |
+| Prestar → devolver → reabrir → borrar | 3 → 2 → 3 → 2 → 3 |
+| `insert` con `fecha_limite = 2099-01-01` | la base guardó 2026-09-29 |
+
+La última fila importa: `calcular_fecha_limite` dejó de respetar la fecha que
+envíe el cliente, así que **REQ-PRE-02 pasó de valor por omisión a regla**.
+
+Las pruebas corrieron dentro de transacciones que abortan solas: los datos
+quedaron intactos —7 préstamos, 21 ejemplares, 8 perfiles, 1 administrador—.
+
+**Aviso del revisor de Supabase que NO hay que "corregir":** marca
+`es_personal`, `es_administrador`, `mi_perfil` y `mi_rol` como funciones
+`security definer` invocables por `authenticated`. Es intencional y necesario:
+las 16 políticas RLS las evalúan como el invocador, así que revocarles
+`execute` rompería el control de acceso entero. Solo devuelven información que
+el propio usuario ya tiene sobre sí mismo.
 
 ### Mejoras pendientes, ninguna urgente
 
