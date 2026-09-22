@@ -1,0 +1,224 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1760 1060" width="1760" height="1060" font-family="Calibri, Arial, sans-serif">
+  <style>
+    .ent   { fill:#EEF2F8; stroke:#2D4B73; stroke-width:2; }
+    .rel   { fill:#FDF3E7; stroke:#A8621B; stroke-width:1.6; }
+    .atr   { fill:#ffffff; stroke:#5D6675; stroke-width:1.1; }
+    .ln    { stroke:#5D6675; stroke-width:1.1; fill:none; }
+    .ln-esp{ stroke:#1B2430; stroke-width:1.6; fill:none; }
+    .esp   { fill:#ffffff; stroke:#1B2430; stroke-width:1.6; }
+    .t-ent { font-size:15px; font-weight:bold; fill:#1B2430; text-anchor:middle; letter-spacing:.5px; }
+    .t-rel { font-size:12px; fill:#A8621B; text-anchor:middle; }
+    .t-atr { font-size:11px; fill:#1B2430; text-anchor:middle; }
+    .t-card{ font-size:12px; font-weight:bold; fill:#2D4B73; text-anchor:middle; }
+    .t-esp { font-size:12px; font-weight:bold; fill:#1B2430; text-anchor:middle; }
+    .tit   { font-size:21px; font-weight:bold; fill:#2D4B73; text-anchor:middle; }
+    .sub   { font-size:12px; fill:#5D6675; text-anchor:middle; }
+  </style>
+  <rect width="1760" height="1060" fill="#ffffff"/>
+  <text x="880" y="34" class="tit">Modelo entidad-relación</text>
+  <text x="880" y="54" class="sub">Sistema de Biblioteca — Escuela Primaria Adalberto Tejeda · esquema en operación</text>
+    <line x1="414" y1="340" x2="556" y2="295" class="ln"/>
+  <line x1="674" y1="295" x2="816" y2="340" class="ln"/>
+  <polygon points="615,266 674,295 615,324 556,295" class="rel"/>
+  <text x="615" y="299" class="t-rel">recibe</text>
+  <text x="534" y="286" class="t-card">1</text>
+  <text x="696" y="286" class="t-card">N</text>
+  <line x1="414" y1="380" x2="556" y2="432" class="ln"/>
+  <line x1="674" y1="432" x2="816" y2="380" class="ln"/>
+  <polygon points="615,403 674,432 615,461 556,432" class="rel"/>
+  <text x="615" y="436" class="t-rel">registra</text>
+  <text x="534" y="448" class="t-card">1</text>
+  <text x="696" y="448" class="t-card">N</text>
+  <line x1="984" y1="360" x2="1116" y2="360" class="ln"/>
+  <line x1="1234" y1="360" x2="1366" y2="360" class="ln"/>
+  <polygon points="1175,331 1234,360 1175,389 1116,360" class="rel"/>
+  <text x="1175" y="364" class="t-rel">incluye</text>
+  <text x="1094" y="351" class="t-card">N</text>
+  <text x="1256" y="351" class="t-card">1</text>
+  <line x1="900" y1="387" x2="900" y2="606" class="ln"/>
+  <line x1="900" y1="664" x2="900" y2="828" class="ln"/>
+  <polygon points="900,606 959,635 900,664 841,635" class="rel"/>
+  <text x="900" y="639" class="t-rel">genera</text>
+  <text x="918" y="598" class="t-card">1</text>
+  <text x="918" y="692" class="t-card">N</text>
+  <line x1="1450" y1="387" x2="1450" y2="606" class="ln"/>
+  <line x1="1450" y1="664" x2="1450" y2="828" class="ln"/>
+  <polygon points="1450,606 1509,635 1450,664 1391,635" class="rel"/>
+  <text x="1450" y="639" class="t-rel">se audita en</text>
+  <text x="1468" y="598" class="t-card">1</text>
+  <text x="1468" y="692" class="t-card">N</text>
+  <line x1="246" y1="360" x2="120" y2="360" class="ln"/>
+  <line x1="120" y1="360" x2="120" y2="985" class="ln"/>
+  <line x1="120" y1="985" x2="660" y2="985" class="ln"/>
+  <line x1="778" y1="985" x2="1345" y2="985" class="ln"/>
+  <line x1="1345" y1="985" x2="1345" y2="882" class="ln"/>
+  <polygon points="719,956 778,985 719,1014 660,985" class="rel"/>
+  <text x="719" y="989" class="t-rel">responsable de</text>
+  <text x="138" y="975" class="t-card">1</text>
+  <text x="1318" y="975" class="t-card">N</text>
+  <line x1="330" y1="387" x2="330" y2="905" class="ln"/>
+  <line x1="330" y1="905" x2="520" y2="905" class="ln"/>
+  <line x1="638" y1="905" x2="800" y2="905" class="ln"/>
+  <line x1="800" y1="905" x2="800" y2="855" class="ln"/>
+  <polygon points="579,876 638,905 579,934 520,905" class="rel"/>
+  <text x="579" y="909" class="t-rel">se avisa a</text>
+  <text x="348" y="895" class="t-card">1</text>
+  <text x="778" y="895" class="t-card">N</text>
+  <line x1="330" y1="387" x2="330" y2="500" class="ln-esp"/>
+  <polygon points="330,500 308,538 352,538" class="esp"/>
+  <text x="330" y="530" class="t-esp">d</text>
+  <line x1="330" y1="538" x2="205" y2="538" class="ln-esp"/>
+  <line x1="205" y1="538" x2="205" y2="593" class="ln-esp"/>
+  <line x1="330" y1="538" x2="520" y2="538" class="ln-esp"/>
+  <line x1="520" y1="538" x2="520" y2="593" class="ln-esp"/>
+  <text x="640" y="500" class="sub" text-anchor="start">especialización disjunta: una persona es alumno o empleado, nunca ambos</text>
+  <rect x="246" y="333" width="168" height="54" class="ent"/>
+  <text x="330" y="365" class="t-ent">PERFILES</text>
+  <rect x="121" y="593" width="168" height="54" class="ent"/>
+  <text x="205" y="625" class="t-ent">USUARIOS</text>
+  <rect x="436" y="593" width="168" height="54" class="ent"/>
+  <text x="520" y="625" class="t-ent">EMPLEADOS</text>
+  <rect x="816" y="333" width="168" height="54" class="ent"/>
+  <text x="900" y="365" class="t-ent">PRESTAMOS</text>
+  <rect x="1366" y="333" width="168" height="54" class="ent"/>
+  <text x="1450" y="365" class="t-ent">LIBROS</text>
+  <rect x="800" y="828" width="200" height="54" class="ent"/>
+  <text x="900" y="860" class="t-ent">NOTIFICACIONES</text>
+  <rect x="1345" y="828" width="210" height="54" class="ent"/>
+  <text x="1450" y="860" class="t-ent">BITACORA_LIBROS</text>
+  <ellipse cx="140" cy="240" rx="52" ry="17" class="atr"/>
+  <text x="140" y="244" class="t-atr" text-decoration="underline">id</text>
+  <line x1="140" y1="240" x2="330" y2="360" class="ln"/>
+  <ellipse cx="260" cy="200" rx="52" ry="17" class="atr"/>
+  <text x="260" y="204" class="t-atr">codigo</text>
+  <line x1="260" y1="200" x2="330" y2="360" class="ln"/>
+  <ellipse cx="390" cy="200" rx="52" ry="17" class="atr"/>
+  <text x="390" y="204" class="t-atr">nombre</text>
+  <line x1="390" y1="200" x2="330" y2="360" class="ln"/>
+  <ellipse cx="500" cy="240" rx="52" ry="17" class="atr"/>
+  <text x="500" y="244" class="t-atr">apellido</text>
+  <line x1="500" y1="240" x2="330" y2="360" class="ln"/>
+  <ellipse cx="100" cy="320" rx="52" ry="17" class="atr"/>
+  <text x="100" y="324" class="t-atr">rol</text>
+  <line x1="100" y1="320" x2="330" y2="360" class="ln"/>
+  <ellipse cx="100" cy="390" rx="52" ry="17" class="atr"/>
+  <text x="100" y="394" class="t-atr">auth_id</text>
+  <line x1="100" y1="390" x2="330" y2="360" class="ln"/>
+  <ellipse cx="180" cy="455" rx="52" ry="17" class="atr"/>
+  <text x="180" y="459" class="t-atr">correo</text>
+  <line x1="180" y1="455" x2="330" y2="360" class="ln"/>
+  <ellipse cx="310" cy="470" rx="52" ry="17" class="atr"/>
+  <text x="310" y="474" class="t-atr">telefono</text>
+  <line x1="310" y1="470" x2="330" y2="360" class="ln"/>
+  <ellipse cx="85" cy="560" rx="52" ry="17" class="atr"/>
+  <text x="85" y="564" class="t-atr" text-decoration="underline" fill="#A8621B">perfil_id</text>
+  <line x1="85" y1="560" x2="205" y2="620" class="ln"/>
+  <ellipse cx="75" cy="675" rx="52" ry="17" class="atr"/>
+  <text x="75" y="679" class="t-atr">grado</text>
+  <line x1="75" y1="675" x2="205" y2="620" class="ln"/>
+  <ellipse cx="205" cy="715" rx="52" ry="17" class="atr"/>
+  <text x="205" y="719" class="t-atr">grupo</text>
+  <line x1="205" y1="715" x2="205" y2="620" class="ln"/>
+  <ellipse cx="490" cy="550" rx="62" ry="17" class="atr"/>
+  <text x="490" y="554" class="t-atr" text-decoration="underline" fill="#A8621B">perfil_id</text>
+  <line x1="490" y1="550" x2="520" y2="620" class="ln"/>
+  <ellipse cx="640" cy="585" rx="62" ry="17" class="atr"/>
+  <text x="640" y="589" class="t-atr">tipo_empleado</text>
+  <line x1="640" y1="585" x2="520" y2="620" class="ln"/>
+  <ellipse cx="650" cy="665" rx="62" ry="17" class="atr"/>
+  <text x="650" y="669" class="t-atr">fecha_ingreso</text>
+  <line x1="650" y1="665" x2="520" y2="620" class="ln"/>
+  <ellipse cx="870" cy="200" rx="62" ry="17" class="atr"/>
+  <text x="870" y="204" class="t-atr" text-decoration="underline">id</text>
+  <line x1="870" y1="200" x2="900" y2="360" class="ln"/>
+  <ellipse cx="1000" cy="220" rx="62" ry="17" class="atr"/>
+  <text x="1000" y="224" class="t-atr" fill="#A8621B">libro_id</text>
+  <line x1="1000" y1="220" x2="900" y2="360" class="ln"/>
+  <ellipse cx="1115" cy="265" rx="62" ry="17" class="atr"/>
+  <text x="1115" y="269" class="t-atr" fill="#A8621B">usuario_id</text>
+  <line x1="1115" y1="265" x2="900" y2="360" class="ln"/>
+  <ellipse cx="1090" cy="430" rx="62" ry="17" class="atr"/>
+  <text x="1090" y="434" class="t-atr" fill="#A8621B">registrado_por</text>
+  <line x1="1090" y1="430" x2="900" y2="360" class="ln"/>
+  <ellipse cx="735" cy="250" rx="62" ry="17" class="atr"/>
+  <text x="735" y="254" class="t-atr">fecha_prestamo</text>
+  <line x1="735" y1="250" x2="900" y2="360" class="ln"/>
+  <ellipse cx="665" cy="325" rx="62" ry="17" class="atr"/>
+  <text x="665" y="329" class="t-atr">fecha_limite</text>
+  <line x1="665" y1="325" x2="900" y2="360" class="ln"/>
+  <ellipse cx="685" cy="400" rx="62" ry="17" class="atr"/>
+  <text x="685" y="404" class="t-atr">fecha_devolucion</text>
+  <line x1="685" y1="400" x2="900" y2="360" class="ln"/>
+  <ellipse cx="780" cy="465" rx="62" ry="17" class="atr"/>
+  <text x="780" y="469" class="t-atr">estado</text>
+  <line x1="780" y1="465" x2="900" y2="360" class="ln"/>
+  <ellipse cx="1410" cy="200" rx="62" ry="17" class="atr"/>
+  <text x="1410" y="204" class="t-atr" text-decoration="underline">id</text>
+  <line x1="1410" y1="200" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1530" cy="210" rx="62" ry="17" class="atr"/>
+  <text x="1530" y="214" class="t-atr">titulo</text>
+  <line x1="1530" y1="210" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1635" cy="255" rx="62" ry="17" class="atr"/>
+  <text x="1635" y="259" class="t-atr">autor</text>
+  <line x1="1635" y1="255" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1680" cy="325" rx="62" ry="17" class="atr"/>
+  <text x="1680" y="329" class="t-atr">existencias</text>
+  <line x1="1680" y1="325" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1660" cy="405" rx="62" ry="17" class="atr"/>
+  <text x="1660" y="409" class="t-atr">tipo_libro</text>
+  <line x1="1660" y1="405" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1580" cy="470" rx="62" ry="17" class="atr"/>
+  <text x="1580" y="474" class="t-atr">ano_publicacion</text>
+  <line x1="1580" y1="470" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1300" cy="250" rx="62" ry="17" class="atr"/>
+  <text x="1300" y="254" class="t-atr">editorial</text>
+  <line x1="1300" y1="250" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1245" cy="300" rx="62" ry="17" class="atr"/>
+  <text x="1245" y="304" class="t-atr">num_paginas</text>
+  <line x1="1245" y1="300" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1278" cy="422" rx="62" ry="17" class="atr"/>
+  <text x="1278" y="426" class="t-atr">activo</text>
+  <line x1="1278" y1="422" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="1360" cy="470" rx="62" ry="17" class="atr"/>
+  <text x="1360" y="474" class="t-atr">motivo_baja</text>
+  <line x1="1360" y1="470" x2="1450" y2="360" class="ln"/>
+  <ellipse cx="740" cy="775" rx="60" ry="17" class="atr"/>
+  <text x="740" y="779" class="t-atr" text-decoration="underline">id</text>
+  <line x1="740" y1="775" x2="900" y2="855" class="ln"/>
+  <ellipse cx="870" cy="750" rx="60" ry="17" class="atr"/>
+  <text x="870" y="754" class="t-atr" fill="#A8621B">perfil_id</text>
+  <line x1="870" y1="750" x2="900" y2="855" class="ln"/>
+  <ellipse cx="1010" cy="775" rx="60" ry="17" class="atr"/>
+  <text x="1010" y="779" class="t-atr" fill="#A8621B">prestamo_id</text>
+  <line x1="1010" y1="775" x2="900" y2="855" class="ln"/>
+  <ellipse cx="1075" cy="855" rx="60" ry="17" class="atr"/>
+  <text x="1075" y="859" class="t-atr">tipo</text>
+  <line x1="1075" y1="855" x2="900" y2="855" class="ln"/>
+  <ellipse cx="1050" cy="930" rx="60" ry="17" class="atr"/>
+  <text x="1050" y="934" class="t-atr">destinatario</text>
+  <line x1="1050" y1="930" x2="900" y2="855" class="ln"/>
+  <ellipse cx="1420" cy="750" rx="60" ry="17" class="atr"/>
+  <text x="1420" y="754" class="t-atr" text-decoration="underline">id</text>
+  <line x1="1420" y1="750" x2="1450" y2="855" class="ln"/>
+  <ellipse cx="1550" cy="770" rx="60" ry="17" class="atr"/>
+  <text x="1550" y="774" class="t-atr" fill="#A8621B">libro_id</text>
+  <line x1="1550" y1="770" x2="1450" y2="855" class="ln"/>
+  <ellipse cx="1630" cy="840" rx="60" ry="17" class="atr"/>
+  <text x="1630" y="844" class="t-atr" fill="#A8621B">perfil_id</text>
+  <line x1="1630" y1="840" x2="1450" y2="855" class="ln"/>
+  <ellipse cx="1610" cy="920" rx="60" ry="17" class="atr"/>
+  <text x="1610" y="924" class="t-atr">accion</text>
+  <line x1="1610" y1="920" x2="1450" y2="855" class="ln"/>
+  <ellipse cx="1470" cy="955" rx="60" ry="17" class="atr"/>
+  <text x="1470" y="959" class="t-atr">ocurrido_en</text>
+  <line x1="1470" y1="955" x2="1450" y2="855" class="ln"/>
+  <g transform="translate(60,1030)">
+    <rect x="0" y="-12" width="18" height="13" class="ent"/>
+    <text x="36" y="-1" class="sub" text-anchor="start">entidad</text>
+    <polygon points="150,-19 180,-6 150,7 120,-6" class="rel"/>
+    <text x="196" y="-1" class="sub" text-anchor="start">relación</text>
+    <ellipse cx="300" cy="-6" rx="32" ry="13" class="atr"/>
+    <text x="348" y="-1" class="sub" text-anchor="start">atributo · subrayado = clave primaria</text>
+    <text x="620" y="-1" class="sub" text-anchor="start" fill="#A8621B">ámbar = clave foránea</text>
+  </g>
+</svg>
