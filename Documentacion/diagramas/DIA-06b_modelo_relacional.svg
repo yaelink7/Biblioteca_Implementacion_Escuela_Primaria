@@ -107,23 +107,7 @@
   <text x="400" y="315" class="at">estado</text><text x="652" y="315" class="tipo">estado_prestamo</text>
   <text x="400" y="333" class="at">creado_en</text><text x="652" y="333" class="tipo">timestamptz</text>
 
-  <!-- =================================================== NOTIFICACIONES -->
-  <rect x="390" y="400" width="270" height="188" rx="4" class="caja"/>
-  <rect x="390" y="400" width="270" height="26" rx="4" class="cab"/>
-  <rect x="390" y="418" width="270" height="8" class="cab"/>
-  <text x="525" y="418" class="cab-txt">notificaciones</text>
-  <rect x="391" y="426" width="268" height="18" class="fila"/>
-  <text x="400" y="439" class="pk">id</text><text x="652" y="439" class="tipo">bigint</text>
-  <text x="400" y="457" class="fk">perfil_id</text><text x="652" y="457" class="tipo">uuid</text>
-  <text x="400" y="475" class="fk">prestamo_id</text><text x="652" y="475" class="tipo">bigint</text>
-  <text x="400" y="493" class="at">tipo</text><text x="652" y="493" class="tipo">text</text>
-  <text x="400" y="511" class="at">destinatario</text><text x="652" y="511" class="tipo">text</text>
-  <text x="400" y="529" class="at">estado</text><text x="652" y="529" class="tipo">text</text>
-  <text x="400" y="547" class="at">detalle</text><text x="652" y="547" class="tipo">text</text>
-  <text x="400" y="565" class="at">enviada_en</text><text x="652" y="565" class="tipo">timestamptz</text>
-  <text x="400" y="583" class="at">creada_en</text><text x="652" y="583" class="tipo">timestamptz</text>
-
-  <!-- =================================================== BITACORA -->
+<!-- =================================================== BITACORA -->
   <rect x="740" y="400" width="260" height="152" rx="4" class="caja"/>
   <rect x="740" y="400" width="260" height="26" rx="4" class="cab"/>
   <rect x="740" y="418" width="260" height="8" class="cab"/>
@@ -157,14 +141,6 @@
   <!-- prestamos.registrado_por -> perfiles.id  SET NULL -->
   <path d="M 390 243 L 366 243 L 366 141 L 300 141" class="ref" marker-end="url(#flecha)"/>
   <text x="370" y="200" class="nota" transform="rotate(-90 370 200)">SET NULL</text>
-
-  <!-- notificaciones.perfil_id -> perfiles.id  CASCADE -->
-  <path d="M 390 457 L 330 457 L 330 153 L 300 153" class="ref" marker-end="url(#flecha)"/>
-  <text x="334" y="330" class="nota" transform="rotate(-90 334 330)">CASCADE</text>
-
-  <!-- notificaciones.prestamo_id -> prestamos.id  SET NULL -->
-  <path d="M 660 475 L 690 475 L 690 189 L 660 189" class="ref" marker-end="url(#flecha)"/>
-  <text x="694" y="350" class="nota" transform="rotate(-90 694 350)">SET NULL</text>
 
   <!-- bitacora.libro_id -> libros.id  CASCADE -->
   <path d="M 1000 457 L 1032 457 L 1032 129 L 1000 129" class="ref" marker-end="url(#flecha)"/>
