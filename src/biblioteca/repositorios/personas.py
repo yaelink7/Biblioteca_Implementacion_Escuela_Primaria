@@ -245,6 +245,37 @@ def actualizar(perfil: Perfil) -> Perfil:
     return Perfil.desde_fila(filas.data[0])
 
 
+def actualizar_empleado(empleado: Empleado) -> None:
+    """Modificacion de empleado en una sola llamada (Corolario 3).
+
+    Antes esto usaba `actualizar()`, que solo escribe la tabla `perfiles`.
+    Como `tipo_empleado` vive en `empleados`, cambiar el puesto no guardaba
+    nada: el formulario confirmaba y el dato seguia siendo el anterior. La
+    funcion `actualizar_empleado` de Postgres escribe las dos tablas en una
+    transaccion, o ninguna.
+    """
+    if not empleado.id:
+        raise ErrorDePersona("No se puede actualizar un empleado sin identificador.")
+
+    try:
+        obtener_cliente().rpc(
+            "actualizar_empleado",
+            {
+                "p_id": empleado.id,
+                "p_nombre": empleado.nombre,
+                "p_apellido": empleado.apellido,
+                "p_tipo_empleado": empleado.tipo_empleado,
+                "p_rol": str(empleado.rol),
+                "p_correo": empleado.correo,
+                "p_telefono": empleado.telefono,
+                "p_calle": empleado.calle,
+                "p_colonia": empleado.colonia,
+            },
+        ).execute()
+    except Exception as error:
+        raise ErrorDePersona(_mensaje_claro(error)) from error
+
+
 def _aplanar(fila: dict, anidada: str) -> dict:
     """Sube al primer nivel las columnas de la tabla relacionada."""
     hija = fila.pop(anidada, None) or {}

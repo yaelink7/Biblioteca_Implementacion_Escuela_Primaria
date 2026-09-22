@@ -106,7 +106,7 @@ class FormularioEmpleado(QDialog):
             if self.es_alta:
                 self.guardado = repo_personas.dar_de_alta_empleado(empleado)
             else:
-                repo_personas.actualizar(empleado)
+                repo_personas.actualizar_empleado(empleado)
                 self.guardado = empleado
         except Exception as error:
             # Cualquier fallo, no solo el que rechaza la base: sin esto
