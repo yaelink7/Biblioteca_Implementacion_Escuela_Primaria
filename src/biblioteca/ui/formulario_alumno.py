@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QDialog, QWidget
 
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.modelos.persona import Alumno
 from biblioteca.repositorios import personas as repo_personas
 from biblioteca.servicios import validador_persona
@@ -87,8 +88,10 @@ class FormularioAlumno(QDialog):
             else:
                 repo_personas.actualizar_alumno(alumno)
                 self.guardado = alumno
-        except repo_personas.ErrorDePersona as error:
-            self.ui.etiquetaError.setText(str(error))
+        except Exception as error:
+            # Cualquier fallo, no solo el que rechaza la base: sin esto
+            # un corte de red se leia como «la base rechazo la operacion».
+            self.ui.etiquetaError.setText(causa_del_error(error))
             self.ui.botonGuardar.setEnabled(True)
             return
 

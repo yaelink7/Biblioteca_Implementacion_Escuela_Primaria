@@ -8,7 +8,6 @@ boton, y no un formulario.
 
 from __future__ import annotations
 
-from datetime import date, timedelta
 
 from PySide6.QtCore import Qt, QTimer
 from PySide6.QtWidgets import QDialog, QListWidgetItem, QWidget
@@ -139,14 +138,16 @@ class DialogoNuevoPrestamo(QDialog):
         # mensaje antes de que el bibliotecario alcance a leerlo. Se limpia
         # solo al intentar un prestamo nuevo.
         if self.alumno and self.libro:
-            vence = date.today() + timedelta(days=DIAS_DE_PRESTAMO)
             self.ui.etiquetaResumen.setText(
                 f"<b>{self.alumno.nombre_completo}</b> ({self.alumno.salon}) "
                 f"se lleva <b>{self.libro.titulo}</b>"
             )
+            # La fecha limite la calcula la base al registrar (Corolario 2).
+            # Anunciarla aqui con date.today() hacia que a partir de las 18:00
+            # la pantalla dijera un dia y la base guardara otro.
             self.ui.etiquetaPlazo.setText(
-                f"Debe devolverlo el {vence.strftime('%d/%m/%Y')} "
-                f"· {DIAS_DE_PRESTAMO} días naturales"
+                f"El plazo es de {DIAS_DE_PRESTAMO} días naturales; "
+                f"la fecha exacta queda registrada al confirmar"
             )
             self.ui.botonPrestar.setEnabled(True)
             return
