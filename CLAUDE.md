@@ -4,8 +4,8 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 22 de septiembre de 2026 — migración 10 aplicada en
-Supabase: los cuatro defectos de la base que encontró la auditoría.
+**Última actualización:** 22 de septiembre de 2026 — Avance 2 entregado, con
+los ocho criterios de la rúbrica.
 
 ---
 
@@ -76,8 +76,22 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
    nuevos y su propósito, decisiones de diseño con su motivo, defectos
    corregidos con su identificador, cambios de dependencias, datos cargados en
    Supabase, salida real de las pruebas, y lo que queda pendiente.
-4. **Abrir un PR solo cuando el anterior ya esté en `main`,** y no volver a
-   empujar a una rama cuyo PR ya se mergeó.
+4. **Cuidar de qué `main` sale cada rama y a cuál vuelve.** Son dos
+   comprobaciones, una antes de empujar y otra antes de mergear:
+
+   ```bash
+   git log --oneline origin/main..HEAD          # antes de empujar
+   git diff --stat origin/main origin/<rama>    # antes de mergear
+   ```
+
+   La primera avisa si el PR de esa rama ya se mergeó: entonces hay que abrir
+   una rama nueva desde `main`, no seguir empujando ahí. La segunda avisa si
+   la rama quedó vieja: **si aparecen líneas en rojo de archivos que esa rama
+   nunca tocó, mergearla revertiría el trabajo de otro PR.** Se corrige con
+   `git merge origin/main` en la rama, antes de mergear.
+
+   Abrir un PR solo cuando el anterior ya esté en `main` evita la mitad del
+   problema; la otra mitad la evitan esas dos órdenes.
 5. **El código y los comentarios van en español**, sin el sufijo `Biblia` que
    usaban los paquetes del sistema Java (`GUIBiblia`, `DAOBiblia`).
 6. **Este archivo se actualiza con cada cambio del proyecto**, en la misma
@@ -94,14 +108,22 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
   a `main`. Al mergearlos seguidos, GitHub no reajusta las bases a tiempo y los
   cambios terminan en la rama intermedia. Pasó **dos veces** (#47/#48 y #53) y
   hubo que abrir PR de rescate (#49 y #54).
-- **Empujar a una rama ya mergeada.** Ha pasado **cuatro veces**: tras el #55
-  (rescate #56), tras el #68, tras el #80 y tras el #82 (rescate #83). El
-  patrón es siempre el mismo: se entrega, la Scrum Master mergea, y se sigue
-  empujando a esa rama porque el PR «sigue abierto» en la sesión. La última vez
-  dejó la migración 10 aplicada en Supabase pero sin registrar en `main`, con
-  la aplicación llamando todavía a la función vieja.
-  **Antes de empujar, comprobar:** `git log --oneline origin/main..HEAD` — si
-  la rama ya se mergeó, abrir una rama nueva desde `main`.
+- **Ramas desalineadas con `main`.** Ha pasado **cinco veces**, en dos
+  variantes.
+
+  *Empujar a una rama ya mergeada* — cuatro veces: tras el #55 (rescate #56),
+  tras el #68, tras el #80 y tras el #82 (rescate #83). Se entrega, la Scrum
+  Master mergea, y se sigue empujando a esa rama porque el PR «sigue abierto»
+  en la sesión. La última vez dejó la migración 10 aplicada en Supabase pero
+  sin registrar en `main`, con la aplicación llamando todavía a la función
+  vieja.
+
+  *Mergear una rama vieja* — una vez, detectada antes de que ocurriera: la
+  rama del Avance 2 salió del merge del #82 y el #83 se mergeó después, así
+  que su diff contra `main` **borraba** la migración 10 y `actualizar_empleado`.
+  Se corrigió con `git merge origin/main` en la rama.
+
+  Las dos comprobaciones de la regla 4 detectan cada variante.
 - **Verificar nombres de archivo con acentos.** `git ls-tree` escapa `ó` como
   `\303\263`; comparar esa cadena contra el sistema de archivos da falsos
   «archivo faltante». Usar `git ls-tree -z` o `core.quotepath false`.
@@ -757,18 +779,38 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
   OpenBiblio) que justifica construir en vez de adoptar, el alcance y las
   exclusiones del sistema, y el capítulo 3 completo. **Corregido por el equipo
   en el PR #71**: quedó con 19 requerimientos funcionales
-- `Documentacion/Avance_Biblioteca_1.3.docx` — **la versión vigente**. Clona el
-  1.2 corregido y agrega: el cronograma real en el capítulo 2, la sección 1.4.1
-  con lo que la escuela pidió en la reunión, el retiro de dos requerimientos no
-  funcionales, el estado de avance rehecho y las correcciones de redacción que
-  arrastraban las versiones anteriores. **19 requerimientos funcionales y 14 no
-  funcionales**
+- `Documentacion/Avance_Biblioteca_1.3.docx` — cierra la serie del Avance 1.
+  Clona el 1.2 corregido y agrega: el cronograma real en el capítulo 2, la
+  sección 1.4.1 con lo que la escuela pidió en la reunión, el retiro de dos
+  requerimientos no funcionales, el estado de avance rehecho y las
+  correcciones de redacción que arrastraban las versiones anteriores.
+  **19 requerimientos funcionales y 14 no funcionales**
+- `Documentacion/Avance_Biblioteca_1.4.docx` — versión del equipo sobre el 1.3,
+  con los casos de uso extendidos `CU-01` a `CU-06` y el diagrama de casos de
+  uso incrustado. Es el insumo del que salió el Avance 2
+- `Documentacion/Avance_Biblioteca_2.docx` — **la entrega vigente**. Contiene
+  **únicamente los ocho criterios de la rúbrica**, uno por capítulo: requisitos,
+  casos de uso, casos de uso extendidos, proceso, modelado de datos, base de
+  datos, interfaces y trazabilidad. La planeación, el análisis y el estado de
+  avance se quedaron en la serie del Avance 1. Trece figuras, sin pies
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
-- `Documentacion/diagramas/` — **los ocho entregables gráficos del Avance 2**.
-  Un archivo por diagrama, con su explicación. Los de Mermaid se ven dibujados
-  en GitHub; `DIA-01` es un SVG. El `README.md` de esa carpeta explica cómo
-  exportarlos para pegarlos en el documento
+- `Documentacion/diagramas/` — los entregables gráficos. Un archivo por
+  diagrama, con su explicación; los de Mermaid se ven dibujados en GitHub.
+  Además:
+  - `DIA-01_casos_de_uso.svg` y `DIA-03_diagrama_de_proceso.svg`, dibujados a
+    mano para poder exportarlos a cualquier resolución
+  - `biblioteca_relacional.png` — **cuidado con el nombre: es el modelo
+    entidad-relación**, no el relacional. Lo hizo el equipo y el nombre
+    despista; ya provocó un error en una versión del Avance 2
+  - `DIA-06b_modelo_relacional.svg` — el relacional de verdad, sin
+    `notificaciones` por decisión de la Scrum Master
+  - `esquema_supabase.svg` y su `.png` — el esquema tal como lo muestra el
+    panel del gestor. **El SVG que exporta Supabase usa `foreignObject` con
+    HTML dentro**, así que ningún renderizador de SVG corriente lo dibuja: hay
+    que convertirlo con un navegador en modo headless
+  - `capturas/` — ocho capturas de la aplicación en ejecución contra la base
+    real, generadas con un guion que inicia sesión y fotografía cada pantalla
 - El **Reporte Técnico de Calidad** del sistema Java (de otra asignatura) vive
   en `NetBeansProjects/BibliotecaIngeSoftware/Documentacion/` y es la fuente
   de los diez defectos
