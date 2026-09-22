@@ -33,3 +33,9 @@ desktop.ini
 
 # --- Respaldos generados por el sistema ---
 respaldos/*.csv
+
+# --- Diagramas: el HTML de un solo archivo se genera, no se versiona ---
+# Pesa 3.5 MB porque lleva Mermaid dentro. Para revisar en linea esta GitHub;
+# para mandarlo por correo se regenera con herramientas/armar_html_diagramas.py
+Documentacion/diagramas/Diagramas_Avance_2.html
+.cache_diagramas/

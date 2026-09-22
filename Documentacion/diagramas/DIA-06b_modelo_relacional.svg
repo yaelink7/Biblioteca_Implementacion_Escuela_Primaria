@@ -1,0 +1,197 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 720" width="1060" height="720" font-family="Calibri, Arial, sans-serif">
+  <style>
+    .caja    { fill: #ffffff; stroke: #2D4B73; stroke-width: 1.6; }
+    .cab     { fill: #2D4B73; }
+    .cab-txt { font-size: 13px; font-weight: bold; fill: #ffffff; text-anchor: middle; }
+    .at      { font-size: 11.5px; fill: #1B2430; }
+    .pk      { font-size: 11.5px; fill: #1B2430; font-weight: bold; text-decoration: underline; }
+    .fk      { font-size: 11.5px; fill: #A8621B; font-style: italic; }
+    .tipo    { font-size: 10px; fill: #8A93A2; text-anchor: end; }
+    .fila    { fill: #F7F9FC; }
+    .ref     { stroke: #A8621B; stroke-width: 1.4; fill: none; }
+    .ref-r   { stroke: #C0392B; stroke-width: 1.8; fill: none; }
+    .nota    { font-size: 10px; fill: #A8621B; font-style: italic; }
+    .nota-r  { font-size: 10px; fill: #C0392B; font-weight: bold; }
+    .titulo  { font-size: 20px; font-weight: bold; fill: #2D4B73; text-anchor: middle; }
+    .sub     { font-size: 12px; fill: #5D6675; text-anchor: middle; }
+  </style>
+
+  <defs>
+    <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#A8621B"/>
+    </marker>
+    <marker id="flecha-r" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#C0392B"/>
+    </marker>
+  </defs>
+
+  <rect width="1060" height="720" fill="#ffffff"/>
+  <text x="530" y="30" class="titulo">DIA-06b · Modelo relacional</text>
+  <text x="530" y="50" class="sub">Traducción del modelo E-R al esquema físico · llave primaria subrayada · llave foránea en ámbar</text>
+
+  <!-- =================================================== PERFILES -->
+  <rect x="40" y="90" width="260" height="296" rx="4" class="caja"/>
+  <rect x="40" y="90" width="260" height="26" rx="4" class="cab"/>
+  <rect x="40" y="108" width="260" height="8" class="cab"/>
+  <text x="170" y="108" class="cab-txt">perfiles</text>
+  <rect x="41" y="116" width="258" height="18" class="fila"/>
+  <text x="50" y="129" class="pk">id</text><text x="292" y="129" class="tipo">uuid</text>
+  <text x="50" y="147" class="fk">auth_id</text><text x="292" y="147" class="tipo">uuid · UK</text>
+  <text x="50" y="165" class="at">rol</text><text x="292" y="165" class="tipo">rol_usuario</text>
+  <text x="50" y="183" class="at">codigo</text><text x="292" y="183" class="tipo">text · UK</text>
+  <text x="50" y="201" class="at">nombre</text><text x="292" y="201" class="tipo">text</text>
+  <text x="50" y="219" class="at">apellido</text><text x="292" y="219" class="tipo">text</text>
+  <text x="50" y="237" class="at">calle</text><text x="292" y="237" class="tipo">text</text>
+  <text x="50" y="255" class="at">colonia</text><text x="292" y="255" class="tipo">text</text>
+  <text x="50" y="273" class="at">numero</text><text x="292" y="273" class="tipo">integer</text>
+  <text x="50" y="291" class="at">codigo_postal</text><text x="292" y="291" class="tipo">text</text>
+  <text x="50" y="309" class="at">telefono</text><text x="292" y="309" class="tipo">text</text>
+  <text x="50" y="327" class="at">correo</text><text x="292" y="327" class="tipo">text</text>
+  <text x="50" y="345" class="at">activo</text><text x="292" y="345" class="tipo">boolean</text>
+  <text x="50" y="363" class="at">creado_en</text><text x="292" y="363" class="tipo">timestamptz</text>
+  <text x="50" y="381" class="at">actualizado_en</text><text x="292" y="381" class="tipo">timestamptz</text>
+
+  <!-- =================================================== USUARIOS -->
+  <rect x="40" y="420" width="260" height="80" rx="4" class="caja"/>
+  <rect x="40" y="420" width="260" height="26" rx="4" class="cab"/>
+  <rect x="40" y="438" width="260" height="8" class="cab"/>
+  <text x="170" y="438" class="cab-txt">usuarios</text>
+  <rect x="41" y="446" width="258" height="18" class="fila"/>
+  <text x="50" y="459" class="pk">perfil_id</text><text x="292" y="459" class="tipo">uuid · FK</text>
+  <text x="50" y="477" class="at">grado</text><text x="292" y="477" class="tipo">smallint · 1..6</text>
+  <text x="50" y="495" class="at">grupo</text><text x="292" y="495" class="tipo">text · ≤ 4</text>
+
+  <!-- =================================================== EMPLEADOS -->
+  <rect x="40" y="530" width="260" height="80" rx="4" class="caja"/>
+  <rect x="40" y="530" width="260" height="26" rx="4" class="cab"/>
+  <rect x="40" y="548" width="260" height="8" class="cab"/>
+  <text x="170" y="548" class="cab-txt">empleados</text>
+  <rect x="41" y="556" width="258" height="18" class="fila"/>
+  <text x="50" y="569" class="pk">perfil_id</text><text x="292" y="569" class="tipo">uuid · FK</text>
+  <text x="50" y="587" class="at">tipo_empleado</text><text x="292" y="587" class="tipo">text</text>
+  <text x="50" y="605" class="at">fecha_ingreso</text><text x="292" y="605" class="tipo">date</text>
+
+  <!-- =================================================== LIBROS -->
+  <rect x="740" y="90" width="260" height="260" rx="4" class="caja"/>
+  <rect x="740" y="90" width="260" height="26" rx="4" class="cab"/>
+  <rect x="740" y="108" width="260" height="8" class="cab"/>
+  <text x="870" y="108" class="cab-txt">libros</text>
+  <rect x="741" y="116" width="258" height="18" class="fila"/>
+  <text x="750" y="129" class="pk">id</text><text x="992" y="129" class="tipo">bigint</text>
+  <text x="750" y="147" class="at">titulo</text><text x="992" y="147" class="tipo">text</text>
+  <text x="750" y="165" class="at">autor</text><text x="992" y="165" class="tipo">text</text>
+  <text x="750" y="183" class="at">tipo_libro</text><text x="992" y="183" class="tipo">text</text>
+  <text x="750" y="201" class="at">editorial</text><text x="992" y="201" class="tipo">text</text>
+  <text x="750" y="219" class="at">existencias</text><text x="992" y="219" class="tipo">integer · ≥ 0</text>
+  <text x="750" y="237" class="at">ano_publicacion</text><text x="992" y="237" class="tipo">smallint</text>
+  <text x="750" y="255" class="at">num_paginas</text><text x="992" y="255" class="tipo">integer · &gt; 0</text>
+  <text x="750" y="273" class="at">activo</text><text x="992" y="273" class="tipo">boolean</text>
+  <text x="750" y="291" class="at">motivo_baja</text><text x="992" y="291" class="tipo">text</text>
+  <text x="750" y="309" class="at">dado_baja_en</text><text x="992" y="309" class="tipo">timestamptz</text>
+  <text x="750" y="327" class="at">creado_en</text><text x="992" y="327" class="tipo">timestamptz</text>
+  <text x="750" y="345" class="at">actualizado_en</text><text x="992" y="345" class="tipo">timestamptz</text>
+
+  <!-- =================================================== PRESTAMOS -->
+  <rect x="390" y="150" width="270" height="188" rx="4" class="caja"/>
+  <rect x="390" y="150" width="270" height="26" rx="4" class="cab"/>
+  <rect x="390" y="168" width="270" height="8" class="cab"/>
+  <text x="525" y="168" class="cab-txt">prestamos</text>
+  <rect x="391" y="176" width="268" height="18" class="fila"/>
+  <text x="400" y="189" class="pk">id</text><text x="652" y="189" class="tipo">bigint</text>
+  <text x="400" y="207" class="fk">libro_id</text><text x="652" y="207" class="tipo">bigint</text>
+  <text x="400" y="225" class="fk">usuario_id</text><text x="652" y="225" class="tipo">uuid</text>
+  <text x="400" y="243" class="fk">registrado_por</text><text x="652" y="243" class="tipo">uuid</text>
+  <text x="400" y="261" class="at">fecha_prestamo</text><text x="652" y="261" class="tipo">date</text>
+  <text x="400" y="279" class="at">fecha_limite</text><text x="652" y="279" class="tipo">date</text>
+  <text x="400" y="297" class="at">fecha_devolucion</text><text x="652" y="297" class="tipo">date</text>
+  <text x="400" y="315" class="at">estado</text><text x="652" y="315" class="tipo">estado_prestamo</text>
+  <text x="400" y="333" class="at">creado_en</text><text x="652" y="333" class="tipo">timestamptz</text>
+
+  <!-- =================================================== NOTIFICACIONES -->
+  <rect x="390" y="400" width="270" height="188" rx="4" class="caja"/>
+  <rect x="390" y="400" width="270" height="26" rx="4" class="cab"/>
+  <rect x="390" y="418" width="270" height="8" class="cab"/>
+  <text x="525" y="418" class="cab-txt">notificaciones</text>
+  <rect x="391" y="426" width="268" height="18" class="fila"/>
+  <text x="400" y="439" class="pk">id</text><text x="652" y="439" class="tipo">bigint</text>
+  <text x="400" y="457" class="fk">perfil_id</text><text x="652" y="457" class="tipo">uuid</text>
+  <text x="400" y="475" class="fk">prestamo_id</text><text x="652" y="475" class="tipo">bigint</text>
+  <text x="400" y="493" class="at">tipo</text><text x="652" y="493" class="tipo">text</text>
+  <text x="400" y="511" class="at">destinatario</text><text x="652" y="511" class="tipo">text</text>
+  <text x="400" y="529" class="at">estado</text><text x="652" y="529" class="tipo">text</text>
+  <text x="400" y="547" class="at">detalle</text><text x="652" y="547" class="tipo">text</text>
+  <text x="400" y="565" class="at">enviada_en</text><text x="652" y="565" class="tipo">timestamptz</text>
+  <text x="400" y="583" class="at">creada_en</text><text x="652" y="583" class="tipo">timestamptz</text>
+
+  <!-- =================================================== BITACORA -->
+  <rect x="740" y="400" width="260" height="152" rx="4" class="caja"/>
+  <rect x="740" y="400" width="260" height="26" rx="4" class="cab"/>
+  <rect x="740" y="418" width="260" height="8" class="cab"/>
+  <text x="870" y="418" class="cab-txt">bitacora_libros</text>
+  <rect x="741" y="426" width="258" height="18" class="fila"/>
+  <text x="750" y="439" class="pk">id</text><text x="992" y="439" class="tipo">bigint</text>
+  <text x="750" y="457" class="fk">libro_id</text><text x="992" y="457" class="tipo">bigint</text>
+  <text x="750" y="475" class="fk">perfil_id</text><text x="992" y="475" class="tipo">uuid</text>
+  <text x="750" y="493" class="at">accion</text><text x="992" y="493" class="tipo">text</text>
+  <text x="750" y="511" class="at">datos_antes</text><text x="992" y="511" class="tipo">jsonb</text>
+  <text x="750" y="529" class="at">datos_despues</text><text x="992" y="529" class="tipo">jsonb</text>
+  <text x="750" y="547" class="at">ocurrido_en</text><text x="992" y="547" class="tipo">timestamptz</text>
+
+  <!-- =================================================== REFERENCIAS -->
+  <!-- usuarios.perfil_id -> perfiles.id  (CASCADE) -->
+  <path d="M 40 459 L 20 459 L 20 129 L 40 129" class="ref" marker-end="url(#flecha)"/>
+  <text x="26" y="300" class="nota" transform="rotate(-90 26 300)">CASCADE</text>
+
+  <!-- empleados.perfil_id -> perfiles.id  (CASCADE) -->
+  <path d="M 40 569 L 10 569 L 10 135 L 40 135" class="ref" marker-end="url(#flecha)"/>
+  <text x="16" y="360" class="nota" transform="rotate(-90 16 360)">CASCADE</text>
+
+  <!-- prestamos.libro_id -> libros.id   RESTRICT -->
+  <path d="M 660 207 L 700 207 L 700 129 L 740 129" class="ref-r" marker-end="url(#flecha-r)"/>
+  <text x="704" y="172" class="nota-r" transform="rotate(-90 704 172)">RESTRICT</text>
+
+  <!-- prestamos.usuario_id -> perfiles.id  RESTRICT -->
+  <path d="M 390 225 L 345 225 L 345 123 L 300 123" class="ref-r" marker-end="url(#flecha-r)"/>
+  <text x="349" y="180" class="nota-r" transform="rotate(-90 349 180)">RESTRICT</text>
+
+  <!-- prestamos.registrado_por -> perfiles.id  SET NULL -->
+  <path d="M 390 243 L 366 243 L 366 141 L 300 141" class="ref" marker-end="url(#flecha)"/>
+  <text x="370" y="200" class="nota" transform="rotate(-90 370 200)">SET NULL</text>
+
+  <!-- notificaciones.perfil_id -> perfiles.id  CASCADE -->
+  <path d="M 390 457 L 330 457 L 330 153 L 300 153" class="ref" marker-end="url(#flecha)"/>
+  <text x="334" y="330" class="nota" transform="rotate(-90 334 330)">CASCADE</text>
+
+  <!-- notificaciones.prestamo_id -> prestamos.id  SET NULL -->
+  <path d="M 660 475 L 690 475 L 690 189 L 660 189" class="ref" marker-end="url(#flecha)"/>
+  <text x="694" y="350" class="nota" transform="rotate(-90 694 350)">SET NULL</text>
+
+  <!-- bitacora.libro_id -> libros.id  CASCADE -->
+  <path d="M 1000 457 L 1032 457 L 1032 129 L 1000 129" class="ref" marker-end="url(#flecha)"/>
+  <text x="1042" y="300" class="nota" transform="rotate(-90 1042 300)">CASCADE</text>
+
+  <!-- bitacora.perfil_id -> perfiles.id  SET NULL -->
+  <path d="M 740 475 L 716 475 L 716 640 L 316 640 L 316 165 L 300 165" class="ref" marker-end="url(#flecha)"/>
+  <text x="520" y="653" class="nota">SET NULL</text>
+
+  <!-- =================================================== RESTRICCION ESPECIAL -->
+  <rect x="390" y="620" width="270" height="62" rx="4" fill="#FDF3E7" stroke="#A8621B" stroke-width="1.4" stroke-dasharray="4 3"/>
+  <text x="400" y="638" class="at" font-weight="bold" fill="#A8621B">Índice único parcial</text>
+  <text x="400" y="654" class="at" font-size="10.5">prestamos (usuario_id)</text>
+  <text x="400" y="668" class="at" font-size="10.5">where estado in ('activo','vencido')</text>
+  <line x1="525" y1="620" x2="525" y2="588" class="ref" stroke-dasharray="4 3"/>
+
+  <!-- =================================================== LEYENDA -->
+  <g transform="translate(40,640)">
+    <text x="0" y="0" class="at" font-weight="bold">Leyenda</text>
+    <text x="0" y="18" class="pk">atributo</text><text x="70" y="18" class="at">llave primaria</text>
+    <text x="0" y="34" class="fk">atributo</text><text x="70" y="34" class="at">llave foránea</text>
+    <text x="0" y="50" class="at">UK</text><text x="70" y="50" class="at">restricción de unicidad</text>
+  </g>
+  <g transform="translate(740,620)">
+    <line x1="0" y1="8" x2="30" y2="8" class="ref-r" marker-end="url(#flecha-r)"/>
+    <text x="38" y="12" class="at">RESTRICT · conserva el historial</text>
+    <line x1="0" y1="30" x2="30" y2="30" class="ref" marker-end="url(#flecha)"/>
+    <text x="38" y="34" class="at">CASCADE / SET NULL</text>
+  </g>
+</svg>
