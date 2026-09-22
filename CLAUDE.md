@@ -94,8 +94,14 @@ No son preferencias de estilo: son acuerdos con Yael. Respétalas.
   a `main`. Al mergearlos seguidos, GitHub no reajusta las bases a tiempo y los
   cambios terminan en la rama intermedia. Pasó **dos veces** (#47/#48 y #53) y
   hubo que abrir PR de rescate (#49 y #54).
-- **Empujar a una rama ya mergeada.** Los commits posteriores al merge del #55
-  se quedaron fuera de `main` y hubo que abrir el #56.
+- **Empujar a una rama ya mergeada.** Ha pasado **cuatro veces**: tras el #55
+  (rescate #56), tras el #68, tras el #80 y tras el #82 (rescate #83). El
+  patrón es siempre el mismo: se entrega, la Scrum Master mergea, y se sigue
+  empujando a esa rama porque el PR «sigue abierto» en la sesión. La última vez
+  dejó la migración 10 aplicada en Supabase pero sin registrar en `main`, con
+  la aplicación llamando todavía a la función vieja.
+  **Antes de empujar, comprobar:** `git log --oneline origin/main..HEAD` — si
+  la rama ya se mergeó, abrir una rama nueva desde `main`.
 - **Verificar nombres de archivo con acentos.** `git ls-tree` escapa `ó` como
   `\303\263`; comparar esa cadena contra el sistema de archivos da falsos
   «archivo faltante». Usar `git ls-tree -z` o `core.quotepath false`.
