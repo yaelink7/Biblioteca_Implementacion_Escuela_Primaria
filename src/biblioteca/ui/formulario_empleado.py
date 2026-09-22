@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QDialog, QWidget
 
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.sesion import sesion_actual
 from biblioteca.modelos.persona import Empleado, Rol
 from biblioteca.repositorios import personas as repo_personas
@@ -46,10 +47,12 @@ class FormularioEmpleado(QDialog):
             self._cargar(empleado)
             self.ui.campoCodigo.setEnabled(False)
 
-        # Cambiar el perfil de acceso queda reservado al administrador; la
-        # regla la impone la base, esto solo evita ofrecer lo que sera
-        # rechazado. Al dar de alta, el perfil forma parte del registro.
-        if not self.es_alta and sesion_actual().perfil.rol != Rol.ADMINISTRADOR:
+        # Cambiar el perfil de acceso queda reservado al administrador,
+        # **tambien al dar de alta**. Antes la restriccion solo se aplicaba al
+        # modificar, de modo que cualquiera del personal podia registrar a un
+        # administrador nuevo y entrar con el. La base todavia lo permite
+        # (proteger_rol solo vigila el UPDATE): falta la migracion 10.
+        if sesion_actual().perfil.rol != Rol.ADMINISTRADOR:
             self.ui.campoRol.setEnabled(False)
             self.ui.etiquetaRol.setText("Perfil en el sistema (solo administrador)")
 
@@ -105,8 +108,10 @@ class FormularioEmpleado(QDialog):
             else:
                 repo_personas.actualizar(empleado)
                 self.guardado = empleado
-        except repo_personas.ErrorDePersona as error:
-            self.ui.etiquetaError.setText(str(error))
+        except Exception as error:
+            # Cualquier fallo, no solo el que rechaza la base: sin esto
+            # un corte de red se leia como «la base rechazo la operacion».
+            self.ui.etiquetaError.setText(causa_del_error(error))
             self.ui.botonGuardar.setEnabled(True)
             return
 

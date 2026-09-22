@@ -191,8 +191,8 @@ class PantallaCatalogo(QWidget):
 
         try:
             repo_libros.dar_de_baja(libro.id, motivo.strip())
-        except repo_libros.ErrorDeCatalogo as error:
-            QMessageBox.warning(self, "No se pudo dar de baja", str(error))
+        except Exception as error:
+            QMessageBox.warning(self, "No se pudo dar de baja", mensaje_de_error(error))
             return
 
         self.recargar()

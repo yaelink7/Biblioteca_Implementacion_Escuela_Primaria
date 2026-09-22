@@ -172,8 +172,8 @@ class PantallaPrestamos(QWidget):
 
         try:
             repo_prestamos.devolver(prestamo.id)
-        except repo_prestamos.ErrorDePrestamo as error:
-            QMessageBox.warning(self, "No se pudo registrar la devolución", str(error))
+        except Exception as error:
+            QMessageBox.warning(self, "No se pudo registrar la devolución", mensaje_de_error(error))
             return
 
         self.recargar()

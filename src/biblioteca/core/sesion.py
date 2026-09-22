@@ -9,6 +9,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from biblioteca.core.errores import causa as causa_del_error
+from biblioteca.core.errores import causa as causa_del_error
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.persona import Perfil, Rol
 
@@ -49,7 +52,12 @@ def iniciar_sesion(correo: str, contrasena: str) -> Sesion:
             {"email": correo, "password": contrasena}
         )
     except Exception as error:
-        raise ErrorDeAcceso("Correo o contraseña incorrectos.") from error
+        # Antes cualquier excepcion salia como credenciales malas: sin
+        # internet la bibliotecaria tecleaba su contrasena cinco veces y
+        # terminaba cambiandola. El traductor distingue la causa, y para
+        # credenciales sigue sin decir cual de los dos campos fallo
+        # (REQ-USU-02).
+        raise ErrorDeAcceso(causa_del_error(error)) from error
 
     if not respuesta.user:
         raise ErrorDeAcceso("Correo o contraseña incorrectos.")

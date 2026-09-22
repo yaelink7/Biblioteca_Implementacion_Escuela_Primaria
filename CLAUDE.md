@@ -4,8 +4,9 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 20 de septiembre de 2026 — los ocho diagramas del
-Avance 2, en `Documentacion/diagramas/`.
+**Última actualización:** 21 de septiembre de 2026 — corregidos los defectos
+de código que encontró la auditoría profunda. Lo que falta necesita la
+migración 10; ver la sección 6.
 
 ---
 
@@ -174,6 +175,7 @@ src/biblioteca/
     supabase_cliente.py    cliente único, cacheado con lru_cache
     sesion.py              iniciar_sesion, cerrar_sesion, sesion_actual, exigir_personal
     errores.py             explicar(), mensaje(), causa(): por qué falló de verdad
+    consultas.py           patron_de_busqueda(): escapa el texto para PostgREST
   modelos/                 entidades del dominio, sin acceso a datos
     persona.py             Rol (enum), Perfil → Alumno, Empleado
     libro.py               Publicacion → Libro
@@ -199,7 +201,7 @@ src/biblioteca/
 herramientas/
   compilar_ui.py           convierte los .ui en módulos de Python
 database/migraciones/      9 migraciones, ya aplicadas en Supabase
-tests/                     48 pruebas con pytest
+tests/                     96 pruebas con pytest
 Documentacion/             entregables de la materia
 .vscode/                   launch.json, settings.json, extensions.json
 ```
@@ -304,7 +306,7 @@ políticas RLS. Lo que nunca debe salir del panel de Supabase es la llave
 
 ```bash
 .venv/Scripts/python.exe main.py                        # ejecutar
-.venv/Scripts/python.exe -m pytest tests/ -v            # 48 pruebas, <1 s
+.venv/Scripts/python.exe -m pytest tests/ -v            # 96 pruebas, <1 s
 .venv/Lib/site-packages/PySide6/designer.exe            # editar pantallas
 .venv/Scripts/python.exe herramientas/compilar_ui.py    # recompilar los .ui
 ```
@@ -418,20 +420,62 @@ corregidos** (PR #55):
 3. Los días de retraso se calculaban con dos relojes distintos.
 4. La fecha de devolución la ponía el cliente.
 
-**Mejoras pendientes, ninguna urgente:**
+## Auditoría profunda — 21 de septiembre
 
-- Código muerto: `sesion.py:exigir_personal()` y `libros.py:obtener()`
+Diez auditorías en paralelo sobre código, esquema, pruebas, documentos y
+backlog. Unos 240 hallazgos en bruto, ~130 reales.
+
+### Corregido en el código
+
+| Defecto | Qué pasaba |
+|---|---|
+| Los patrones de error no coincidían con la base | Tres de las reglas más usadas buscaban textos que los disparadores **nunca emiten**, así que «no quedan ejemplares» llegaba como volcado de Postgres |
+| Cuatro traductores de errores | Cada repositorio tenía su lista y se contradecían: el mismo `duplicate key` significaba tres cosas distintas. Ahora todos delegan en `core/errores.py` |
+| `"401"` como señal de sesión vencida | Cualquier error con esos dígitos —un `id` 1401— mandaba a reiniciar sesión |
+| Las tres pantallas de captura | No pasaban por el traductor: un corte de red se leía «la base rechazó la operación» |
+| El login culpaba a la contraseña | Sin internet decía «correo o contraseña incorrectos», y la bibliotecaria la cambiaba |
+| La coma rompía la búsqueda | «García, Ana» partía el filtro de PostgREST. Ahora se escapa en `core/consultas.py` |
+| `date.today()` en el préstamo | Anunciaba una fecha de vencimiento que la base no iba a guardar. Ahora muestra el plazo, no una fecha |
+| `filas.data[0]` sin guarda | Un `UPDATE` que no afectaba filas reventaba con `IndexError` que ninguna pantalla atrapa |
+| La búsqueda por salón | No filtraba por `activo` ni por rol: «4B» mostraba alumnos dados de baja que su nombre no mostraba |
+| El perfil de acceso al dar de alta | El combo solo se bloqueaba al modificar, de modo que cualquiera podía registrar a un administrador |
+
+Las pruebas pasaron de 48 a 96. Las nuevas cubren **cada mensaje que la base
+levanta**, copiado literalmente de los `raise exception` de las migraciones:
+si un disparador cambia su texto y nadie actualiza el traductor, la prueba
+falla. Antes `coverage` reportaba 100 % con siete de las ocho reglas sin
+interrogar.
+
+### Lo que NO se pudo arreglar sin tocar la base
+
+Necesitan la **migración 10**, y hasta entonces siguen abiertos:
+
+1. **Escalada de privilegios.** `proteger_rol` es `before update of rol`: no
+   corre en el INSERT, `perfiles_alta` solo exige `es_personal()` y
+   `registrar_empleado` acepta `p_rol => 'administrador'`. Además `auth_id`
+   no está protegido, así que se puede repuntar el del administrador. Se cerró
+   la puerta de la interfaz; **la de la API sigue abierta**.
+2. **Cambiar el puesto de un empleado no guarda nada.** `tipo_empleado` vive
+   en la tabla `empleados` y `actualizar()` solo escribe `perfiles`. Falta una
+   función `actualizar_empleado` como la que ya existe para alumnos.
+3. **El inventario puede descuadrarse.** `mover_inventario` no cubre el
+   `DELETE` de un préstamo, ni reabrir uno devuelto, ni cambiar `libro_id`.
+4. **El reloj sigue en UTC.** Seis sitios usan `current_date`: en Veracruz un
+   libro se marca vencido desde las 18:00 del día que aún no vence.
+
+### Mejoras pendientes, ninguna urgente
+
+- Código muerto: `sesion.py:exigir_personal()`, `sesion.py:hay_sesion()`,
+  `libros.py:obtener()` y los dos `datos_propios()` de `modelos/persona.py`
 - Diez consultas de los repositorios sin `.limit()`
-- Un `except: pass` silencioso al cerrar sesión
-- ~~Veinte `except Exception` genéricos~~ — **corregido**. Las nueve pantallas
-  usan `core/errores.py`, que distingue la falta de red, la sesión vencida, el
-  permiso faltante, la regla de la base y el defecto de programación. Cada
-  mensaje dice la causa, qué hacer y el detalle técnico. Es lo que exige
-  `RNF-USA-03`, que antes el código contradecía. Los repositorios conservan sus
-  propios `_mensaje_claro()`, que ya traducían bien
+- Un `except Exception: pass` silencioso al cerrar sesión
+- `core/config.py` lee el entorno al importarse, así que ni las funciones puras
+  de los repositorios se pueden probar sin `.env`
 - Sin pruebas de repositorios, sesión ni interfaz
 - Supabase avisa que la protección contra contraseñas filtradas está
   desactivada — es un interruptor en el panel
+- Hay un libro de prueba en el catálogo real: `"El principito"` duplicado,
+  autor `"nl"`
 
 ---
 

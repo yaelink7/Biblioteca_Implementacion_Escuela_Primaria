@@ -11,6 +11,7 @@ from datetime import date
 
 from PySide6.QtWidgets import QDialog, QWidget
 
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.modelos.libro import Libro
 from biblioteca.repositorios import libros as repo_libros
 from biblioteca.servicios import validador_libro
@@ -86,8 +87,10 @@ class FormularioLibro(QDialog):
                 self.guardado = repo_libros.dar_de_alta(libro)
             else:
                 self.guardado = repo_libros.modificar(libro)
-        except repo_libros.ErrorDeCatalogo as error:
-            self.ui.etiquetaError.setText(str(error))
+        except Exception as error:
+            # Cualquier fallo, no solo el que rechaza la base: sin esto
+            # un corte de red se leia como «la base rechazo la operacion».
+            self.ui.etiquetaError.setText(causa_del_error(error))
             self.ui.botonGuardar.setEnabled(True)
             return
 

@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import re
 
+from biblioteca.core.consultas import patron_de_busqueda
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.persona import Alumno, Empleado, Perfil, Rol
 
@@ -41,7 +43,7 @@ def buscar_alumnos(texto: str) -> list[Alumno]:
     if not texto:
         return listar_alumnos()
 
-    patron = f"%{texto}%"
+    patron = patron_de_busqueda(texto)
     filas = (
         obtener_cliente()
         .table(TABLA_PERFILES)
@@ -86,7 +88,11 @@ def alumnos_del_salon(grado: int, grupo: str) -> list[Alumno]:
     alumnos = []
     for fila in filas.data:
         perfil = fila.pop("perfiles", None)
-        if perfil:
+        # Los mismos filtros que listar_alumnos y buscar_alumnos: sin ellos,
+        # teclear "4B" mostraba alumnos dados de baja que teclear su nombre
+        # no mostraba. Se filtra aqui porque el .eq() de PostgREST sobre una
+        # tabla anidada recorta el anidado, no la fila padre.
+        if perfil and perfil.get("activo") and perfil.get("rol") == str(Rol.ALUMNO):
             alumnos.append(Alumno.desde_fila({**perfil, **fila}))
     return sorted(alumnos, key=lambda a: a.apellido)
 
@@ -228,6 +234,14 @@ def actualizar(perfil: Perfil) -> Perfil:
     except Exception as error:
         raise ErrorDePersona(_mensaje_claro(error)) from error
 
+    if not filas.data:
+        # Sin esta guarda un UPDATE que no afecta filas —id que ya
+        # no existe, o fila invisible por RLS— reventaba con
+        # IndexError, que ninguna pantalla atrapa.
+        raise ErrorDePersona(
+            "La base no devolvió la persona después de guardar. "
+            "Actualiza la pantalla y comprueba si el cambio quedó."
+        )
     return Perfil.desde_fila(filas.data[0])
 
 
@@ -240,24 +254,11 @@ def _aplanar(fila: dict, anidada: str) -> dict:
 
 
 def _mensaje_claro(error: Exception) -> str:
-    texto = str(error)
+    """Traduce el error de la base. El traductor vive en core/errores.py.
 
-    # Las funciones de Postgres lanzan su propio mensaje ya redactado para
-    # el usuario; se devuelve tal cual en lugar de envolverlo en ruido.
-    for propio in ("No se encontró", "no puede tener perfil",
-                   "No puedes cambiar tu propio", "Solo un administrador"):
-        if propio in texto:
-            inicio = texto.index(propio)
-            return texto[inicio:].split("'")[0].split('"')[0].strip()
-
-    if "perfiles_codigo_key" in texto or ("duplicate key" in texto and "codigo" in texto):
-        return "Ya existe una persona registrada con ese código."
-    if "correo" in texto and "check" in texto:
-        return "El correo electrónico no tiene un formato válido."
-    if "nombre" in texto and "check" in texto:
-        return "El nombre y el apellido no pueden ir vacíos."
-    if "grado" in texto and "check" in texto:
-        return "El grado debe estar entre 1 y 6."
-    if "violates row-level security" in texto or "42501" in texto:
-        return "Tu perfil no tiene permiso para registrar personas."
-    return f"La base de datos rechazó la operación: {texto}"
+    Antes cada repositorio tenia su propia lista y se contradecian: el mismo
+    `duplicate key` significaba tres cosas distintas segun quien lo atrapara.
+    Ademas buscaban textos que los disparadores nunca emiten, asi que las
+    reglas mas usadas llegaban al bibliotecario como volcado de Postgres.
+    """
+    return causa_del_error(error)

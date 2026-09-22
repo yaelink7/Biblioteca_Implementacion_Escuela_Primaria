@@ -11,6 +11,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.prestamo import EstadoPrestamo, Prestamo
 
@@ -155,17 +156,11 @@ def deudores() -> list[Deudor]:
 
 
 def _mensaje_claro(error: Exception) -> str:
-    texto = str(error)
+    """Traduce el error de la base. El traductor vive en core/errores.py.
 
-    if "prestamo_unico_activo" in texto or "duplicate key" in texto:
-        return (
-            "Este alumno ya tiene un préstamo activo. "
-            "Solo se permite un libro por alumno."
-        )
-    if "existencias" in texto or "sin ejemplares" in texto:
-        return "No quedan ejemplares disponibles de este libro."
-    if "violates row-level security" in texto or "42501" in texto:
-        return "Tu perfil no tiene permiso para registrar préstamos."
-    if "foreign key" in texto:
-        return "El libro o el alumno indicado no existe."
-    return f"La base de datos rechazó la operación: {texto}"
+    Antes cada repositorio tenia su propia lista y se contradecian: el mismo
+    `duplicate key` significaba tres cosas distintas segun quien lo atrapara.
+    Ademas buscaban textos que los disparadores nunca emiten, asi que las
+    reglas mas usadas llegaban al bibliotecario como volcado de Postgres.
+    """
+    return causa_del_error(error)

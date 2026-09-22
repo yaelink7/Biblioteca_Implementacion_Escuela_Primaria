@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from biblioteca.core.consultas import patron_de_busqueda
+from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.libro import Libro
 from biblioteca.servicios import validador_libro
@@ -35,7 +37,7 @@ def buscar(texto: str) -> list[Libro]:
     if not texto:
         return listar()
 
-    patron = f"%{texto}%"
+    patron = patron_de_busqueda(texto)
     filas = (
         obtener_cliente()
         .table(TABLA)
@@ -52,6 +54,7 @@ def obtener(libro_id: int) -> Libro | None:
     filas = (
         obtener_cliente().table(TABLA).select(_COLUMNAS).eq("id", libro_id).execute()
     )
+    # Una lectura que no encuentra nada no es un error: devuelve None.
     return Libro.desde_fila(filas.data[0]) if filas.data else None
 
 
@@ -74,6 +77,14 @@ def dar_de_alta(libro: Libro) -> Libro:
     except Exception as error:
         raise ErrorDeCatalogo(_mensaje_claro(error)) from error
 
+    if not filas.data:
+        # Sin esta guarda, un insert que no devuelve la fila —por ejemplo si
+        # RLS deja escribir pero no leer— reventaba con IndexError, que
+        # ninguna pantalla atrapa: el diálogo se quedaba colgado sin decir nada.
+        raise ErrorDeCatalogo(
+            "La base no devolvió el libro después de guardarlo. "
+            "Actualiza la pantalla y comprueba si quedó registrado."
+        )
     return Libro.desde_fila(filas.data[0])
 
 
@@ -96,6 +107,14 @@ def modificar(libro: Libro) -> Libro:
     except Exception as error:
         raise ErrorDeCatalogo(_mensaje_claro(error)) from error
 
+    if not filas.data:
+        # Sin esta guarda un UPDATE que no afecta filas —id que ya
+        # no existe, o fila invisible por RLS— reventaba con
+        # IndexError, que ninguna pantalla atrapa.
+        raise ErrorDeCatalogo(
+            "La base no devolvió el libro después de guardar. "
+            "Actualiza la pantalla y comprueba si el cambio quedó."
+        )
     return Libro.desde_fila(filas.data[0])
 
 
@@ -127,17 +146,11 @@ def dar_de_baja(libro_id: int, motivo: str) -> None:
 
 
 def _mensaje_claro(error: Exception) -> str:
-    """Traduce el error crudo de Postgres a algo accionable."""
-    texto = str(error)
+    """Traduce el error de la base. El traductor vive en core/errores.py.
 
-    if "ano_publicacion" in texto or "futuro" in texto:
-        return "El año de publicación no puede ser futuro."
-    if "prestamos activos" in texto or "prestamo activo" in texto:
-        return "No se puede dar de baja: el libro tiene préstamos activos."
-    if "existencias" in texto:
-        return "Las existencias no pueden quedar en negativo."
-    if "duplicate key" in texto or "unique" in texto:
-        return "Ya existe un libro con ese identificador."
-    if "violates row-level security" in texto or "42501" in texto:
-        return "Tu perfil no tiene permiso para modificar el catálogo."
-    return f"La base de datos rechazó la operación: {texto}"
+    Antes cada repositorio tenia su propia lista y se contradecian: el mismo
+    `duplicate key` significaba tres cosas distintas segun quien lo atrapara.
+    Ademas buscaban textos que los disparadores nunca emiten, asi que las
+    reglas mas usadas llegaban al bibliotecario como volcado de Postgres.
+    """
+    return causa_del_error(error)
