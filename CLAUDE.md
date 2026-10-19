@@ -406,6 +406,12 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #69 | Archivo de contexto al día tras el Avance 1.2 y el cronograma |
 | #70 | Avance 1.3 — **cerrado sin mergear**, se rehará sobre el 1.2 corregido |
 | #71 | Corrección de los requerimientos funcionales del 1.2, por el equipo |
+| #80 | Acuerdos de la reunión con la escuela, y las ocho historias que dejó |
+| #81 | Los ocho diagramas del Sprint 1, en `Documentacion/diagramas/` |
+| #82 | Los diez defectos de la auditoría profunda + migración 10 |
+| #83 | PR de rescate: integró a `main` la migración 10 y `actualizar_empleado` |
+| #84 | Avance 2 con los ocho criterios de la rúbrica; regla 4 ampliada |
+| #85 | Suite de pruebas rehecha sobre la del sistema Java (ver 6.4) |
 
 ## La migración del Java está terminada
 
