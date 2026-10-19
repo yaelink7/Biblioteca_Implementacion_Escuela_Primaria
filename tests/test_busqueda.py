@@ -57,13 +57,42 @@ def test_el_patron_se_puede_importar_sin_credenciales():
     faltan, y los repositorios lo arrastran. Por eso ni sus funciones puras se
     podian probar en una maquina sin `.env`. Este modulo no debe heredarlo:
     se comprueba en un proceso aparte, con el entorno limpio.
+
+    **El proceso aparte es la parte que importa.** Antes se miraba el
+    `sys.modules` de este mismo proceso, y eso solo decia la verdad mientras
+    ningun otro archivo de la suite importara `config`. Al agregarse las
+    pruebas de repositorios y de interfaz dejo de cumplirse, y la prueba
+    empezo a fallar por lo que habian hecho sus vecinas en vez de por lo que
+    hace `consultas.py`. Aqui se arranca un interprete limpio que importa
+    solo ese modulo, de modo que su `sys.modules` responde por el y por
+    nadie mas.
     """
+    import subprocess
     import sys
+    from pathlib import Path
 
-    import biblioteca.core.consultas  # noqa: F401
+    import biblioteca
 
-    assert "biblioteca.core.config" not in sys.modules, (
-        "core/consultas.py arrastro core/config.py, que exige las variables "
-        "de entorno al importarse"
+    # `pythonpath = ["src"]` del pyproject solo aplica a pytest; el proceso
+    # nuevo necesita que se le diga donde vive el paquete.
+    src = str(Path(biblioteca.__file__).resolve().parents[1])
+    guion = (
+        "import sys, biblioteca.core.consultas\n"
+        "arrastrados = [m for m in ('biblioteca.core.config',\n"
+        "                           'biblioteca.core.supabase_cliente')\n"
+        "               if m in sys.modules]\n"
+        "print(','.join(arrastrados))\n"
     )
-    assert "biblioteca.core.supabase_cliente" not in sys.modules
+
+    proceso = subprocess.run(
+        [sys.executable, "-c", guion],
+        capture_output=True, text=True, cwd=src,
+    )
+
+    assert proceso.returncode == 0, (
+        f"core/consultas.py no se pudo importar solo: {proceso.stderr[-400:]}"
+    )
+    assert proceso.stdout.strip() == "", (
+        f"core/consultas.py arrastro {proceso.stdout.strip()}, que exige las "
+        "variables de entorno al importarse"
+    )

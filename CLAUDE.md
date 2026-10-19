@@ -4,8 +4,9 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 22 de septiembre de 2026 — Avance 2 entregado, con
-los ocho criterios de la rúbrica.
+**Última actualización:** 19 de octubre de 2026 — suite de pruebas rehecha
+sobre la del sistema Java, con sus cuatro grupos y la medición de cobertura
+que el informe de JaCoCo pedía (ver 6.4).
 
 ---
 
@@ -227,8 +228,13 @@ src/biblioteca/
     empleados.py           + formulario_empleado.py
 herramientas/
   compilar_ui.py           convierte los .ui en módulos de Python
-database/migraciones/      9 migraciones, ya aplicadas en Supabase
-tests/                     96 pruebas con pytest
+database/migraciones/      10 migraciones, ya aplicadas en Supabase
+tests/                     684 pruebas con pytest, en los cuatro grupos que
+  conftest.py              tenía la suite JUnit del sistema Java
+  caja_negra/              las reglas, sin leer la implementación
+  caja_blanca/             las ramas del código, con dobles del cliente
+  interfaz/                las nueve pantallas, Qt en modo offscreen
+  integracion/             el flujo completo, de la pantalla a la consulta
 Documentacion/             entregables de la materia
 .vscode/                   launch.json, settings.json, extensions.json
 ```
@@ -337,7 +343,7 @@ políticas RLS. Lo que nunca debe salir del panel de Supabase es la llave
 
 ```bash
 .venv/Scripts/python.exe main.py                        # ejecutar
-.venv/Scripts/python.exe -m pytest tests/ -v            # 96 pruebas, <1 s
+.venv/Scripts/python.exe -m pytest tests/ -v            # 684 pruebas, ~5 s
 .venv/Lib/site-packages/PySide6/designer.exe            # editar pantallas
 .venv/Scripts/python.exe herramientas/compilar_ui.py    # recompilar los .ui
 ```
@@ -475,7 +481,8 @@ Las pruebas pasaron de 48 a 96. Las nuevas cubren **cada mensaje que la base
 levanta**, copiado literalmente de los `raise exception` de las migraciones:
 si un disparador cambia su texto y nadie actualiza el traductor, la prueba
 falla. Antes `coverage` reportaba 100 % con siete de las ocho reglas sin
-interrogar.
+interrogar. *(Esas 96 son las de la auditoría; después se rehizo la suite
+entera sobre la del sistema Java y quedaron 684 — ver 6.4.)*
 
 ### Corregido en la base — migración 10, aplicada el 22 de septiembre
 
@@ -528,14 +535,98 @@ el propio usuario ya tiene sobre sí mismo.
 - Código muerto: `sesion.py:exigir_personal()`, `sesion.py:hay_sesion()`,
   `libros.py:obtener()` y los dos `datos_propios()` de `modelos/persona.py`
 - Diez consultas de los repositorios sin `.limit()`
-- Un `except Exception: pass` silencioso al cerrar sesión
-- `core/config.py` lee el entorno al importarse, así que ni las funciones puras
-  de los repositorios se pueden probar sin `.env`
-- Sin pruebas de repositorios, sesión ni interfaz
+- Un `except Exception: pass` silencioso al cerrar sesión — **ya probado**:
+  existe para que la aplicación pueda cerrarse sin internet
+- ~~`core/config.py` lee el entorno al importarse~~ — sigue leyéndolo, pero ya
+  no impide probar: `tests/conftest.py` pone valores de prueba antes de que
+  nada importe el paquete
+- ~~Sin pruebas de repositorios, sesión ni interfaz~~ — las tres capas están
+  al 100 %, ver la sección 6.4
 - Supabase avisa que la protección contra contraseñas filtradas está
   desactivada — es un interruptor en el panel
 - Hay un libro de prueba en el catálogo real: `"El principito"` duplicado,
   autor `"nl"`
+
+## 6.4 La suite de pruebas — rehecha sobre la del sistema Java
+
+El sistema Java tenía **70 pruebas JUnit en 16 archivos**, repartidas en
+cuatro paquetes, y un informe de métricas con JaCoCo. Se rehicieron los
+cuatro grupos, no solo caja blanca y negra: `QA-02` (#19) queda cerrado.
+
+| Paquete Java | Qué probaba | Archivos · pruebas | Equivalente aquí | Pruebas |
+|---|---|---|---|---|
+| `ClasesBiblia` | Entidades del dominio | 4 · 13 | `tests/caja_negra/` | 162 |
+| `DAOBiblia` | Persistencia en CSV | 2 · 5 | `tests/caja_blanca/` | 176 |
+| `GUIBiblia` | Las ventanas Swing | 10 · 47 | `tests/interfaz/` | 226 |
+| `ConsolaBiblia` | Alta de libro completa | 1 · 9 | `tests/integracion/` | 24 |
+| | | | los cinco archivos que ya existían | 96 |
+| **16 · 70** | | | **684** | |
+
+**La diferencia está en el indicador de ramas, no en el de líneas.** El
+informe del Java reportaba **74 % de instrucciones y 24 % de ramas**, y su
+propia conclusión era que «las pruebas recorren el código, pero no lo
+interrogan». Midiendo lo mismo con `coverage`, que es el JaCoCo de Python:
+
+| | Sistema Java | Aquí |
+|---|---|---|
+| Instrucciones · sentencias | 74 % | **100 %** (1 617, ninguna sin recorrer) |
+| Ramas | 24 % | **99 %** (357 de 360) |
+| Capa gráfica, ramas | 14 % | 100 % en las nueve pantallas |
+
+```bash
+.venv/Scripts/python.exe -m pytest tests/ --cov=biblioteca --cov-branch
+```
+
+Las tres ramas parciales que quedan son salidas de bucle sin interés y una
+condición de `ui/estilo.py`. Los `ui_*.py` de `ui/generado/` se cuentan
+aparte: son código de máquina que se sobrescribe, y mezclarlos infla la cifra
+igual que `GUIBiblia` inflaba la del original.
+
+### Qué cambió respecto del original, y por qué
+
+- **Los casos TC-19 a TC-30 ya se pueden ejecutar.** La matriz del Java los
+  dejaba sin automatizar porque la lógica vivía dentro de `guardarenlista`,
+  un método privado de `GUILibro` atado a Swing, y cada `JOptionPane` dejaba
+  la suite esperando un clic. Al extraer las reglas a `servicios/` dejaron de
+  necesitar una ventana.
+- **`AltaLibroConsola` ya no hace falta.** Era un desvío: una interfaz de
+  texto escrita para poder probar lo que el formulario no dejaba. Se probaba
+  el desvío, no el camino del usuario. `tests/integracion/` recorre el
+  formulario real.
+- **Tres pruebas cambiaron de signo.** Las que documentaban D-01, D-06 y D-09
+  celebraban que el sistema aceptara datos que sus mensajes decían rechazar.
+  Ahora comprueban el rechazo.
+- **Los tres casos de CSV siguen sin cerrarse.** `tests/caja_negra/
+  test_alta_de_libro.py` trae la prueba de TC-06 marcada como fallo esperado:
+  el día que se implemente `REP-03` (#38) deja de fallar y avisa sola.
+
+### Cosas que las pruebas nuevas encontraron
+
+- **`repositorios/prestamos.py:189`** — `registrar()` hace `filas.data[0]` sin
+  la guarda que sí tienen `libros.dar_de_alta` y `libros.modificar`. Con una
+  respuesta vacía levanta `IndexError`, que no es `ErrorDePrestamo` y
+  **ninguna pantalla atrapa**. La prueba fija el comportamiento de hoy: el día
+  que se agregue la guarda, falla y hay que cambiarla.
+- **`core/sesion.py:12-14`** — el mismo `import` repetido tres veces.
+- **`ui/formulario_empleado.py:52-56`** — el comentario dice «falta la
+  migración 10». Ya está aplicada.
+- **`repositorios/personas.py:_aplanar()`** consume el diccionario que recibe
+  (`fila.pop`). En la aplicación da igual, porque cada fila llega recién
+  deserializada; queda anotado porque no se ve al leer la llamada.
+
+### Dos trampas del andamiaje, por si alguien agrega pruebas
+
+1. **Un widget sin nombre al que apuntar se destruye solo.** `Pantalla().ui.x`
+   deja la pantalla como temporal: Python la recoge y Qt destruye el objeto
+   C++ antes de la aserción. Hay que guardarla en una variable.
+2. **`monkeypatch.setattr(QMessageBox, "warning", ...)` no prende**, porque es
+   un tipo de Shiboken: el cuadro se abre de verdad y la suite se cuelga
+   esperando un clic — el mismo problema que el Java no supo resolver. Se
+   sustituye el nombre que importa cada módulo de `ui/`.
+
+`tests/conftest.py` tiene además una red de seguridad de ámbito de sesión que
+impide salir a internet: `cerrar_sesion()` construía un cliente real y la
+suite se colgaba **después de la última prueba**, sin mensaje.
 
 ---
 
@@ -737,7 +828,7 @@ empezara.
 | #9 | `DOC-01` | Actualizar la Factibilidad Técnica (resuelto en el Avance 1.1 y 1.2, falta cerrar el issue) |
 | #10 | `QA-01` | Acordar la Definición de Terminado del equipo |
 | #13 | `USU-03` | Registro de cuentas con contraseña propia |
-| #19 | `QA-02` | Traducir la suite JUnit a pytest |
+| #19 | `QA-02` | ~~Traducir la suite JUnit a pytest~~ — **hecho**, falta cerrar el issue (ver 6.4) |
 | #20 | `DOC-02` | Aviso de privacidad para tutores |
 | #24 | `LIB-04` | Bitácora de trazabilidad: falta el disparador |
 | #28 | `DOC-03` | Diagramas del sistema |
