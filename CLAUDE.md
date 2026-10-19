@@ -4,9 +4,9 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 19 de octubre de 2026 — suite de pruebas rehecha
-sobre la del sistema Java, con sus cuatro grupos y la medición de cobertura
-que el informe de JaCoCo pedía (ver 6.4).
+**Última actualización:** 19 de octubre de 2026 — Avance 3 entregado, con
+seguridad verificada contra la base real (sección 11), y suite de pruebas
+rehecha sobre la del sistema Java (sección 6.4).
 
 ---
 
@@ -885,11 +885,18 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
 - `Documentacion/Avance_Biblioteca_1.4.docx` — versión del equipo sobre el 1.3,
   con los casos de uso extendidos `CU-01` a `CU-06` y el diagrama de casos de
   uso incrustado. Es el insumo del que salió el Avance 2
-- `Documentacion/Avance_Biblioteca_2.docx` — **la entrega vigente**. Contiene
-  **únicamente los ocho criterios de la rúbrica**, uno por capítulo: requisitos,
-  casos de uso, casos de uso extendidos, proceso, modelado de datos, base de
-  datos, interfaces y trazabilidad. La planeación, el análisis y el estado de
-  avance se quedaron en la serie del Avance 1. Trece figuras, sin pies
+- `Documentacion/Avance_Biblioteca_2.docx` — contiene **únicamente los ocho
+  criterios de la rúbrica**, uno por capítulo: requisitos, casos de uso, casos
+  de uso extendidos, proceso, modelado de datos, base de datos, interfaces y
+  trazabilidad. La planeación, el análisis y el estado de avance se quedaron
+  en la serie del Avance 1. Trece figuras, sin pies
+- `Documentacion/Avance_Biblioteca_3.docx` — **la entrega vigente**. Mismo
+  criterio: solo lo que pide la rúbrica —**Seguridad, Implementación,
+  Evaluación**— más el capítulo de interfaces que pidió el equipo,
+  desglosado pantalla por pantalla con captura, descripción y
+  funcionalidades. Cuatro capítulos, 14 tablas, 12 capturas, ~5 300 palabras.
+  Las cifras no están escritas a mano: salen de correr el sistema y las
+  pruebas contra la base real el 19 de octubre. Ver la sección 11
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
 - `Documentacion/diagramas/` — los entregables gráficos. Un archivo por
@@ -1301,3 +1308,88 @@ modo oscuro de Windows dejaba ilegibles los encabezados de las tablas.
 formulario de libro gana colección y asignatura, el de alumno gana CURP,
 maestro y datos del tutor y pierde el correo, y aparece una pantalla nueva de
 estadísticas. Conviene dibujarlas después de #72–#79, no antes.
+
+---
+
+# 11. Avance 3 — seguridad, implementación y evaluación
+
+Entregado el **19 de octubre de 2026**. Como el Avance 2, lleva solo lo que
+pide la rúbrica. La instrucción del profesor son tres palabras —**Seguridad,
+Implementación, Evaluación**— y el equipo pidió además una sección de
+interfaces desglosada pantalla por pantalla.
+
+Hay una guía en `Downloads/Guía para el Avance 3.md` que propone siete
+secciones. **No se siguió**, por decisión de la Scrum Master: es una
+sugerencia de una IA, no la rúbrica, y agregaba introducción, conclusiones y
+anexos que el profesor no pidió y que repetirían el Avance 1.
+
+## Las capturas
+
+`Documentacion/avance3/capturas/` — doce PNG tomados el 19 de octubre con el
+sistema corriendo **contra la base real**, no maquetas. Se regeneran con:
+
+```bash
+.venv/Scripts/python.exe herramientas/capturar_pantallas.py Documentacion/avance3/capturas
+```
+
+**Dos trampas del guion, que costaron dos intentos cada una:**
+
+1. **No usar `QT_QPA_PLATFORM=offscreen`.** Esa plataforma no trae
+   tipografías y todo el texto sale como cajas vacías. Con la plataforma
+   nativa las ventanas parpadean un instante, que es el precio de que se lea.
+2. **Deseleccionar los campos después de `show()`, no antes.** El foco se
+   reparte al mostrar la ventana, y es el foco el que selecciona el texto:
+   si no, el primer campo de cada formulario sale resaltado en magenta.
+
+## Lo que el Avance 3 verificó contra la base real
+
+El Avance 2 declaró, para cada requisito de seguridad, **cómo** se
+comprobaría. El Avance 3 ejecutó esas comprobaciones:
+
+| Prueba | Resultado |
+|---|---|
+| Consulta sin sesión, con la llave publishable | Las 7 tablas devuelven **0 filas** |
+| La misma consulta con los tres perfiles | Alumno: 1 perfil, 2 préstamos, 0 empleados. Personal: todo |
+| Seis intentos de escalada de privilegios | **Seis rechazos**, padrón intacto |
+| Inspección del repositorio | Ninguna credencial en el código |
+
+Los seis intentos de escalada fueron: el alumno cambiando su propio rol,
+leyendo la plantilla y leyendo préstamos ajenos; el bibliotecario dando de
+alta un perfil administrador, llamando `registrar_empleado` con rol
+administrador, y cambiando su propio rol.
+
+## Un defecto que destapó esa verificación
+
+**`core/errores.py` no traduce un mensaje de la migración 10.** La base
+responde `"Solo un administrador puede registrar a otro administrador."`, y
+el traductor solo reconoce la variante `"solo un administrador puede
+cambiar"`. El bibliotecario lee «La operación no se pudo completar» y no sabe
+qué hizo mal.
+
+No es un fallo de seguridad —el rechazo ocurre igual— pero incumple
+`RNF-USA-03`. Se corrige agregando una entrada a `REGLAS_DE_LA_BASE`.
+**Pendiente, sin tocar.**
+
+Es exactamente el mismo patrón que la auditoría de septiembre ya había
+encontrado: se agrega un mensaje en una migración y nadie lo da de alta en el
+traductor. `tests/test_mensajes_de_la_base.py` existe para atraparlo, pero
+solo cubre los mensajes que alguien recordó copiar.
+
+## Cambios de estado de los requisitos
+
+| Requisito | Antes | Ahora | Por qué |
+|---|---|---|---|
+| `RNF-MAN-01` | Parcial | **Cumplido** | Le faltaban las pruebas automatizadas; la suite las aporta |
+| `RNF-USA-03` | Cumplido | **Parcial** | El mensaje sin traducir de arriba |
+
+Los funcionales no cambiaron: **14 cumplidos, 4 parciales, 3 pendientes**, de
+19. Lo que cambió es que ahora cada uno dice con qué se verificó.
+
+## Lo que el Avance 3 dice que NO se ha evaluado
+
+La sesión de aceptación con el docente (`QA-04`, #41) **sigue abierta**, y el
+documento lo declara sin rodeos en vez de inventarla. Deja el guion de lo que
+hay que medir: cronometrar el préstamo contra `RNF-USA-01`, confirmar el
+límite de un libro y el plazo de siete días, ver si los mensajes de error se
+entienden, y verificar el vocabulario —el sistema dice «tipo o género» donde
+la escuela dice «colección»—.
