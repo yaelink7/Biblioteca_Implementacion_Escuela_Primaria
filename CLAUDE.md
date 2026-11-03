@@ -379,6 +379,30 @@ y seis dígitos no los cumplen con datos de menores de por medio.
 —dos vencidos a propósito, para que el reporte de deudores tenga qué mostrar.
 Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 
+## Abrir la aplicación sin VS Code
+
+```bash
+.venv/Scripts/python.exe herramientas/empaquetar.py
+```
+
+Arma `Biblioteca Escolar.exe` con PyInstaller, lo deja en
+`%LOCALAPPDATA%\Programs\Biblioteca Escolar\` y pone un acceso directo
+«Biblioteca Escolar» en el escritorio. Lleva dentro Python, Qt, las letras y
+los iconos, así que la computadora no necesita tener Python. Pesa unos 145 MB
+y tarda unos tres minutos en armarse.
+
+- **Es una foto del código.** Después de cada cambio, o al cambiar de rama,
+  hay que volver a correr el guion con la aplicación cerrada; si no, el
+  acceso directo abre la versión anterior.
+- **El `.env` viaja junto al `.exe`.** `core/config.py` lo busca tres
+  carpetas arriba de sí mismo, y dentro del ejecutable esa carpeta es la del
+  `.exe`: no hubo que tocar el código. Su llave publishable no es secreta.
+- **Para la computadora de la biblioteca**, `--destino E:/` y
+  `--sin-acceso-directo` dejan la carpeta en una memoria USB. Se copia
+  completa y allá se crea el acceso directo.
+- **El ejecutable no está firmado.** Si Windows o el antivirus lo detienen la
+  primera vez, es por eso; no hay certificado de firma en el proyecto.
+
 ---
 
 # 6. Qué se ha hecho
