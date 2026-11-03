@@ -14,6 +14,10 @@ from biblioteca.core.supabase_cliente import obtener_cliente
 from biblioteca.modelos.persona import Alumno, Empleado, Perfil, Rol
 
 TABLA_PERFILES = "perfiles"
+TABLA_MAESTROS = "maestros_de_grupo"
+
+# Lo propio del alumno que se trae junto con su perfil
+_DATOS_DE_ALUMNO = "usuarios(grado, grupo, curp)"
 
 
 class ErrorDePersona(Exception):
@@ -24,7 +28,7 @@ def listar_alumnos() -> list[Alumno]:
     filas = (
         obtener_cliente()
         .table(TABLA_PERFILES)
-        .select("*, usuarios(grado, grupo)")
+        .select(f"*, {_DATOS_DE_ALUMNO}")
         .eq("rol", str(Rol.ALUMNO))
         .eq("activo", True)
         .order("apellido")
@@ -34,10 +38,14 @@ def listar_alumnos() -> list[Alumno]:
 
 
 def buscar_alumnos(texto: str) -> list[Alumno]:
-    """Busca por nombre, apellido o codigo.
+    """Busca por nombre, apellido, codigo o CURP.
 
     La Factibilidad Operativa pide registrar un prestamo en menos de treinta
     segundos "buscando al alumno por nombre o grupo"; esto es la mitad de eso.
+
+    La CURP vive en la tabla usuarios, y PostgREST no puede mezclarla en el
+    mismo `.or_()` con las columnas de perfiles: va en una segunda consulta,
+    y quien ya aparecio por su nombre no se repite.
     """
     texto = texto.strip()
     if not texto:
@@ -47,14 +55,27 @@ def buscar_alumnos(texto: str) -> list[Alumno]:
     filas = (
         obtener_cliente()
         .table(TABLA_PERFILES)
-        .select("*, usuarios(grado, grupo)")
+        .select(f"*, {_DATOS_DE_ALUMNO}")
         .eq("rol", str(Rol.ALUMNO))
         .eq("activo", True)
         .or_(f"nombre.ilike.{patron},apellido.ilike.{patron},codigo.ilike.{patron}")
         .order("apellido")
         .execute()
     )
-    return [Alumno.desde_fila(_aplanar(f, "usuarios")) for f in filas.data]
+    alumnos = [Alumno.desde_fila(_aplanar(f, "usuarios")) for f in filas.data]
+
+    por_curp = (
+        obtener_cliente()
+        .table("usuarios")
+        .select("grado, grupo, curp, perfiles(*)")
+        .ilike("curp", f"%{texto}%")
+        .execute()
+    )
+    vistos = {a.id for a in alumnos}
+    nuevos = [a for a in _alumnos_de_usuarios(por_curp.data) if a.id not in vistos]
+    if nuevos:
+        alumnos = sorted(alumnos + nuevos, key=lambda a: a.apellido)
+    return alumnos
 
 
 def buscar_alumnos_o_salon(texto: str) -> list[Alumno]:
@@ -79,14 +100,18 @@ def alumnos_del_salon(grado: int, grupo: str) -> list[Alumno]:
     filas = (
         obtener_cliente()
         .table("usuarios")
-        .select("grado, grupo, perfiles(*)")
+        .select("grado, grupo, curp, perfiles(*)")
         .eq("grado", grado)
         .eq("grupo", grupo)
         .execute()
     )
+    return sorted(_alumnos_de_usuarios(filas.data), key=lambda a: a.apellido)
 
+
+def _alumnos_de_usuarios(filas: list[dict]) -> list[Alumno]:
+    """Alumnos activos a partir de filas de usuarios con su perfil anidado."""
     alumnos = []
-    for fila in filas.data:
+    for fila in filas:
         perfil = fila.pop("perfiles", None)
         # Los mismos filtros que listar_alumnos y buscar_alumnos: sin ellos,
         # teclear "4B" mostraba alumnos dados de baja que teclear su nombre
@@ -94,7 +119,7 @@ def alumnos_del_salon(grado: int, grupo: str) -> list[Alumno]:
         # tabla anidada recorta el anidado, no la fila padre.
         if perfil and perfil.get("activo") and perfil.get("rol") == str(Rol.ALUMNO):
             alumnos.append(Alumno.desde_fila({**perfil, **fila}))
-    return sorted(alumnos, key=lambda a: a.apellido)
+    return alumnos
 
 
 def dar_de_alta_alumno(alumno: Alumno) -> Alumno:
@@ -122,6 +147,7 @@ def dar_de_alta_alumno(alumno: Alumno) -> Alumno:
                 "p_colonia": alumno.colonia,
                 "p_codigo_postal": alumno.codigo_postal,
                 "p_numero": alumno.numero,
+                "p_curp": alumno.curp,
             },
         ).execute()
     except Exception as error:
@@ -206,8 +232,47 @@ def actualizar_alumno(alumno: Alumno) -> None:
                 "p_colonia": alumno.colonia,
                 "p_codigo_postal": alumno.codigo_postal,
                 "p_numero": alumno.numero,
+                "p_curp": alumno.curp,
             },
         ).execute()
+    except Exception as error:
+        raise ErrorDePersona(_mensaje_claro(error)) from error
+
+
+def listar_maestros() -> dict[tuple[int, str], str]:
+    """El maestro de cada salon (USU-09), por (grado, grupo).
+
+    Se asigna una vez por salon y lo heredan sus alumnos: al empezar otro
+    ciclo se corrige aqui, sin tocar la ficha de cada nino.
+    """
+    filas = (
+        obtener_cliente()
+        .table(TABLA_MAESTROS)
+        .select("grado, grupo, maestro")
+        .execute()
+    )
+    return {(f["grado"], f["grupo"]): f["maestro"] for f in filas.data}
+
+
+def guardar_maestros(cambios: dict[tuple[int, str], str]) -> None:
+    """Asigna o quita el maestro de los salones indicados.
+
+    Un nombre vacio quita la asignacion. Cada salon es independiente: si la
+    conexion se corta a medias, volver a guardar deja todo como se pidio.
+    """
+    asignar = [
+        {"grado": grado, "grupo": grupo, "maestro": maestro.strip()}
+        for (grado, grupo), maestro in cambios.items()
+        if maestro and maestro.strip()
+    ]
+    quitar = [salon for salon, maestro in cambios.items() if not (maestro and maestro.strip())]
+
+    try:
+        cliente = obtener_cliente()
+        if asignar:
+            cliente.table(TABLA_MAESTROS).upsert(asignar, on_conflict="grado,grupo").execute()
+        for grado, grupo in quitar:
+            cliente.table(TABLA_MAESTROS).delete().eq("grado", grado).eq("grupo", grupo).execute()
     except Exception as error:
         raise ErrorDePersona(_mensaje_claro(error)) from error
 

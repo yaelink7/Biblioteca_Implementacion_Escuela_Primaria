@@ -16,6 +16,11 @@ from biblioteca.servicios.validador_libro import Resultado
 # Suficiente para atrapar erratas de captura sin rechazar correos validos
 PATRON_CORREO = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 GRUPOS_VALIDOS = re.compile(r"^[A-Za-z]$")
+PATRON_CURP = re.compile(
+    r"^[A-Z][AEIOUX][A-Z]{2}[0-9]{2}(0[1-9]|1[0-2])(0[1-9]|[12][0-9]|3[01])[HM]"
+    r"(AS|BC|BS|CC|CL|CM|CS|CH|DF|DG|GT|GR|HG|JC|MC|MN|MS|NT|NL|OC|PL|QT|QR|SP|SL|SR|TC|TS|TL|VZ|YN|ZS|NE)"
+    r"[B-DF-HJ-NP-TV-Z]{3}[A-Z0-9][0-9]$"
+)
 
 
 def validar_perfil(perfil: Perfil) -> Resultado:
@@ -57,10 +62,20 @@ def validar_alumno(alumno: Alumno) -> Resultado:
             "Indica el grado y el grupo juntos, o deja ambos sin asignar."
         )
 
-    if not (alumno.correo or alumno.telefono):
+    # USU-08: la escuela confirmo que el correo no funciona con las familias,
+    # asi que el unico contacto que cuenta es el telefono del tutor.
+    if not alumno.telefono:
         r.errores.append(
-            "Registra al menos un contacto del tutor: sin él no hay forma "
+            "Registra el teléfono del tutor: sin él no hay forma "
             "de avisar de un préstamo vencido."
+        )
+
+    # USU-07: opcional, pero si se escribe tiene que ser una CURP de verdad.
+    # Es la misma regla de usuarios_curp_formato en la migracion 11.
+    if alumno.curp and not PATRON_CURP.match(alumno.curp):
+        r.errores.append(
+            "La CURP no tiene el formato oficial: son 18 caracteres, "
+            "como CURV200412MVZRMLA4."
         )
 
     return r

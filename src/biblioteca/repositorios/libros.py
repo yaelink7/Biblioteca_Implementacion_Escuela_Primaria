@@ -11,7 +11,8 @@ from biblioteca.servicios import validador_libro
 TABLA = "libros"
 _COLUMNAS = (
     "id, titulo, autor, tipo_libro, editorial, existencias, "
-    "ano_publicacion, num_paginas, activo, motivo_baja, dado_baja_en"
+    "ano_publicacion, num_paginas, coleccion, asignatura, "
+    "activo, motivo_baja, dado_baja_en"
 )
 
 
@@ -29,21 +30,24 @@ def listar(incluir_bajas: bool = False) -> list[Libro]:
 
 
 def buscar(texto: str) -> list[Libro]:
-    """Busqueda por coincidencia parcial en titulo, autor o tipo (REQ-BUS-01).
+    """Busqueda por coincidencia parcial (REQ-BUS-01) en titulo, autor, tipo,
+    coleccion o asignatura.
 
-    El usuario no necesita el nombre exacto: "prin" encuentra "El principito".
+    El usuario no necesita el nombre exacto: "prin" encuentra "El principito",
+    y "astro" trae la coleccion Astrolabio entera.
     """
     texto = texto.strip()
     if not texto:
         return listar()
 
     patron = patron_de_busqueda(texto)
+    columnas = ("titulo", "autor", "tipo_libro", "coleccion", "asignatura")
     filas = (
         obtener_cliente()
         .table(TABLA)
         .select(_COLUMNAS)
         .eq("activo", True)
-        .or_(f"titulo.ilike.{patron},autor.ilike.{patron},tipo_libro.ilike.{patron}")
+        .or_(",".join(f"{columna}.ilike.{patron}" for columna in columnas))
         .order("titulo")
         .execute()
     )
