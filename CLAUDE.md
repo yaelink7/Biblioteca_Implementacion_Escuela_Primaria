@@ -4,9 +4,10 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 19 de octubre de 2026 — suite de pruebas rehecha
-sobre la del sistema Java, con sus cuatro grupos y la medición de cobertura
-que el informe de JaCoCo pedía (ver 6.4).
+**Última actualización:** 3 de noviembre de 2026 — la aplicación empieza a
+usar el diseño mostaza, «Lápiz»: base, inicio de sesión y Catálogo
+(sección 11). Antes, el 19 de octubre: suite de pruebas rehecha sobre la del
+sistema Java, con sus cuatro grupos y la medición de cobertura (ver 6.4).
 
 ---
 
@@ -218,9 +219,13 @@ src/biblioteca/
   ui/
     disenos/               11 archivos .ui que se abren en Qt Designer
     generado/              ui_*.py que produce el compilador — NO editar a mano
-    estilo.py              paleta y hoja de estilo compartida
-    login.py               REQ-USU-02
-    ventana_principal.py   las cinco pestañas
+    recursos/              letras (Manrope, IBM Plex Mono · OFL) e iconos (Lucide · ISC)
+    apariencia.py          carga las letras; icono() tiñe un SVG del color pedido
+    estilo.py              paleta mostaza, hoja de estilo, aplicar_apariencia(), rotular()
+    componentes.py         BotonRiel (menú de iconos), DelegadoFilaElegida, poner_icono()
+    formato.py             fecha_corta(), inicial() de la portada de un libro
+    login.py               REQ-USU-02 — la ficha de biblioteca sobre el grafito
+    ventana_principal.py   columna de iconos con las cinco secciones
     catalogo.py            + formulario_libro.py
     prestamos.py           + nuevo_prestamo.py
     alumnos.py             + formulario_alumno.py + historial_alumno.py
@@ -229,7 +234,7 @@ src/biblioteca/
 herramientas/
   compilar_ui.py           convierte los .ui en módulos de Python
 database/migraciones/      10 migraciones, ya aplicadas en Supabase
-tests/                     684 pruebas con pytest, en los cuatro grupos que
+tests/                     719 pruebas con pytest, en los cuatro grupos que
   conftest.py              tenía la suite JUnit del sistema Java
   caja_negra/              las reglas, sin leer la implementación
   caja_blanca/             las ramas del código, con dobles del cliente
@@ -343,7 +348,7 @@ políticas RLS. Lo que nunca debe salir del panel de Supabase es la llave
 
 ```bash
 .venv/Scripts/python.exe main.py                        # ejecutar
-.venv/Scripts/python.exe -m pytest tests/ -v            # 684 pruebas, ~5 s
+.venv/Scripts/python.exe -m pytest tests/ -v            # 719 pruebas, ~6 s
 .venv/Lib/site-packages/PySide6/designer.exe            # editar pantallas
 .venv/Scripts/python.exe herramientas/compilar_ui.py    # recompilar los .ui
 ```
@@ -412,6 +417,7 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #83 | PR de rescate: integró a `main` la migración 10 y `actualizar_empleado` |
 | #84 | Avance 2 con los ocho criterios de la rúbrica; regla 4 ampliada |
 | #85 | Suite de pruebas rehecha sobre la del sistema Java (ver 6.4) |
+| #88 | Diseño «Lápiz», mostaza: base, inicio de sesión y Catálogo (ver 11) |
 
 ## La migración del Java está terminada
 
@@ -1301,3 +1307,87 @@ modo oscuro de Windows dejaba ilegibles los encabezados de las tablas.
 formulario de libro gana colección y asignatura, el de alumno gana CURP,
 maestro y datos del tutor y pierde el correo, y aparece una pantalla nueva de
 estadísticas. Conviene dibujarlas después de #72–#79, no antes.
+
+---
+
+# 11. El diseño «Lápiz» en la aplicación — 3 de noviembre
+
+Yael eligió la propuesta D, mostaza sobre grafito, y pidió llevarla a la
+aplicación. Las cuatro propuestas y los dos prototipos navegables viven en
+`Documentacion/disenos/`, que todavía no está en el repositorio: entran con su
+propio PR de documentación. La referencia para implementar es
+`Prototipo_mostaza.html`; cuando el prototipo y esta aplicación no coincidan,
+gana el prototipo.
+
+## Qué cubre la primera entrega
+
+La base que usan todas las pantallas, más la primera pantalla completa:
+
+- **Letras e iconos dentro del paquete** (`ui/recursos/`): Manrope variable,
+  con sus pesos de 400 a 800; IBM Plex Mono en tres pesos, y los 31 iconos de
+  Lucide del prototipo, cada uno con su licencia. No hace falta internet ni
+  ningún paquete de Python nuevo: PySide6 ya trae QtSvg.
+- **Paleta y hoja de estilo** en `ui/estilo.py`. El estilo base es Fusion y la
+  paleta se fija completa, para que el tema oscuro de Windows no cambie nada.
+- **Columna de iconos** en lugar de pestañas. Arriba de cada pantalla va una
+  línea con la escuela, la fecha y quién entró, que sustituye a la barra de
+  estado. Abajo de la columna, el avatar y **cerrar sesión**, que regresa a
+  la ficha de entrada sin cerrar el programa.
+- **Inicio de sesión**: la ficha de biblioteca sobre el grafito punteado.
+- **Catálogo**, completo: título, resumen, búsqueda y «Registrar libro»
+  arriba; la tabla en su tarjeta, y a la derecha la ficha del libro elegido,
+  con Modificar y Dar de baja.
+- **Formulario de libro** en dos columnas, con un recuadro rojo arriba que
+  dice qué revisar.
+
+## Lo que sigue
+
+Préstamos, Alumnos, Deudores y Empleados, con sus diálogos, van en entregas
+siguientes. Mientras tanto ya usan la paleta y las letras nuevas, pero
+conservan su acomodo anterior: sin título y sin panel de detalle.
+
+**Quedan fuera hasta que el Product Owner las apruebe** (regla 7) el criterio
+«por vencer» de tres días con su conteo, el contador de deudores junto al
+menú y, en el panel del préstamo, el teléfono del tutor (depende de
+`USU-08`, #75) y quién registró el préstamo.
+
+**Los campos que pidió la escuela** (#72 a #76) necesitan migraciones y no
+son parte del diseño: el Catálogo sigue mostrando «Tipo o género» hasta
+`LIB-06` y `LIB-07`. Las entradas rápidas del prototipo, para entrar con un
+clic como administrador o como bibliotecario, no pasan a la aplicación; así
+se decidió desde el 27 de octubre.
+
+## Decisiones y trampas, para quien siga con otra pantalla
+
+1. **La hoja de estilo de Qt no sabe de mayúsculas ni de espacio entre
+   letras.** `rotular()` se los pone a la fuente del control. El texto queda
+   como se escribió, así que las pruebas lo siguen leyendo igual.
+2. **Los encabezados de tabla son la excepción.** Al dibujar cada sección, Qt
+   ignora la fuente del encabezado entero; `rotular_encabezados()` se la pone
+   a cada columna. Si la hoja fija la letra en `QHeaderView::section`, las
+   mayúsculas se pierden también.
+3. **La hoja de estilo no sabe teñir un SVG.** Las flechas y la palomita que
+   cita con `url()` las escribe `ruta_para_hoja()`, ya coloreadas, en la
+   carpeta temporal del sistema.
+4. **Qt deja 4 px entre icono y texto en un botón; el prototipo, 8.**
+   `poner_icono()` agrega la diferencia.
+5. **Los selectores van por propiedad** (`[rol="titulo"]`,
+   `[secundario="true"]`, `[peligro="true"]`) y no por tipo dentro de un
+   contenedor: un `QFrame QLabel` le ganaría a cualquier etiqueta con rol
+   propio, y ese choque solo se ve al abrir la pantalla.
+6. **El rojo quedó para lo urgente.** Un libro agotado va en rojo, con su
+   punto; uno dado de baja apaga su fila en gris. La prueba que pedía rojo
+   para los dos se cambió a esta regla.
+7. **Para fotografiar ventanas sin que parpadeen** sirve
+   `WA_DontShowOnScreen` antes de `show()`: Qt las arma como si estuvieran
+   en pantalla, con las letras reales, y no aparecen. La plataforma
+   `offscreen` no sirve para eso porque dibuja el texto como cajas vacías.
+
+## Pruebas
+
+`tests/interfaz/test_diseno.py` suma 35 pruebas: las letras e iconos del
+paquete, la hoja de estilo, el menú de iconos, la línea superior, cerrar
+sesión, la ficha del Catálogo, el recuadro de error y la ficha de entrada. La
+suite queda en 719: pasan 718, y la de TC-06 falla como se espera. Todas las
+sentencias de `biblioteca` se recorren, y fuera del código generado las
+únicas ramas parciales son las dos de siempre, en `formulario_empleado.py`.

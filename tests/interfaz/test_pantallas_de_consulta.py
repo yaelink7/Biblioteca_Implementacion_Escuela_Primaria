@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import pytest
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import QMessageBox
 
 from biblioteca.repositorios import libros as repo_libros
@@ -30,6 +31,7 @@ from biblioteca.ui.alumnos import PantallaAlumnos
 from biblioteca.ui.catalogo import PantallaCatalogo
 from biblioteca.ui.deudores import PantallaDeudores
 from biblioteca.ui.empleados import PantallaEmpleados
+from biblioteca.ui.estilo import APAGADO, ROJO
 from biblioteca.ui.prestamos import PantallaPrestamos
 
 
@@ -104,17 +106,25 @@ class TestCatalogo:
 
         assert textos(catalogo.ui.tablaLibros, 2)[4] == "Baja: Extraviado"
 
-    def test_lo_agotado_y_lo_dado_de_baja_se_marcan_en_rojo(
+    def test_lo_agotado_va_en_rojo_y_lo_dado_de_baja_se_apaga(
         self, sin_base, libros_de_ejemplo, con_sesion
     ):
-        """Para que se distinga de un vistazo, sin leer cada fila."""
+        """Para que se distinga de un vistazo, sin leer cada fila.
+
+        Antes los dos iban en rojo. En el diseño «Lápiz» el rojo se reserva
+        para lo urgente: un libro sin ejemplares lo es, y lleva además su
+        punto. Uno dado de baja ya no está en el acervo, así que su fila
+        entera se apaga en gris.
+        """
         sin_base(repo_libros, listar=libros_de_ejemplo, buscar=[])
 
         pantalla = PantallaCatalogo()
         tabla = pantalla.ui.tablaLibros
 
-        assert tabla.item(1, 4).foreground().color() == Qt.GlobalColor.darkRed
-        assert tabla.item(2, 4).foreground().color() == Qt.GlobalColor.darkRed
+        assert tabla.item(1, 4).foreground().color() == QColor(ROJO)
+        assert not tabla.item(1, 4).icon().isNull()
+        assert all(tabla.item(2, c).foreground().color() == QColor(APAGADO)
+                   for c in range(tabla.columnCount()))
 
     def test_un_campo_sin_dato_muestra_una_raya_y_no_la_palabra_none(
         self, sin_base, libros_de_ejemplo, con_sesion
