@@ -24,7 +24,7 @@ class Ui_FormularioLibro(object):
     def setupUi(self, FormularioLibro):
         if not FormularioLibro.objectName():
             FormularioLibro.setObjectName(u"FormularioLibro")
-        FormularioLibro.resize(580, 600)
+        FormularioLibro.resize(700, 720)
         self.disposicion = QVBoxLayout(FormularioLibro)
         self.disposicion.setSpacing(16)
         self.disposicion.setObjectName(u"disposicion")
@@ -68,7 +68,7 @@ class Ui_FormularioLibro(object):
 
         self.formulario = QGridLayout()
         self.formulario.setObjectName(u"formulario")
-        self.formulario.setHorizontalSpacing(16)
+        self.formulario.setHorizontalSpacing(18)
         self.formulario.setVerticalSpacing(6)
         self.etiquetaTitulo = QLabel(FormularioLibro)
         self.etiquetaTitulo.setObjectName(u"etiquetaTitulo")
@@ -100,29 +100,41 @@ class Ui_FormularioLibro(object):
 
         self.formulario.addWidget(self.campoEditorial, 3, 1, 1, 1)
 
-        self.etiquetaTipo = QLabel(FormularioLibro)
-        self.etiquetaTipo.setObjectName(u"etiquetaTipo")
+        self.etiquetaColeccion = QLabel(FormularioLibro)
+        self.etiquetaColeccion.setObjectName(u"etiquetaColeccion")
 
-        self.formulario.addWidget(self.etiquetaTipo, 4, 0, 1, 1)
+        self.formulario.addWidget(self.etiquetaColeccion, 4, 0, 1, 1)
+
+        self.etiquetaAsignatura = QLabel(FormularioLibro)
+        self.etiquetaAsignatura.setObjectName(u"etiquetaAsignatura")
+
+        self.formulario.addWidget(self.etiquetaAsignatura, 4, 1, 1, 1)
+
+        self.campoColeccion = QComboBox(FormularioLibro)
+        self.campoColeccion.setObjectName(u"campoColeccion")
+
+        self.formulario.addWidget(self.campoColeccion, 5, 0, 1, 1)
+
+        self.campoAsignatura = QComboBox(FormularioLibro)
+        self.campoAsignatura.setObjectName(u"campoAsignatura")
+
+        self.formulario.addWidget(self.campoAsignatura, 5, 1, 1, 1)
+
+        self.notaColeccion = QLabel(FormularioLibro)
+        self.notaColeccion.setObjectName(u"notaColeccion")
+        self.notaColeccion.setWordWrap(True)
+
+        self.formulario.addWidget(self.notaColeccion, 6, 0, 1, 1)
 
         self.etiquetaExistencias = QLabel(FormularioLibro)
         self.etiquetaExistencias.setObjectName(u"etiquetaExistencias")
 
-        self.formulario.addWidget(self.etiquetaExistencias, 4, 1, 1, 1)
+        self.formulario.addWidget(self.etiquetaExistencias, 7, 0, 1, 1)
 
-        self.campoTipo = QComboBox(FormularioLibro)
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.addItem("")
-        self.campoTipo.setObjectName(u"campoTipo")
-        self.campoTipo.setEditable(True)
+        self.etiquetaAno = QLabel(FormularioLibro)
+        self.etiquetaAno.setObjectName(u"etiquetaAno")
 
-        self.formulario.addWidget(self.campoTipo, 5, 0, 1, 1)
+        self.formulario.addWidget(self.etiquetaAno, 7, 1, 1, 1)
 
         self.campoExistencias = QSpinBox(FormularioLibro)
         self.campoExistencias.setObjectName(u"campoExistencias")
@@ -131,17 +143,7 @@ class Ui_FormularioLibro(object):
         self.campoExistencias.setMaximum(9999)
         self.campoExistencias.setValue(1)
 
-        self.formulario.addWidget(self.campoExistencias, 5, 1, 1, 1)
-
-        self.etiquetaAno = QLabel(FormularioLibro)
-        self.etiquetaAno.setObjectName(u"etiquetaAno")
-
-        self.formulario.addWidget(self.etiquetaAno, 6, 0, 1, 1)
-
-        self.etiquetaPaginas = QLabel(FormularioLibro)
-        self.etiquetaPaginas.setObjectName(u"etiquetaPaginas")
-
-        self.formulario.addWidget(self.etiquetaPaginas, 6, 1, 1, 1)
+        self.formulario.addWidget(self.campoExistencias, 8, 0, 1, 1)
 
         self.campoAno = QSpinBox(FormularioLibro)
         self.campoAno.setObjectName(u"campoAno")
@@ -150,7 +152,18 @@ class Ui_FormularioLibro(object):
         self.campoAno.setMaximum(2026)
         self.campoAno.setValue(1399)
 
-        self.formulario.addWidget(self.campoAno, 7, 0, 1, 1)
+        self.formulario.addWidget(self.campoAno, 8, 1, 1, 1)
+
+        self.notaExistencias = QLabel(FormularioLibro)
+        self.notaExistencias.setObjectName(u"notaExistencias")
+        self.notaExistencias.setWordWrap(True)
+
+        self.formulario.addWidget(self.notaExistencias, 9, 0, 1, 1)
+
+        self.etiquetaPaginas = QLabel(FormularioLibro)
+        self.etiquetaPaginas.setObjectName(u"etiquetaPaginas")
+
+        self.formulario.addWidget(self.etiquetaPaginas, 10, 0, 1, 1)
 
         self.campoPaginas = QSpinBox(FormularioLibro)
         self.campoPaginas.setObjectName(u"campoPaginas")
@@ -159,17 +172,20 @@ class Ui_FormularioLibro(object):
         self.campoPaginas.setMaximum(99999)
         self.campoPaginas.setValue(0)
 
-        self.formulario.addWidget(self.campoPaginas, 7, 1, 1, 1)
+        self.formulario.addWidget(self.campoPaginas, 11, 0, 1, 1)
 
+        self.formulario.setColumnStretch(0, 1)
+        self.formulario.setColumnStretch(1, 1)
 
         self.disposicion.addLayout(self.formulario)
 
         self.etiquetaObligatorios = QLabel(FormularioLibro)
         self.etiquetaObligatorios.setObjectName(u"etiquetaObligatorios")
+        self.etiquetaObligatorios.setWordWrap(True)
 
         self.disposicion.addWidget(self.etiquetaObligatorios)
 
-        self.espacio = QSpacerItem(20, 4, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+        self.espacio = QSpacerItem(40, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
 
         self.disposicion.addItem(self.espacio)
 
@@ -198,17 +214,15 @@ class Ui_FormularioLibro(object):
 
         QWidget.setTabOrder(self.campoTitulo, self.campoAutor)
         QWidget.setTabOrder(self.campoAutor, self.campoEditorial)
-        QWidget.setTabOrder(self.campoEditorial, self.campoTipo)
-        QWidget.setTabOrder(self.campoTipo, self.campoExistencias)
+        QWidget.setTabOrder(self.campoEditorial, self.campoColeccion)
+        QWidget.setTabOrder(self.campoColeccion, self.campoAsignatura)
+        QWidget.setTabOrder(self.campoAsignatura, self.campoExistencias)
         QWidget.setTabOrder(self.campoExistencias, self.campoAno)
         QWidget.setTabOrder(self.campoAno, self.campoPaginas)
-        QWidget.setTabOrder(self.campoPaginas, self.botonCancelar)
-        QWidget.setTabOrder(self.botonCancelar, self.botonGuardar)
+        QWidget.setTabOrder(self.campoPaginas, self.botonGuardar)
+        QWidget.setTabOrder(self.botonGuardar, self.botonCancelar)
 
         self.retranslateUi(FormularioLibro)
-
-        self.botonGuardar.setDefault(True)
-
 
         QMetaObject.connectSlotsByName(FormularioLibro)
     # setupUi
@@ -227,24 +241,21 @@ class Ui_FormularioLibro(object):
         self.etiquetaAutor.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
         self.etiquetaEditorial.setText(QCoreApplication.translate("FormularioLibro", u"Editorial", None))
         self.etiquetaEditorial.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
-        self.etiquetaTipo.setText(QCoreApplication.translate("FormularioLibro", u"Tipo o g\u00e9nero", None))
-        self.etiquetaTipo.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
+        self.etiquetaColeccion.setText(QCoreApplication.translate("FormularioLibro", u"Colecci\u00f3n", None))
+        self.etiquetaColeccion.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
+        self.etiquetaAsignatura.setText(QCoreApplication.translate("FormularioLibro", u"Asignatura", None))
+        self.etiquetaAsignatura.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
+        self.notaColeccion.setText(QCoreApplication.translate("FormularioLibro", u"Libros del Rinc\u00f3n, con los grados de cada una.", None))
+        self.notaColeccion.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"notaCampo", None))
         self.etiquetaExistencias.setText(QCoreApplication.translate("FormularioLibro", u"Ejemplares <span style=\"color:#A3261B\">*</span>", None))
         self.etiquetaExistencias.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
-        self.campoTipo.setItemText(0, QCoreApplication.translate("FormularioLibro", u"Infantil", None))
-        self.campoTipo.setItemText(1, QCoreApplication.translate("FormularioLibro", u"Juvenil", None))
-        self.campoTipo.setItemText(2, QCoreApplication.translate("FormularioLibro", u"Cuento", None))
-        self.campoTipo.setItemText(3, QCoreApplication.translate("FormularioLibro", u"Novela", None))
-        self.campoTipo.setItemText(4, QCoreApplication.translate("FormularioLibro", u"Poes\u00eda", None))
-        self.campoTipo.setItemText(5, QCoreApplication.translate("FormularioLibro", u"Aventura", None))
-        self.campoTipo.setItemText(6, QCoreApplication.translate("FormularioLibro", u"Fantas\u00eda", None))
-        self.campoTipo.setItemText(7, QCoreApplication.translate("FormularioLibro", u"Consulta", None))
-
         self.etiquetaAno.setText(QCoreApplication.translate("FormularioLibro", u"A\u00f1o de publicaci\u00f3n", None))
         self.etiquetaAno.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
+        self.campoAno.setSpecialValueText(QCoreApplication.translate("FormularioLibro", u"Sin especificar", None))
+        self.notaExistencias.setText(QCoreApplication.translate("FormularioLibro", u"Los que est\u00e1n hoy en el estante.", None))
+        self.notaExistencias.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"notaCampo", None))
         self.etiquetaPaginas.setText(QCoreApplication.translate("FormularioLibro", u"N\u00famero de p\u00e1ginas", None))
         self.etiquetaPaginas.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"etiquetaCampo", None))
-        self.campoAno.setSpecialValueText(QCoreApplication.translate("FormularioLibro", u"Sin especificar", None))
         self.campoPaginas.setSpecialValueText(QCoreApplication.translate("FormularioLibro", u"Sin especificar", None))
         self.etiquetaObligatorios.setText(QCoreApplication.translate("FormularioLibro", u"<span style=\"color:#A3261B\">*</span> Campos obligatorios", None))
         self.etiquetaObligatorios.setProperty(u"rol", QCoreApplication.translate("FormularioLibro", u"notaCampo", None))

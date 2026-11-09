@@ -11,7 +11,7 @@ la franja mostaza, los rotulos a maquina y la perforacion de abajo.
 from __future__ import annotations
 
 from PySide6.QtCore import QPointF, Qt
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtGui import QColor, QIcon, QPainter
 from PySide6.QtWidgets import (
     QApplication,
     QDialog,
@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (
 
 from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.sesion import ErrorDeAcceso, Sesion, iniciar_sesion
-from biblioteca.ui.apariencia import icono
+from biblioteca.ui.apariencia import icono, logo_escuela, marca_escuela
 from biblioteca.ui.estilo import COLOR_ERROR, GRAFITO, GRAFITO_CLARO, TENUE, TEXTO, rotular
 from biblioteca.ui.generado.ui_login import Ui_DialogoLogin
 
@@ -56,6 +56,10 @@ class DialogoLogin(QDialog):
         posicion = QLineEdit.ActionPosition.LeadingPosition
         ui.campoCorreo.addAction(icono("correo", TENUE), posicion)
         ui.campoContrasena.addAction(icono("candado", TENUE), posicion)
+        # El logo de la escuela, provisional, junto al nombre de la biblioteca
+        ui.logoFicha.setPixmap(logo_escuela(120, 68))
+        ui.logoFicha.setAccessibleName("Escuela Primaria Adalberto Tejeda")
+        self.setWindowIcon(QIcon(marca_escuela(64)))
         # La flecha va despues de la palabra, como en el prototipo
         ui.botonEntrar.setIcon(icono("flecha", TEXTO))
         ui.botonEntrar.setLayoutDirection(Qt.LayoutDirection.RightToLeft)

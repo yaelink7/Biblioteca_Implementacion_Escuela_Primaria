@@ -131,6 +131,9 @@ class Ui_PantallaCatalogo(object):
 
         self.cuerpo.addWidget(self.tarjetaTabla)
 
+        self.columnaPanel = QVBoxLayout()
+        self.columnaPanel.setSpacing(0)
+        self.columnaPanel.setObjectName(u"columnaPanel")
         self.panelLibro = QFrame(PantallaCatalogo)
         self.panelLibro.setObjectName(u"panelLibro")
         self.panelLibro.setMinimumWidth(300)
@@ -206,60 +209,83 @@ class Ui_PantallaCatalogo(object):
         self.datosLibro.setObjectName(u"datosLibro")
         self.datosLibro.setHorizontalSpacing(16)
         self.datosLibro.setVerticalSpacing(10)
-        self.datoTipo = QLabel(self.fichaLibro)
-        self.datoTipo.setObjectName(u"datoTipo")
+        self.datoColeccion = QLabel(self.fichaLibro)
+        self.datoColeccion.setObjectName(u"datoColeccion")
 
-        self.datosLibro.addWidget(self.datoTipo, 0, 0, 1, 1)
+        self.datosLibro.addWidget(self.datoColeccion, 0, 0, 1, 1, Qt.AlignTop)
 
-        self.valorTipo = QLabel(self.fichaLibro)
-        self.valorTipo.setObjectName(u"valorTipo")
-        self.valorTipo.setWordWrap(True)
+        self.coleccionYGrados = QVBoxLayout()
+        self.coleccionYGrados.setSpacing(2)
+        self.coleccionYGrados.setObjectName(u"coleccionYGrados")
+        self.valorColeccion = QLabel(self.fichaLibro)
+        self.valorColeccion.setObjectName(u"valorColeccion")
+        self.valorColeccion.setWordWrap(True)
 
-        self.datosLibro.addWidget(self.valorTipo, 0, 1, 1, 1)
+        self.coleccionYGrados.addWidget(self.valorColeccion)
+
+        self.valorGrados = QLabel(self.fichaLibro)
+        self.valorGrados.setObjectName(u"valorGrados")
+        self.valorGrados.setProperty(u"tenue", True)
+
+        self.coleccionYGrados.addWidget(self.valorGrados)
+
+
+        self.datosLibro.addLayout(self.coleccionYGrados, 0, 1, 1, 1)
+
+        self.datoAsignatura = QLabel(self.fichaLibro)
+        self.datoAsignatura.setObjectName(u"datoAsignatura")
+
+        self.datosLibro.addWidget(self.datoAsignatura, 1, 0, 1, 1)
+
+        self.valorAsignatura = QLabel(self.fichaLibro)
+        self.valorAsignatura.setObjectName(u"valorAsignatura")
+        self.valorAsignatura.setWordWrap(True)
+
+        self.datosLibro.addWidget(self.valorAsignatura, 1, 1, 1, 1)
 
         self.datoEditorial = QLabel(self.fichaLibro)
         self.datoEditorial.setObjectName(u"datoEditorial")
 
-        self.datosLibro.addWidget(self.datoEditorial, 1, 0, 1, 1)
+        self.datosLibro.addWidget(self.datoEditorial, 2, 0, 1, 1)
 
         self.valorEditorial = QLabel(self.fichaLibro)
         self.valorEditorial.setObjectName(u"valorEditorial")
         self.valorEditorial.setWordWrap(True)
 
-        self.datosLibro.addWidget(self.valorEditorial, 1, 1, 1, 1)
+        self.datosLibro.addWidget(self.valorEditorial, 2, 1, 1, 1)
 
         self.datoAno = QLabel(self.fichaLibro)
         self.datoAno.setObjectName(u"datoAno")
 
-        self.datosLibro.addWidget(self.datoAno, 2, 0, 1, 1)
+        self.datosLibro.addWidget(self.datoAno, 3, 0, 1, 1)
 
         self.valorAno = QLabel(self.fichaLibro)
         self.valorAno.setObjectName(u"valorAno")
         self.valorAno.setProperty(u"mono", True)
 
-        self.datosLibro.addWidget(self.valorAno, 2, 1, 1, 1)
+        self.datosLibro.addWidget(self.valorAno, 3, 1, 1, 1)
 
         self.datoPaginas = QLabel(self.fichaLibro)
         self.datoPaginas.setObjectName(u"datoPaginas")
 
-        self.datosLibro.addWidget(self.datoPaginas, 3, 0, 1, 1)
+        self.datosLibro.addWidget(self.datoPaginas, 4, 0, 1, 1)
 
         self.valorPaginas = QLabel(self.fichaLibro)
         self.valorPaginas.setObjectName(u"valorPaginas")
         self.valorPaginas.setProperty(u"mono", True)
 
-        self.datosLibro.addWidget(self.valorPaginas, 3, 1, 1, 1)
+        self.datosLibro.addWidget(self.valorPaginas, 4, 1, 1, 1)
 
         self.datoDisponibles = QLabel(self.fichaLibro)
         self.datoDisponibles.setObjectName(u"datoDisponibles")
 
-        self.datosLibro.addWidget(self.datoDisponibles, 4, 0, 1, 1)
+        self.datosLibro.addWidget(self.datoDisponibles, 5, 0, 1, 1)
 
         self.valorDisponibles = QLabel(self.fichaLibro)
         self.valorDisponibles.setObjectName(u"valorDisponibles")
         self.valorDisponibles.setProperty(u"mono", True)
 
-        self.datosLibro.addWidget(self.valorDisponibles, 4, 1, 1, 1)
+        self.datosLibro.addWidget(self.valorDisponibles, 5, 1, 1, 1)
 
         self.datosLibro.setColumnStretch(1, 1)
 
@@ -290,7 +316,15 @@ class Ui_PantallaCatalogo(object):
         self.disposicionPanel.addLayout(self.accionesPanel)
 
 
-        self.cuerpo.addWidget(self.panelLibro, 0, Qt.AlignTop)
+        self.columnaPanel.addWidget(self.panelLibro)
+
+        self.espacioPanel = QSpacerItem(20, 40, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.columnaPanel.addItem(self.espacioPanel)
+
+        self.columnaPanel.setStretch(1, 1)
+
+        self.cuerpo.addLayout(self.columnaPanel)
 
         self.cuerpo.setStretch(0, 1)
 
@@ -314,7 +348,7 @@ class Ui_PantallaCatalogo(object):
         self.etiquetaTitulo.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"titulo", None))
         self.etiquetaResumen.setText("")
         self.etiquetaResumen.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"resumen", None))
-        self.campoBusqueda.setPlaceholderText(QCoreApplication.translate("PantallaCatalogo", u"T\u00edtulo, autor o tipo", None))
+        self.campoBusqueda.setPlaceholderText(QCoreApplication.translate("PantallaCatalogo", u"T\u00edtulo, autor o colecci\u00f3n", None))
         self.campoBusqueda.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"busqueda", None))
         self.botonNuevo.setText(QCoreApplication.translate("PantallaCatalogo", u"Registrar libro", None))
         self.tarjetaTabla.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"tarjeta", None))
@@ -327,9 +361,9 @@ class Ui_PantallaCatalogo(object):
         ___qtablewidgetitem1 = self.tablaLibros.horizontalHeaderItem(1)
         ___qtablewidgetitem1.setText(QCoreApplication.translate("PantallaCatalogo", u"Autor", None))
         ___qtablewidgetitem2 = self.tablaLibros.horizontalHeaderItem(2)
-        ___qtablewidgetitem2.setText(QCoreApplication.translate("PantallaCatalogo", u"Tipo", None))
+        ___qtablewidgetitem2.setText(QCoreApplication.translate("PantallaCatalogo", u"Colecci\u00f3n", None))
         ___qtablewidgetitem3 = self.tablaLibros.horizontalHeaderItem(3)
-        ___qtablewidgetitem3.setText(QCoreApplication.translate("PantallaCatalogo", u"A\u00f1o", None))
+        ___qtablewidgetitem3.setText(QCoreApplication.translate("PantallaCatalogo", u"Asignatura", None))
         ___qtablewidgetitem4 = self.tablaLibros.horizontalHeaderItem(4)
         ___qtablewidgetitem4.setText(QCoreApplication.translate("PantallaCatalogo", u"Estado", None))
         self.panelLibro.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"panel", None))
@@ -345,10 +379,16 @@ class Ui_PantallaCatalogo(object):
         self.cajaBaja.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"cajaGris", None))
         self.etiquetaBaja.setText("")
         self.etiquetaBaja.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"textoCaja", None))
-        self.datoTipo.setText(QCoreApplication.translate("PantallaCatalogo", u"Tipo o g\u00e9nero", None))
-        self.datoTipo.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"dato", None))
-        self.valorTipo.setText("")
-        self.valorTipo.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"valor", None))
+        self.datoColeccion.setText(QCoreApplication.translate("PantallaCatalogo", u"Colecci\u00f3n", None))
+        self.datoColeccion.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"dato", None))
+        self.valorColeccion.setText("")
+        self.valorColeccion.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"valor", None))
+        self.valorGrados.setText("")
+        self.valorGrados.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"valor", None))
+        self.datoAsignatura.setText(QCoreApplication.translate("PantallaCatalogo", u"Asignatura", None))
+        self.datoAsignatura.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"dato", None))
+        self.valorAsignatura.setText("")
+        self.valorAsignatura.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"valor", None))
         self.datoEditorial.setText(QCoreApplication.translate("PantallaCatalogo", u"Editorial", None))
         self.datoEditorial.setProperty(u"rol", QCoreApplication.translate("PantallaCatalogo", u"dato", None))
         self.valorEditorial.setText("")

@@ -1,8 +1,9 @@
 """Alta y modificacion de empleados (REQ-EMP-01).
 
-El alta esta restringida al perfil administrador. La restriccion la aplica
-Postgres mediante las politicas RLS, no este codigo: aqui solo se anticipa
-para no dejar que el usuario llene un formulario que sera rechazado.
+Cambiar el perfil de acceso esta reservado al administrador. La restriccion
+la aplica Postgres (proteger_rol y las politicas RLS), no este codigo: aqui
+solo se anticipa, con el candado y una linea que dice por que, para no dejar
+que el usuario llene un formulario que sera rechazado.
 """
 
 from __future__ import annotations
@@ -14,7 +15,6 @@ from biblioteca.core.sesion import sesion_actual
 from biblioteca.modelos.persona import Empleado, Rol
 from biblioteca.repositorios import personas as repo_personas
 from biblioteca.servicios import validador_persona
-from biblioteca.ui.estilo import COLOR_ERROR, COLOR_TENUE
 from biblioteca.ui.generado.ui_formulario_empleado import Ui_FormularioEmpleado
 
 # Lo que se ve en el desplegable, y el rol que guarda cada opcion
@@ -22,6 +22,14 @@ PERFILES = {
     "Bibliotecario": Rol.BIBLIOTECARIO,
     "Administrador": Rol.ADMINISTRADOR,
 }
+
+# Los puestos de la biblioteca. La lista se puede escribir: un puesto que no
+# este aqui se teclea y se guarda igual.
+PUESTOS = ("Bibliotecaria", "Auxiliar", "Docente encargado", "Dirección")
+
+SOLO_ADMINISTRADOR = "Solo un administrador asigna o cambia perfiles de acceso."
+PROPIO = "No puedes cambiar tu propio perfil de acceso."
+ADMINISTRADOR = "El administrador además puede cambiar perfiles de acceso."
 
 
 class FormularioEmpleado(QDialog):
@@ -36,29 +44,49 @@ class FormularioEmpleado(QDialog):
         self.es_alta = empleado is None
         self.guardado: Empleado | None = None
 
-        self.setWindowTitle(
-            "Registrar empleado" if self.es_alta else "Modificar empleado"
+        titulo = "Registrar empleado" if self.es_alta else "Modificar empleado"
+        self.setWindowTitle(titulo)
+        self.ui.etiquetaEncabezado.setText(titulo)
+        self.ui.etiquetaSubtitulo.setText(
+            "Con el correo que escribas, la persona inicia sesión."
+            if self.es_alta else empleado.nombre_completo
         )
-        self.ui.etiquetaError.setStyleSheet(f"color: {COLOR_ERROR};")
-        self.ui.etiquetaAviso.setStyleSheet(f"color: {COLOR_TENUE};")
-        self.ui.botonCancelar.setProperty("secundario", True)
+        self.ui.cajaError.hide()
+
+        self.ui.campoPuesto.setEditable(True)
+        self.ui.campoPuesto.addItems(PUESTOS)
+        self.ui.campoPuesto.setCurrentIndex(-1)
+        self.ui.campoPuesto.lineEdit().setPlaceholderText("Elige o escribe el puesto")
 
         if empleado is not None:
             self._cargar(empleado)
             self.ui.campoCodigo.setEnabled(False)
 
-        # Cambiar el perfil de acceso queda reservado al administrador,
-        # **tambien al dar de alta**. Antes la restriccion solo se aplicaba al
-        # modificar, de modo que cualquiera del personal podia registrar a un
-        # administrador nuevo y entrar con el. La base todavia lo permite
-        # (proteger_rol solo vigila el UPDATE): falta la migracion 10.
-        if sesion_actual().perfil.rol != Rol.ADMINISTRADOR:
-            self.ui.campoRol.setEnabled(False)
-            self.ui.etiquetaRol.setText("Perfil en el sistema (solo administrador)")
+        self._bloquear_perfil()
 
         self.ui.botonGuardar.clicked.connect(self._guardar)
         self.ui.botonCancelar.clicked.connect(self.reject)
         (self.ui.campoCodigo if self.es_alta else self.ui.campoNombre).setFocus()
+
+    def _bloquear_perfil(self) -> None:
+        """El candado del perfil de acceso, y la razon debajo.
+
+        Cambiarlo queda reservado al administrador, **tambien al dar de
+        alta**: antes la restriccion solo se aplicaba al modificar, de modo
+        que cualquiera del personal podia registrar a un administrador nuevo
+        y entrar con el. Desde la migracion 10 la base tambien lo rechaza.
+        Nadie cambia el suyo: proteger_rol lo rechaza aunque sea administrador.
+        """
+        yo = sesion_actual().perfil
+        es_propio = not self.es_alta and self.empleado.id == yo.id
+        if yo.rol != Rol.ADMINISTRADOR:
+            self.ui.campoRol.setEnabled(False)
+            self.ui.notaRol.setText(SOLO_ADMINISTRADOR)
+        elif es_propio:
+            self.ui.campoRol.setEnabled(False)
+            self.ui.notaRol.setText(PROPIO)
+        else:
+            self.ui.notaRol.setText(ADMINISTRADOR)
 
     def _cargar(self, empleado: Empleado) -> None:
         self.ui.campoCodigo.setText(empleado.codigo)
@@ -91,14 +119,23 @@ class FormularioEmpleado(QDialog):
         )
         if self.empleado is not None:
             empleado.id = self.empleado.id
+            empleado.numero = self.empleado.numero
+            empleado.codigo_postal = self.empleado.codigo_postal
+            empleado.fecha_ingreso = self.empleado.fecha_ingreso
         return empleado
+
+    def _mostrar_error(self, titulo: str, texto: str) -> None:
+        """El recuadro rojo de arriba: que paso y que corregir."""
+        self.ui.tituloError.setText(titulo)
+        self.ui.etiquetaError.setText(texto)
+        self.ui.cajaError.show()
 
     def _guardar(self) -> None:
         empleado = self._recoger()
 
         revision = validador_persona.validar_empleado(empleado)
         if not revision.es_valido:
-            self.ui.etiquetaError.setText(revision.mensaje)
+            self._mostrar_error("Revisa estos datos:", revision.mensaje)
             return
 
         self.ui.botonGuardar.setEnabled(False)
@@ -111,7 +148,7 @@ class FormularioEmpleado(QDialog):
         except Exception as error:
             # Cualquier fallo, no solo el que rechaza la base: sin esto
             # un corte de red se leia como «la base rechazo la operacion».
-            self.ui.etiquetaError.setText(causa_del_error(error))
+            self._mostrar_error("No se pudo guardar:", causa_del_error(error))
             self.ui.botonGuardar.setEnabled(True)
             return
 

@@ -79,9 +79,9 @@
             <property name="spacing"><number>14</number></property>
             <item>
              <widget class="QLabel" name="logoFicha">
-              <property name="minimumSize"><size><width>54</width><height>54</height></size></property>
-              <property name="maximumSize"><size><width>54</width><height>54</height></size></property>
-              <property name="text"><string>LOGO</string></property>
+              <property name="minimumSize"><size><width>120</width><height>68</height></size></property>
+              <property name="maximumSize"><size><width>120</width><height>68</height></size></property>
+              <property name="text"><string/></property>
               <property name="alignment"><set>Qt::AlignCenter</set></property>
              </widget>
             </item>

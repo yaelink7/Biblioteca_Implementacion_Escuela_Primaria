@@ -11,6 +11,11 @@ from datetime import date
 from enum import StrEnum
 from typing import Any, Self
 
+# «Por vencer»: le quedan tres dias o menos. Lo aprobo Yael el 8 de noviembre
+# de 2026, con su conteo y su filtro en Prestamos (CLAUDE.md, 7.0). Vive aqui
+# y no en core/config.py porque el modelo no lee el .env.
+DIAS_POR_VENCER = 3
+
 
 class EstadoPrestamo(StrEnum):
     ACTIVO = "activo"
@@ -35,6 +40,8 @@ class Prestamo:
     titulo_libro: str | None = None
     nombre_alumno: str | None = None
     salon: str | None = None
+    grado: int | None = None
+    grupo: str | None = None
 
     # Lo calcula la base, no este codigo: positivo si faltan dias, negativo
     # si ya vencio, cero si vence hoy. Antes se calculaba aqui con el reloj
@@ -52,6 +59,17 @@ class Prestamo:
     @property
     def esta_vencido(self) -> bool:
         return self.dias_de_retraso > 0
+
+    @property
+    def por_vencer(self) -> bool:
+        """Le quedan entre cero y DIAS_POR_VENCER dias; «vence hoy» cuenta.
+
+        Sale de dias_restantes, que calcula la base: el reloj del equipo no
+        interviene.
+        """
+        if self.estado == EstadoPrestamo.DEVUELTO:
+            return False
+        return 0 <= self.dias_restantes <= DIAS_POR_VENCER
 
     @property
     def resumen(self) -> str:
@@ -83,6 +101,8 @@ class Prestamo:
             titulo_libro=fila.get("titulo_libro") or fila.get("titulo"),
             nombre_alumno=fila.get("nombre_alumno"),
             salon=_salon(fila),
+            grado=fila.get("grado"),
+            grupo=fila.get("grupo"),
             dias_restantes=fila.get("dias_restantes", 0),
         )
 

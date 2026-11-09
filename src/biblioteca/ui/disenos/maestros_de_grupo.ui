@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogoMaestros</class>
+ <widget class="QDialog" name="DialogoMaestros">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>640</width><height>620</height></rect></property>
+  <property name="windowTitle"><string>Maestros de grupo</string></property>
+  <layout class="QVBoxLayout" name="disposicion" stretch="0,0,0,1,0">
+   <property name="leftMargin"><number>30</number></property>
+   <property name="topMargin"><number>26</number></property>
+   <property name="rightMargin"><number>30</number></property>
+   <property name="bottomMargin"><number>26</number></property>
+   <property name="spacing"><number>16</number></property>
+   <item>
+    <layout class="QVBoxLayout" name="encabezado">
+     <property name="spacing"><number>4</number></property>
+     <item>
+      <widget class="QLabel" name="etiquetaEncabezado">
+       <property name="text"><string>Maestros de grupo</string></property>
+       <property name="rol" stdset="0"><string>tituloDialogo</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="etiquetaExplicacion">
+     <property name="text"><string>El maestro se asigna una vez por salón y todos sus alumnos lo heredan. Al empezar otro ciclo escolar se corrige aquí.</string></property>
+     <property name="wordWrap"><bool>true</bool></property>
+     <property name="rol" stdset="0"><string>textoDialogo</string></property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="cajaError">
+     <layout class="QVBoxLayout" name="disposicionError">
+      <property name="leftMargin"><number>16</number></property>
+      <property name="topMargin"><number>12</number></property>
+      <property name="rightMargin"><number>16</number></property>
+      <property name="bottomMargin"><number>12</number></property>
+      <property name="spacing"><number>4</number></property>
+      <item>
+       <widget class="QLabel" name="tituloError">
+        <property name="text"><string>No se pudo guardar:</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="etiquetaError">
+        <property name="text"><string/></property>
+        <property name="wordWrap"><bool>true</bool></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="marcoTabla">
+     <property name="rol" stdset="0"><string>marcoTabla</string></property>
+     <layout class="QVBoxLayout" name="disposicionMarco">
+      <property name="leftMargin"><number>1</number></property>
+      <property name="topMargin"><number>1</number></property>
+      <property name="rightMargin"><number>1</number></property>
+      <property name="bottomMargin"><number>1</number></property>
+      <property name="spacing"><number>0</number></property>
+      <item>
+       <widget class="QTableWidget" name="tablaMaestros">
+        <property name="frameShape"><enum>QFrame::NoFrame</enum></property>
+        <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+        <property name="selectionMode"><enum>QAbstractItemView::NoSelection</enum></property>
+        <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+        <property name="showGrid"><bool>false</bool></property>
+        <property name="wordWrap"><bool>false</bool></property>
+        <property name="sortingEnabled"><bool>false</bool></property>
+        <property name="focusPolicy"><enum>Qt::NoFocus</enum></property>
+        <property name="rol" stdset="0"><string>tablaDialogo</string></property>
+        <attribute name="verticalHeaderVisible"><bool>false</bool></attribute>
+        <attribute name="verticalHeaderDefaultSectionSize"><number>56</number></attribute>
+        <attribute name="horizontalHeaderStretchLastSection"><bool>false</bool></attribute>
+        <attribute name="horizontalHeaderHighlightSections"><bool>false</bool></attribute>
+        <column><property name="text"><string>Salón</string></property></column>
+        <column><property name="text"><string>Maestro de grupo</string></property></column>
+        <column><property name="text"><string>Alumnos</string></property></column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="filaBotones">
+     <property name="spacing"><number>10</number></property>
+     <item>
+      <spacer name="espacioBotones">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="botonCancelar">
+       <property name="text"><string>Cancelar</string></property>
+       <property name="minimumHeight"><number>44</number></property>
+       <property name="secundario" stdset="0"><bool>true</bool></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="botonGuardar">
+       <property name="text"><string>Guardar</string></property>
+       <property name="minimumHeight"><number>44</number></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>tablaMaestros</tabstop>
+  <tabstop>botonGuardar</tabstop>
+  <tabstop>botonCancelar</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

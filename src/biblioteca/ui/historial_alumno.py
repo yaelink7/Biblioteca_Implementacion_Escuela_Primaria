@@ -9,12 +9,11 @@ todo rastro de quien lo habia tenido.
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QFont
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QDialog,
     QHeaderView,
     QMessageBox,
-    QTableWidgetItem,
     QWidget,
 )
 
@@ -22,8 +21,18 @@ from biblioteca.core.errores import mensaje as mensaje_de_error
 from biblioteca.modelos.persona import Alumno
 from biblioteca.modelos.prestamo import EstadoPrestamo
 from biblioteca.repositorios import prestamos as repo_prestamos
-from biblioteca.ui.estilo import COLOR_PRINCIPAL, COLOR_TENUE
+from biblioteca.ui.componentes import CeldaOrdenada
+from biblioteca.ui.estilo import ROJO
+from biblioteca.ui.formato import fecha_numerica, plural, salon
 from biblioteca.ui.generado.ui_historial_alumno import Ui_DialogoHistorial
+
+
+ALTO_MAXIMO = 340
+
+
+def _orden(fecha) -> str:
+    """Las fechas se ordenan como fechas, no como «dd/mm/aaaa»."""
+    return fecha.isoformat() if fecha else ""
 
 
 class DialogoHistorial(QDialog):
@@ -34,20 +43,18 @@ class DialogoHistorial(QDialog):
 
         self.alumno = alumno
         self.setWindowTitle(f"Historial · {alumno.nombre_completo}")
-
-        titulo = QFont()
-        titulo.setPointSize(14)
-        titulo.setBold(True)
-        self.ui.etiquetaAlumno.setFont(titulo)
-        self.ui.etiquetaAlumno.setStyleSheet(f"color: {COLOR_PRINCIPAL};")
-        self.ui.etiquetaAlumno.setText(
-            f"{alumno.nombre_completo}  ·  {alumno.salon}  ·  {alumno.codigo}"
-        )
-        self.ui.etiquetaResumen.setStyleSheet(f"color: {COLOR_TENUE};")
-        self.ui.etiquetaNota.setStyleSheet(f"color: {COLOR_TENUE};")
+        partes = [alumno.nombre_completo, salon(alumno.grado, alumno.grupo)]
+        if alumno.codigo:
+            partes.append(alumno.codigo)
+        self.ui.etiquetaAlumno.setText(" · ".join(partes))
 
         cabecera = self.ui.tablaHistorial.horizontalHeader()
+        cabecera.setDefaultAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
         cabecera.setSectionResizeMode(0, QHeaderView.ResizeMode.Stretch)
+        for columna in (1, 2, 3, 4):
+            cabecera.setSectionResizeMode(columna, QHeaderView.ResizeMode.ResizeToContents)
+        # Lo mas reciente arriba, como lo entrega la base
+        cabecera.setSortIndicator(1, Qt.SortOrder.DescendingOrder)
 
         self.ui.botonCerrar.clicked.connect(self.accept)
         self._cargar()
@@ -72,21 +79,24 @@ class DialogoHistorial(QDialog):
 
         for fila, p in enumerate(movimientos):
             celdas = [
-                p.titulo_libro or "—",
-                p.fecha_prestamo.strftime("%d/%m/%Y") if p.fecha_prestamo else "—",
-                p.fecha_limite.strftime("%d/%m/%Y") if p.fecha_limite else "—",
-                p.fecha_devolucion.strftime("%d/%m/%Y") if p.fecha_devolucion else "—",
-                p.resumen,
+                CeldaOrdenada(p.titulo_libro or "—", p.titulo_libro or ""),
+                CeldaOrdenada(fecha_numerica(p.fecha_prestamo), _orden(p.fecha_prestamo)),
+                CeldaOrdenada(fecha_numerica(p.fecha_limite), _orden(p.fecha_limite)),
+                CeldaOrdenada(fecha_numerica(p.fecha_devolucion), _orden(p.fecha_devolucion)),
+                CeldaOrdenada(p.resumen, p.dias_restantes),
             ]
-            for columna, texto in enumerate(celdas):
-                celda = QTableWidgetItem(texto)
-                if columna:
-                    celda.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                if columna == 4 and p.esta_vencido:
-                    celda.setForeground(Qt.GlobalColor.darkRed)
+            if p.esta_vencido:
+                celdas[4].setForeground(QColor(ROJO))
+            for columna, celda in enumerate(celdas):
                 tabla.setItem(fila, columna, celda)
 
         tabla.setSortingEnabled(True)
+        self.ui.marcoTabla.setVisible(bool(movimientos))
+        # La tabla mide lo que sus filas, hasta un tope; despues se desliza
+        alto = (tabla.horizontalHeader().sizeHint().height()
+                + len(movimientos) * tabla.verticalHeader().defaultSectionSize() + 4)
+        tabla.setFixedHeight(min(alto, ALTO_MAXIMO))
+        self.adjustSize()
         self._resumir(movimientos)
 
     def _resumir(self, movimientos: list) -> None:
@@ -102,12 +112,12 @@ class DialogoHistorial(QDialog):
         activos = len(movimientos) - devueltos
         vencidos = sum(1 for p in movimientos if p.esta_vencido)
 
-        partes = [f"{len(movimientos)} préstamo{'s' if len(movimientos) != 1 else ''}"]
+        partes = [plural(len(movimientos), "préstamo")]
         if devueltos:
-            partes.append(f"{devueltos} devuelto{'s' if devueltos != 1 else ''}")
+            partes.append(plural(devueltos, "devuelto"))
         if activos:
             partes.append(f"{activos} sin devolver")
         if vencidos:
-            partes.append(f"{vencidos} vencido{'s' if vencidos != 1 else ''}")
+            partes.append(plural(vencidos, "vencido"))
 
-        self.ui.etiquetaResumen.setText("   ·   ".join(partes))
+        self.ui.etiquetaResumen.setText(" · ".join(partes))

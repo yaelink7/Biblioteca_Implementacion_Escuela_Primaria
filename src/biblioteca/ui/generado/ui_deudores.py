@@ -24,69 +24,119 @@ class Ui_PantallaDeudores(object):
     def setupUi(self, PantallaDeudores):
         if not PantallaDeudores.objectName():
             PantallaDeudores.setObjectName(u"PantallaDeudores")
-        PantallaDeudores.resize(900, 560)
+        PantallaDeudores.resize(1100, 680)
         self.disposicion = QVBoxLayout(PantallaDeudores)
-        self.disposicion.setSpacing(14)
+        self.disposicion.setSpacing(18)
         self.disposicion.setObjectName(u"disposicion")
-        self.disposicion.setContentsMargins(20, 20, 20, 20)
-        self.marcoTotales = QFrame(PantallaDeudores)
-        self.marcoTotales.setObjectName(u"marcoTotales")
-        self.marcoTotales.setFrameShape(QFrame.StyledPanel)
-        self.disposicionTotales = QHBoxLayout(self.marcoTotales)
-        self.disposicionTotales.setSpacing(28)
-        self.disposicionTotales.setObjectName(u"disposicionTotales")
-        self.disposicionTotales.setContentsMargins(18, 14, 18, 14)
-        self.etiquetaTotal = QLabel(self.marcoTotales)
-        self.etiquetaTotal.setObjectName(u"etiquetaTotal")
+        self.disposicion.setContentsMargins(0, 0, 0, 0)
+        self.encabezado = QHBoxLayout()
+        self.encabezado.setSpacing(12)
+        self.encabezado.setObjectName(u"encabezado")
+        self.textoEncabezado = QVBoxLayout()
+        self.textoEncabezado.setSpacing(6)
+        self.textoEncabezado.setObjectName(u"textoEncabezado")
+        self.etiquetaTitulo = QLabel(PantallaDeudores)
+        self.etiquetaTitulo.setObjectName(u"etiquetaTitulo")
 
-        self.disposicionTotales.addWidget(self.etiquetaTotal)
+        self.textoEncabezado.addWidget(self.etiquetaTitulo)
 
-        self.etiquetaMasAtrasado = QLabel(self.marcoTotales)
-        self.etiquetaMasAtrasado.setObjectName(u"etiquetaMasAtrasado")
-
-        self.disposicionTotales.addWidget(self.etiquetaMasAtrasado)
-
-        self.espacioTotales = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.disposicionTotales.addItem(self.espacioTotales)
-
-        self.etiquetaGenerado = QLabel(self.marcoTotales)
+        self.etiquetaGenerado = QLabel(PantallaDeudores)
         self.etiquetaGenerado.setObjectName(u"etiquetaGenerado")
 
-        self.disposicionTotales.addWidget(self.etiquetaGenerado)
+        self.textoEncabezado.addWidget(self.etiquetaGenerado)
 
 
-        self.disposicion.addWidget(self.marcoTotales)
+        self.encabezado.addLayout(self.textoEncabezado)
 
-        self.filaFiltro = QHBoxLayout()
-        self.filaFiltro.setSpacing(10)
-        self.filaFiltro.setObjectName(u"filaFiltro")
+        self.espacioEncabezado = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.encabezado.addItem(self.espacioEncabezado)
+
         self.etiquetaSalon = QLabel(PantallaDeudores)
         self.etiquetaSalon.setObjectName(u"etiquetaSalon")
+        self.etiquetaSalon.setMinimumHeight(44)
 
-        self.filaFiltro.addWidget(self.etiquetaSalon)
+        self.encabezado.addWidget(self.etiquetaSalon, 0, Qt.AlignBottom)
 
         self.campoSalon = QComboBox(PantallaDeudores)
         self.campoSalon.setObjectName(u"campoSalon")
-        self.campoSalon.setMinimumHeight(32)
-        self.campoSalon.setMinimumWidth(160)
+        self.campoSalon.setMinimumSize(QSize(150, 44))
 
-        self.filaFiltro.addWidget(self.campoSalon)
-
-        self.espacioFiltro = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.filaFiltro.addItem(self.espacioFiltro)
+        self.encabezado.addWidget(self.campoSalon, 0, Qt.AlignBottom)
 
         self.botonActualizar = QPushButton(PantallaDeudores)
         self.botonActualizar.setObjectName(u"botonActualizar")
-        self.botonActualizar.setMinimumHeight(34)
+        self.botonActualizar.setMinimumHeight(44)
+        self.botonActualizar.setProperty(u"secundario", True)
 
-        self.filaFiltro.addWidget(self.botonActualizar)
+        self.encabezado.addWidget(self.botonActualizar, 0, Qt.AlignBottom)
 
 
-        self.disposicion.addLayout(self.filaFiltro)
+        self.disposicion.addLayout(self.encabezado)
 
-        self.tablaDeudores = QTableWidget(PantallaDeudores)
+        self.hojaReporte = QFrame(PantallaDeudores)
+        self.hojaReporte.setObjectName(u"hojaReporte")
+        self.disposicionHoja = QVBoxLayout(self.hojaReporte)
+        self.disposicionHoja.setSpacing(0)
+        self.disposicionHoja.setObjectName(u"disposicionHoja")
+        self.disposicionHoja.setContentsMargins(0, 0, 0, 0)
+        self.franjaHoja = QFrame(self.hojaReporte)
+        self.franjaHoja.setObjectName(u"franjaHoja")
+        self.franjaHoja.setMinimumHeight(6)
+        self.franjaHoja.setMaximumHeight(6)
+
+        self.disposicionHoja.addWidget(self.franjaHoja)
+
+        self.cabezaHoja = QHBoxLayout()
+        self.cabezaHoja.setSpacing(12)
+        self.cabezaHoja.setObjectName(u"cabezaHoja")
+        self.cabezaHoja.setContentsMargins(26, 22, 26, 14)
+        self.iconoTotal = QLabel(self.hojaReporte)
+        self.iconoTotal.setObjectName(u"iconoTotal")
+        self.iconoTotal.setMinimumSize(QSize(28, 28))
+        self.iconoTotal.setMaximumSize(QSize(28, 28))
+
+        self.cabezaHoja.addWidget(self.iconoTotal, 0, Qt.AlignVCenter)
+
+        self.etiquetaTotal = QLabel(self.hojaReporte)
+        self.etiquetaTotal.setObjectName(u"etiquetaTotal")
+
+        self.cabezaHoja.addWidget(self.etiquetaTotal, 0, Qt.AlignBottom)
+
+        self.etiquetaTotalTexto = QLabel(self.hojaReporte)
+        self.etiquetaTotalTexto.setObjectName(u"etiquetaTotalTexto")
+
+        self.cabezaHoja.addWidget(self.etiquetaTotalTexto, 0, Qt.AlignBottom)
+
+        self.espacioCabeza = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.cabezaHoja.addItem(self.espacioCabeza)
+
+        self.etiquetaMasAtrasado = QLabel(self.hojaReporte)
+        self.etiquetaMasAtrasado.setObjectName(u"etiquetaMasAtrasado")
+
+        self.cabezaHoja.addWidget(self.etiquetaMasAtrasado, 0, Qt.AlignBottom)
+
+
+        self.disposicionHoja.addLayout(self.cabezaHoja)
+
+        self.marcoRaya = QVBoxLayout()
+        self.marcoRaya.setObjectName(u"marcoRaya")
+        self.marcoRaya.setContentsMargins(26, 0, 26, 4)
+        self.dobleRaya = QFrame(self.hojaReporte)
+        self.dobleRaya.setObjectName(u"dobleRaya")
+        self.dobleRaya.setMinimumHeight(5)
+        self.dobleRaya.setMaximumHeight(5)
+
+        self.marcoRaya.addWidget(self.dobleRaya)
+
+
+        self.disposicionHoja.addLayout(self.marcoRaya)
+
+        self.marcoTablaHoja = QVBoxLayout()
+        self.marcoTablaHoja.setObjectName(u"marcoTablaHoja")
+        self.marcoTablaHoja.setContentsMargins(12, 0, 12, 0)
+        self.tablaDeudores = QTableWidget(self.hojaReporte)
         if (self.tablaDeudores.columnCount() < 6):
             self.tablaDeudores.setColumnCount(6)
         __qtablewidgetitem = QTableWidgetItem()
@@ -102,21 +152,54 @@ class Ui_PantallaDeudores(object):
         __qtablewidgetitem5 = QTableWidgetItem()
         self.tablaDeudores.setHorizontalHeaderItem(5, __qtablewidgetitem5)
         self.tablaDeudores.setObjectName(u"tablaDeudores")
-        self.tablaDeudores.setAlternatingRowColors(True)
+        self.tablaDeudores.setFrameShape(QFrame.NoFrame)
         self.tablaDeudores.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tablaDeudores.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tablaDeudores.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tablaDeudores.setShowGrid(False)
+        self.tablaDeudores.setWordWrap(False)
         self.tablaDeudores.setSortingEnabled(True)
+        self.tablaDeudores.horizontalHeader().setHighlightSections(False)
         self.tablaDeudores.horizontalHeader().setStretchLastSection(True)
         self.tablaDeudores.verticalHeader().setVisible(False)
+        self.tablaDeudores.verticalHeader().setDefaultSectionSize(46)
 
-        self.disposicion.addWidget(self.tablaDeudores)
+        self.marcoTablaHoja.addWidget(self.tablaDeudores)
 
-        self.etiquetaNota = QLabel(PantallaDeudores)
+
+        self.disposicionHoja.addLayout(self.marcoTablaHoja)
+
+        self.pieHoja = QFrame(self.hojaReporte)
+        self.pieHoja.setObjectName(u"pieHoja")
+        self.disposicionPie = QHBoxLayout(self.pieHoja)
+        self.disposicionPie.setSpacing(12)
+        self.disposicionPie.setObjectName(u"disposicionPie")
+        self.disposicionPie.setContentsMargins(26, 14, 26, 18)
+        self.etiquetaNota = QLabel(self.pieHoja)
         self.etiquetaNota.setObjectName(u"etiquetaNota")
         self.etiquetaNota.setWordWrap(True)
 
-        self.disposicion.addWidget(self.etiquetaNota)
+        self.disposicionPie.addWidget(self.etiquetaNota)
 
+        self.etiquetaCriterio = QLabel(self.pieHoja)
+        self.etiquetaCriterio.setObjectName(u"etiquetaCriterio")
+
+        self.disposicionPie.addWidget(self.etiquetaCriterio)
+
+        self.disposicionPie.setStretch(0, 1)
+
+        self.disposicionHoja.addWidget(self.pieHoja)
+
+
+        self.disposicion.addWidget(self.hojaReporte)
+
+        self.espacioFinal = QSpacerItem(40, 20, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
+
+        self.disposicion.addItem(self.espacioFinal)
+
+        self.disposicion.setStretch(2, 1)
+        QWidget.setTabOrder(self.campoSalon, self.botonActualizar)
+        QWidget.setTabOrder(self.botonActualizar, self.tablaDeudores)
 
         self.retranslateUi(PantallaDeudores)
 
@@ -125,11 +208,21 @@ class Ui_PantallaDeudores(object):
 
     def retranslateUi(self, PantallaDeudores):
         PantallaDeudores.setWindowTitle(QCoreApplication.translate("PantallaDeudores", u"Deudores", None))
-        self.etiquetaTotal.setText(QCoreApplication.translate("PantallaDeudores", u"\u2014", None))
-        self.etiquetaMasAtrasado.setText("")
+        self.etiquetaTitulo.setText(QCoreApplication.translate("PantallaDeudores", u"Deudores", None))
+        self.etiquetaTitulo.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"titulo", None))
         self.etiquetaGenerado.setText("")
+        self.etiquetaGenerado.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"resumen", None))
         self.etiquetaSalon.setText(QCoreApplication.translate("PantallaDeudores", u"Filtrar por sal\u00f3n", None))
+        self.etiquetaSalon.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"etiquetaLinea", None))
         self.botonActualizar.setText(QCoreApplication.translate("PantallaDeudores", u"Actualizar", None))
+        self.hojaReporte.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"hoja", None))
+        self.iconoTotal.setText("")
+        self.etiquetaTotal.setText(QCoreApplication.translate("PantallaDeudores", u"\u2014", None))
+        self.etiquetaTotal.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"cifra", None))
+        self.etiquetaTotalTexto.setText("")
+        self.etiquetaTotalTexto.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"cifraTexto", None))
+        self.etiquetaMasAtrasado.setText("")
+        self.etiquetaMasAtrasado.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"peor", None))
         ___qtablewidgetitem = self.tablaDeudores.horizontalHeaderItem(0)
         ___qtablewidgetitem.setText(QCoreApplication.translate("PantallaDeudores", u"Alumno", None))
         ___qtablewidgetitem1 = self.tablaDeudores.horizontalHeaderItem(1)
@@ -142,6 +235,10 @@ class Ui_PantallaDeudores(object):
         ___qtablewidgetitem4.setText(QCoreApplication.translate("PantallaDeudores", u"Retraso", None))
         ___qtablewidgetitem5 = self.tablaDeudores.horizontalHeaderItem(5)
         ___qtablewidgetitem5.setText(QCoreApplication.translate("PantallaDeudores", u"Contacto del tutor", None))
+        self.pieHoja.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"pieHoja", None))
         self.etiquetaNota.setText(QCoreApplication.translate("PantallaDeudores", u"El reporte se genera del estado actual de los pr\u00e9stamos. No requiere revisar registros a mano.", None))
+        self.etiquetaNota.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"notaHoja", None))
+        self.etiquetaCriterio.setText("")
+        self.etiquetaCriterio.setProperty(u"rol", QCoreApplication.translate("PantallaDeudores", u"pista", None))
     # retranslateUi
 

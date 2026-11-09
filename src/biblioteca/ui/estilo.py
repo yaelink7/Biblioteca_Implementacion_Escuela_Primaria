@@ -66,6 +66,7 @@ def hoja_de_estilo() -> str:
     orden_arriba = ruta_para_hoja("arriba", TEXTO)
     orden_abajo = ruta_para_hoja("abajo", TEXTO)
     palomita = ruta_para_hoja("palomita", TEXTO)
+    candado = ruta_para_hoja("candado", TENUE)
 
     return f"""
 /* --- Base --- */
@@ -75,10 +76,7 @@ QToolTip {{ background: {GRAFITO}; color: #FFFFFF; border: none; padding: 6px 8p
 
 /* --- Columna de iconos --- */
 QFrame#riel {{ background: {GRAFITO}; border: none; }}
-QLabel#logoRiel {{
-    border: 1px dashed #6E727A; border-radius: 12px;
-    color: #9DA1A8; font-size: 10px; font-weight: 700;
-}}
+QLabel#logoRiel {{ border: none; }}
 QLabel#avatarRiel {{
     background: {GRAFITO_CLARO}; color: #FFFFFF; border-radius: 20px;
     font-size: 13px; font-weight: 700;
@@ -206,12 +204,78 @@ QLabel[rol="valor"][mono="true"] {{ font-family: "{FAMILIA_MONO}"; font-size: 13
 QLabel[rol="valor"][alerta="true"] {{ color: {ROJO}; font-weight: 700; }}
 QFrame[rol="cajaGris"] {{ background: #F4F3EF; border: none; border-radius: 10px; }}
 QLabel[rol="textoCaja"] {{ font-size: 13px; color: {GRIS}; }}
+QLabel[rol="valor"][fuerte="true"] {{ font-weight: 700; }}
+QLabel[rol="valor"][tenue="true"] {{ color: {TENUE}; font-size: 13px; }}
+QLabel[rol="tablaVacia"] {{ font-size: 14px; color: {TENUE}; padding: 28px 20px; }}
+
+/* La persona del panel: sus iniciales en un circulo de grafito */
+QLabel[rol="avatar"] {{
+    background: {GRAFITO}; color: #FFFFFF; border-radius: 22px; font-size: 14px; font-weight: 700;
+}}
+
+/* La caja de situacion del panel: gris para avisar, roja si urge */
+QFrame[rol="caja"] {{ background: #F4F3EF; border: none; border-radius: 10px; }}
+QFrame[rol="caja"][tono="rojo"] {{ background: {ROJO_FONDO}; }}
+QLabel[rol="tituloCaja"] {{ font-size: 14px; font-weight: 800; color: {TEXTO}; }}
+QLabel[rol="tituloCaja"][tono="rojo"] {{ color: {ROJO_OSCURO}; }}
+QLabel[rol="textoCaja"][tono="rojo"] {{ color: {ROJO_OSCURO}; }}
+
+/* --- Empleados: quien puede hacer que, con la raya mostaza a la izquierda --- */
+QFrame[rol="aviso"] {{
+    background: {SUPERFICIE}; border: 1px solid {BORDE}; border-left: 4px solid {MOSTAZA};
+    border-radius: 8px;
+}}
+QLabel[rol="textoAviso"] {{ font-size: 14px; color: {GRIS}; }}
+
+/* --- Deudores: el reporte como una hoja con su franja --- */
+QLabel[rol="etiquetaLinea"] {{ font-size: 14px; color: {GRIS}; }}
+QFrame[rol="hoja"] {{ background: {SUPERFICIE}; border: 1px solid {BORDE}; border-radius: 12px; }}
+QFrame#franjaHoja {{
+    background: {MOSTAZA}; border: none;
+    border-top-left-radius: 11px; border-top-right-radius: 11px;
+}}
+QLabel[rol="cifra"] {{ font-family: "{FAMILIA_MONO}"; font-size: 44px; font-weight: 500; }}
+QLabel[rol="cifra"][alerta="true"] {{ color: {ROJO}; }}
+QLabel[rol="cifraTexto"] {{ font-size: 17px; font-weight: 800; }}
+QLabel[rol="peor"] {{ font-size: 14px; color: {GRIS}; }}
+QFrame#dobleRaya {{
+    background: transparent; border: none;
+    border-top: 1px solid {BORDE_CONTROL}; border-bottom: 1px solid {BORDE_CONTROL};
+}}
+QFrame[rol="pieHoja"] {{ background: transparent; border: none; border-top: 1px solid {RAYA}; }}
+QLabel[rol="notaHoja"] {{ font-size: 13px; color: {TENUE}; }}
 
 /* --- Dialogos de captura --- */
 QLabel[rol="tituloDialogo"] {{ font-size: 24px; font-weight: 800; }}
 QLabel[rol="subtituloDialogo"] {{ font-size: 14px; color: {TENUE}; }}
-QLabel[rol="etiquetaCampo"] {{ font-size: 14px; font-weight: 700; }}
+QLabel[rol="etiquetaCampo"] {{ font-size: 14px; font-weight: 700; padding-top: 8px; }}
 QLabel[rol="notaCampo"] {{ font-size: 13px; color: {TENUE}; }}
+QLabel[rol="textoDialogo"] {{ font-size: 15px; }}
+QLabel[rol="paso"] {{ font-size: 15px; font-weight: 800; }}
+QLabel[rol="resumenPrestamo"] {{ font-size: 15px; }}
+QLabel[rol="separador"] {{
+    font-size: 12px; font-weight: 700; color: {TENUE};
+    border-top: 1px solid {BORDE}; padding-top: 14px; margin-top: 8px;
+}}
+QLabel[rol="datoFijo"] {{
+    border: 1px dashed {BORDE_CONTROL}; border-radius: 8px; padding: 0 12px;
+    min-height: 42px; font-size: 14px;
+}}
+QComboBox::down-arrow:disabled {{ image: url({candado}); width: 16px; height: 16px; }}
+
+/* Las listas de opciones del prestamo: el delegado dibuja cada renglon */
+QListWidget[rol="opciones"] {{ background: {SOBRE_FILA}; border: 1px solid {BORDE}; border-radius: 8px; }}
+QListWidget[rol="opciones"]::item {{ padding: 0; }}
+QListWidget[rol="opciones"]::item:selected {{ background: transparent; }}
+
+/* Tablas dentro de un dialogo: el marco redondeado y el encabezado tenue */
+QFrame[rol="marcoTabla"] {{ background: {SUPERFICIE}; border: 1px solid {BORDE}; border-radius: 12px; }}
+QTableView[rol="tablaDialogo"] {{ background: transparent; border: none; }}
+QTableView[rol="tablaDialogo"] QHeaderView::section {{
+    background: {SOBRE_FILA}; color: {TENUE}; border: none; border-bottom: 1px solid {BORDE};
+    padding: 0 12px; min-height: 38px;
+}}
+QTableView[rol="tablaDialogo"] QLineEdit {{ min-height: 36px; }}
 QFrame#cajaError {{ background: {ROJO_FONDO}; border: none; border-radius: 10px; }}
 QLabel#tituloError {{ color: {ROJO_OSCURO}; font-size: 14px; font-weight: 800; }}
 QFrame#cajaError QLabel#etiquetaError {{ color: {ROJO_OSCURO}; font-size: 14px; }}
@@ -224,10 +288,7 @@ QFrame#franjaFicha {{
     border-top-left-radius: 6px; border-top-right-radius: 6px;
 }}
 QLabel[rol="rotuloFicha"] {{ font-family: "{FAMILIA_MONO}"; font-size: 12px; color: {TENUE}; }}
-QLabel#logoFicha {{
-    border: 1px dashed #A3A6AC; border-radius: 12px; color: #6E727A;
-    font-size: 10px; font-weight: 700;
-}}
+QLabel#logoFicha {{ border: none; }}
 QLabel[rol="tituloFicha"] {{ font-size: 24px; font-weight: 800; }}
 QLabel[rol="escuelaFicha"] {{ font-size: 14px; color: {GRIS}; }}
 QFrame#rayaFicha {{

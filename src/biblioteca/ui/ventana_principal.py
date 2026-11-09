@@ -6,11 +6,14 @@ de la biblioteca: catalogo, prestamos, alumnos, deudores y empleados.
 La navegacion es la columna de iconos del diseno «Lapiz»: en grafito, con el
 mostaza solo en la seccion abierta. Encima de cada pantalla va una linea con
 la escuela, la fecha y quien esta dentro, que sustituye a la barra de estado.
+Arriba de la columna va el arbol del logo de la escuela, y junto a Deudores,
+cuantos prestamos vencidos hay (lo aprobo Yael el 8 de noviembre de 2026).
 """
 
 from __future__ import annotations
 
 from PySide6.QtCore import QDate, QSize, Qt
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import (
     QButtonGroup,
     QFrame,
@@ -25,7 +28,7 @@ from PySide6.QtWidgets import (
 
 from biblioteca.core.sesion import Sesion, cerrar_sesion
 from biblioteca.ui.alumnos import PantallaAlumnos
-from biblioteca.ui.apariencia import icono
+from biblioteca.ui.apariencia import icono, marca_escuela
 from biblioteca.ui.catalogo import PantallaCatalogo
 from biblioteca.ui.componentes import BotonRiel
 from biblioteca.ui.deudores import PantallaDeudores
@@ -56,16 +59,21 @@ class VentanaPrincipal(QMainWindow):
         self.resize(1280, 800)
         self.setMinimumSize(1024, 640)
 
+        self.setWindowIcon(QIcon(marca_escuela(64)))
+
         self.paginas = QStackedWidget()
         self.menu = QButtonGroup(self)
         self.botones: list[BotonRiel] = []
+        self.pantallas: dict[str, QWidget] = {}
         for indice, (nombre, nombre_icono, pantalla) in enumerate(SECCIONES):
-            self.paginas.addWidget(pantalla(self))
+            self.pantallas[nombre_icono] = pantalla(self)
+            self.paginas.addWidget(self.pantallas[nombre_icono])
             boton = BotonRiel(nombre, nombre_icono)
             self.menu.addButton(boton, indice)
             self.botones.append(boton)
         self.botones[0].setChecked(True)
         self.menu.idClicked.connect(self.paginas.setCurrentIndex)
+        self._enlazar_pantallas()
 
         marco = QWidget()
         disposicion = QHBoxLayout(marco)
@@ -74,6 +82,21 @@ class VentanaPrincipal(QMainWindow):
         disposicion.addWidget(self._riel())
         disposicion.addWidget(self._principal(), 1)
         self.setCentralWidget(marco)
+
+    def _enlazar_pantallas(self) -> None:
+        """Lo que cambia en una pantalla y se ve en otra.
+
+        El numero de Deudores sale de su propio reporte (las filas de
+        v_deudores). Un prestamo nuevo o una devolucion lo cambian, y tambien
+        la situacion de cada alumno: las dos pantallas se vuelven a consultar.
+        """
+        deudores = self.pantallas["deudores"]
+        boton_deudores = self.botones[[s[1] for s in SECCIONES].index("deudores")]
+        boton_deudores.poner_insignia(deudores.total)
+        deudores.total_cambio.connect(boton_deudores.poner_insignia)
+        prestamos = self.pantallas["prestamos"]
+        prestamos.prestamos_cambiaron.connect(deudores.recargar)
+        prestamos.prestamos_cambiaron.connect(self.pantallas["alumnos"].recargar)
 
     @property
     def secciones(self) -> list[str]:
@@ -88,10 +111,13 @@ class VentanaPrincipal(QMainWindow):
         columna.setContentsMargins(8, 20, 8, 18)
         columna.setSpacing(6)
 
-        logo = QLabel("LOGO")
+        logo = QLabel()
         logo.setObjectName("logoRiel")
         logo.setFixedSize(54, 54)
-        logo.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        logo.setPixmap(marca_escuela(54))
+        logo.setToolTip("Escuela Primaria Adalberto Tejeda")
+        logo.setAccessibleName("Escuela Primaria Adalberto Tejeda")
+        self.logo = logo
         columna.addWidget(logo, 0, Qt.AlignmentFlag.AlignHCenter)
         columna.addSpacing(20)
         for boton in self.botones:

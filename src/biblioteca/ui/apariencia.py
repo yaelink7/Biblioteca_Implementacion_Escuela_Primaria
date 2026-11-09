@@ -14,14 +14,22 @@ import tempfile
 from functools import cache
 from pathlib import Path
 
-from PySide6.QtCore import QByteArray, QRectF, Qt
-from PySide6.QtGui import QFontDatabase, QIcon, QPainter, QPixmap
+from PySide6.QtCore import QByteArray, QRect, QRectF, Qt
+from PySide6.QtGui import QFontDatabase, QIcon, QPainter, QPainterPath, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
 RECURSOS = Path(__file__).resolve().parent / "recursos"
 
 FAMILIA = "Manrope"
 FAMILIA_MONO = "IBM Plex Mono"
+
+# El logo de la escuela, provisional: lo entrego Yael el 8 de noviembre. Para
+# cambiarlo basta con sustituir este archivo.
+LOGO = RECURSOS / "logo" / "escuela.jpg"
+# El arbol del logo, sin letras encima: es la marca donde el letrero entero
+# no se alcanzaria a leer, como la columna de iconos (x, y, lado, en pixeles
+# de la imagen original).
+RECORTE_ARBOL = (6, 12, 446)
 
 
 @cache
@@ -63,6 +71,42 @@ def icono(nombre: str, color: str, tamano: int = 18, aire: int = 0) -> QIcon:
         imagen.setDevicePixelRatio(escala)
         resultado.addPixmap(imagen)
     return resultado
+
+
+def _redondeada(imagen: QPixmap, ancho: int, alto: int, radio: float) -> QPixmap:
+    """La imagen ajustada al tamano pedido, con las esquinas redondeadas.
+
+    La hoja de estilo de Qt redondea el borde de una etiqueta pero no recorta
+    la imagen que lleva dentro: el recorte se hace aqui, al dibujarla. Se
+    dibuja al doble para que se vea nitida en pantallas de alta densidad.
+    """
+    escala = 2
+    resultado = QPixmap(ancho * escala, alto * escala)
+    resultado.fill(Qt.GlobalColor.transparent)
+    pintor = QPainter(resultado)
+    pintor.setRenderHint(QPainter.RenderHint.Antialiasing)
+    pintor.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+    contorno = QPainterPath()
+    contorno.addRoundedRect(QRectF(resultado.rect()), radio * escala, radio * escala)
+    pintor.setClipPath(contorno)
+    pintor.drawPixmap(resultado.rect(), imagen)
+    pintor.end()
+    resultado.setDevicePixelRatio(escala)
+    return resultado
+
+
+@cache
+def logo_escuela(ancho: int, alto: int, radio: float = 8) -> QPixmap:
+    """El logo completo de la escuela, para donde cabe el letrero."""
+    return _redondeada(QPixmap(str(LOGO)), ancho, alto, radio)
+
+
+@cache
+def marca_escuela(lado: int, radio: float = 12) -> QPixmap:
+    """El arbol del logo, cuadrado: la marca de la columna de iconos."""
+    x, y, recorte = RECORTE_ARBOL
+    arbol = QPixmap(str(LOGO)).copy(QRect(x, y, recorte, recorte))
+    return _redondeada(arbol, lado, lado, radio)
 
 
 def ruta_para_hoja(nombre: str, color: str) -> str:

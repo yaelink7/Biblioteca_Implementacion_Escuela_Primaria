@@ -8,19 +8,24 @@ boton, y no un formulario.
 
 from __future__ import annotations
 
+from html import escape
 
 from PySide6.QtCore import Qt, QTimer
-from PySide6.QtWidgets import QDialog, QListWidgetItem, QWidget
+from PySide6.QtWidgets import QDialog, QLineEdit, QListWidgetItem, QWidget
 
-from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.core.config import DIAS_DE_PRESTAMO
+from biblioteca.core.errores import causa as causa_del_error
+from biblioteca.core.errores import explicar
 from biblioteca.core.sesion import sesion_actual
 from biblioteca.modelos.libro import Libro
 from biblioteca.modelos.persona import Alumno
 from biblioteca.repositorios import libros as repo_libros
 from biblioteca.repositorios import personas as repo_personas
 from biblioteca.repositorios import prestamos as repo_prestamos
-from biblioteca.ui.estilo import COLOR_ERROR, COLOR_PRINCIPAL, COLOR_TENUE
+from biblioteca.ui.apariencia import icono
+from biblioteca.ui.componentes import COLOR_NOTA, DETALLE, NOTA, DelegadoOpcion
+from biblioteca.ui.estilo import MARCADOR, ROJO, ROJO_OSCURO, TENUE
+from biblioteca.ui.formato import salon
 from biblioteca.ui.generado.ui_nuevo_prestamo import Ui_DialogoNuevoPrestamo
 
 MS_ANTES_DE_BUSCAR = 250
@@ -40,12 +45,9 @@ class DialogoNuevoPrestamo(QDialog):
 
         self._temp_alumnos = self._temporizador(self._buscar_alumnos)
         self._temp_libros = self._temporizador(self._buscar_libros)
+        self._con_prestamo = self._prestamos_en_curso()
 
-        self.ui.etiquetaError.setStyleSheet(f"color: {COLOR_ERROR};")
-        self.ui.etiquetaPlazo.setStyleSheet(f"color: {COLOR_TENUE};")
-        self.ui.botonCancelar.setProperty("secundario", True)
-        for etiqueta in (self.ui.etiquetaAlumno, self.ui.etiquetaLibro):
-            etiqueta.setStyleSheet(f"color: {COLOR_PRINCIPAL}; font-weight: 600;")
+        self._preparar_aspecto()
 
         self.ui.campoBuscarAlumno.textChanged.connect(self._temp_alumnos.start)
         self.ui.campoBuscarLibro.textChanged.connect(self._temp_libros.start)
@@ -58,6 +60,17 @@ class DialogoNuevoPrestamo(QDialog):
         self._buscar_libros()
         self.ui.campoBuscarAlumno.setFocus()
 
+    def _preparar_aspecto(self) -> None:
+        ui = self.ui
+        for campo in (ui.campoBuscarAlumno, ui.campoBuscarLibro):
+            campo.addAction(icono("buscar", MARCADOR), QLineEdit.ActionPosition.LeadingPosition)
+        for lista in (ui.listaAlumnos, ui.listaLibros):
+            lista.setItemDelegate(DelegadoOpcion(lista))
+            lista.setMouseTracking(True)
+            lista.setSpacing(2)
+        ui.iconoError.setPixmap(icono("alerta", ROJO_OSCURO, 18).pixmap(18, 18))
+        ui.cajaError.hide()
+
     def _temporizador(self, funcion) -> QTimer:
         """Evita una consulta por cada tecla mientras el usuario escribe."""
         t = QTimer(self)
@@ -65,6 +78,18 @@ class DialogoNuevoPrestamo(QDialog):
         t.setInterval(MS_ANTES_DE_BUSCAR)
         t.timeout.connect(funcion)
         return t
+
+    def _prestamos_en_curso(self) -> dict[str, str]:
+        """Quien ya tiene un libro, para avisarlo antes de intentar el prestamo.
+
+        Es solo un aviso: la regla de un libro por alumno la aplica la base.
+        Si la consulta falla, el dialogo sigue sirviendo sin el aviso.
+        """
+        try:
+            return {p.usuario_id: p.titulo_libro or "un libro"
+                    for p in repo_prestamos.activos()}
+        except Exception:
+            return {}
 
     # ------------------------------------------------------------------
     # Busquedas
@@ -82,9 +107,13 @@ class DialogoNuevoPrestamo(QDialog):
         self.ui.listaAlumnos.clear()
         self.alumno = None
 
-        for alumno in encontrados:
-            item = QListWidgetItem(f"{alumno.nombre_completo}   ·   {alumno.salon}")
+        for alumno in sorted(encontrados, key=lambda a: a.nombre_completo):
+            item = QListWidgetItem(alumno.nombre_completo)
             item.setData(Qt.ItemDataRole.UserRole, alumno)
+            item.setData(DETALLE, f"{salon(alumno.grado, alumno.grupo)} · {alumno.codigo}")
+            prestado = self._con_prestamo.get(alumno.id or "")
+            if prestado:
+                item.setData(NOTA, f" · tiene «{prestado}»")
             self.ui.listaAlumnos.addItem(item)
             # Si quien ya estaba elegido sigue entre los resultados, se
             # conserva: de otro modo una busqueda pendiente borraria la
@@ -107,11 +136,16 @@ class DialogoNuevoPrestamo(QDialog):
         self.libro = None
 
         for libro in encontrados:
-            item = QListWidgetItem(f"{libro.titulo}   ·   {libro.estado}")
+            item = QListWidgetItem(libro.titulo)
             item.setData(Qt.ItemDataRole.UserRole, libro)
+            item.setData(DETALLE, libro.autor)
+            item.setData(NOTA, f" · {libro.estado}")
             if not libro.disponible:
                 # Se muestra pero no se puede elegir: explica por que no esta
                 item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEnabled)
+                item.setData(COLOR_NOTA, ROJO)
+            else:
+                item.setData(COLOR_NOTA, TENUE)
             self.ui.listaLibros.addItem(item)
             if elegido and libro.id == elegido and libro.disponible:
                 self.ui.listaLibros.setCurrentItem(item)
@@ -139,15 +173,16 @@ class DialogoNuevoPrestamo(QDialog):
         # solo al intentar un prestamo nuevo.
         if self.alumno and self.libro:
             self.ui.etiquetaResumen.setText(
-                f"<b>{self.alumno.nombre_completo}</b> ({self.alumno.salon}) "
-                f"se lleva <b>{self.libro.titulo}</b>"
+                f"<b>{escape(self.alumno.nombre_completo, quote=False)}</b> "
+                f"({salon(self.alumno.grado, self.alumno.grupo)}) "
+                f"se lleva <b>{escape(self.libro.titulo, quote=False)}</b>"
             )
             # La fecha limite la calcula la base al registrar (Corolario 2).
             # Anunciarla aqui con date.today() hacia que a partir de las 18:00
             # la pantalla dijera un dia y la base guardara otro.
             self.ui.etiquetaPlazo.setText(
                 f"El plazo es de {DIAS_DE_PRESTAMO} días naturales; "
-                f"la fecha exacta queda registrada al confirmar"
+                f"la fecha exacta queda registrada al confirmar."
             )
             self.ui.botonPrestar.setEnabled(True)
             return
@@ -171,6 +206,7 @@ class DialogoNuevoPrestamo(QDialog):
             return
 
         self.ui.etiquetaError.clear()
+        self.ui.cajaError.hide()
         self.ui.botonPrestar.setEnabled(False)
         try:
             repo_prestamos.registrar(
@@ -181,12 +217,18 @@ class DialogoNuevoPrestamo(QDialog):
         except repo_prestamos.ErrorDePrestamo as error:
             # Aqui aparece el limite de un libro por alumno, que aplica
             # Postgres mediante un indice unico parcial.
-            self._error(str(error))
+            que_hacer = explicar(error).que_hacer
+            self._error(str(error), que_hacer)
             self.ui.botonPrestar.setEnabled(True)
             return
 
         self.registrado = True
         self.accept()
 
-    def _error(self, mensaje: str) -> None:
-        self.ui.etiquetaError.setText(mensaje)
+    def _error(self, mensaje: str, que_hacer: str = "") -> None:
+        """El recuadro rojo de abajo: que paso, en negrita, y que hacer."""
+        texto = f"<b>{escape(mensaje, quote=False)}</b>"
+        if que_hacer:
+            texto += f"<br>{escape(que_hacer, quote=False)}"
+        self.ui.etiquetaError.setText(texto)
+        self.ui.cajaError.show()

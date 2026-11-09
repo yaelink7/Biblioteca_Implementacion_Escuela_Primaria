@@ -6,7 +6,9 @@ La busqueda es la funcion que el sistema Java no tenia: el bibliotecario
 debia recorrer la lista completa para encontrar un titulo.
 
 En el diseno «Lapiz» la tabla lleva a la derecha la ficha del libro elegido,
-con las dos acciones que piden una seleccion: modificar y dar de baja.
+con las dos acciones que piden una seleccion: modificar y dar de baja. Desde
+la reunion con la escuela el acervo se lee por coleccion de Libros del Rincon
+y por asignatura (LIB-06 y LIB-07), no por el «tipo o genero» de antes.
 """
 
 from __future__ import annotations
@@ -23,7 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from biblioteca.core.errores import mensaje as mensaje_de_error
-from biblioteca.modelos.libro import Libro
+from biblioteca.modelos.libro import COLECCIONES, Libro
 from biblioteca.repositorios import libros as repo_libros
 from biblioteca.ui.apariencia import icono
 from biblioteca.ui.componentes import DelegadoFilaElegida, poner_icono
@@ -132,8 +134,8 @@ class PantallaCatalogo(QWidget):
             celdas = [
                 libro.titulo,
                 libro.autor,
-                libro.tipo_libro or "—",
-                str(libro.ano_publicacion) if libro.ano_publicacion else "—",
+                libro.coleccion or "—",
+                libro.asignatura or "—",
                 libro.estado,
             ]
             for columna, texto in enumerate(celdas):
@@ -201,7 +203,11 @@ class PantallaCatalogo(QWidget):
         ui.portada.setText(inicial(libro.titulo))
         ui.etiquetaLibroTitulo.setText(libro.titulo)
         ui.etiquetaLibroAutor.setText(libro.autor)
-        ui.valorTipo.setText(libro.tipo_libro or "—")
+        ui.valorColeccion.setText(libro.coleccion or "Sin colección")
+        grados = COLECCIONES.get(libro.coleccion or "")
+        ui.valorGrados.setText(grados or "")
+        ui.valorGrados.setVisible(bool(grados))
+        ui.valorAsignatura.setText(libro.asignatura or "Sin asignatura")
         ui.valorEditorial.setText(libro.editorial or "—")
         ui.valorAno.setText(str(libro.ano_publicacion) if libro.ano_publicacion else "—")
         ui.valorPaginas.setText(str(libro.num_paginas) if libro.num_paginas else "—")

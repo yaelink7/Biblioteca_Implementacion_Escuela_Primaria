@@ -2,140 +2,169 @@
 <ui version="4.0">
  <class>DialogoNuevoPrestamo</class>
  <widget class="QDialog" name="DialogoNuevoPrestamo">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>760</width>
-    <height>500</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Registrar préstamo</string>
-  </property>
-  <layout class="QVBoxLayout" name="disposicion">
-   <property name="leftMargin"><number>20</number></property>
-   <property name="topMargin"><number>20</number></property>
-   <property name="rightMargin"><number>20</number></property>
-   <property name="bottomMargin"><number>20</number></property>
-   <property name="spacing"><number>12</number></property>
-
+  <property name="geometry"><rect><x>0</x><y>0</y><width>880</width><height>680</height></rect></property>
+  <property name="windowTitle"><string>Registrar préstamo</string></property>
+  <layout class="QVBoxLayout" name="disposicion" stretch="0,1,0,0,0">
+   <property name="leftMargin"><number>30</number></property>
+   <property name="topMargin"><number>26</number></property>
+   <property name="rightMargin"><number>30</number></property>
+   <property name="bottomMargin"><number>26</number></property>
+   <property name="spacing"><number>16</number></property>
+   <item>
+    <layout class="QVBoxLayout" name="encabezado">
+     <property name="spacing"><number>4</number></property>
+     <item>
+      <widget class="QLabel" name="etiquetaEncabezado">
+       <property name="text"><string>Registrar préstamo</string></property>
+       <property name="rol" stdset="0"><string>tituloDialogo</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="etiquetaSubtitulo">
+       <property name="text"><string>Dos búsquedas y un botón. El plazo y el inventario los calcula la base.</string></property>
+       <property name="wordWrap"><bool>true</bool></property>
+       <property name="rol" stdset="0"><string>subtituloDialogo</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <layout class="QHBoxLayout" name="filaColumnas">
      <property name="spacing"><number>18</number></property>
-
      <item>
       <layout class="QVBoxLayout" name="columnaAlumno">
-       <property name="spacing"><number>8</number></property>
+       <property name="spacing"><number>10</number></property>
        <item>
         <widget class="QLabel" name="etiquetaAlumno">
          <property name="text"><string>1. ¿Quién se lo lleva?</string></property>
+         <property name="rol" stdset="0"><string>paso</string></property>
         </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="campoBuscarAlumno">
-         <property name="placeholderText">
-          <string>Nombre, código o salón (4B)</string>
-         </property>
-         <property name="minimumHeight"><number>34</number></property>
+         <property name="minimumSize"><size><width>200</width><height>44</height></size></property>
+         <property name="placeholderText"><string>Nombre, código o salón (4B)</string></property>
          <property name="clearButtonEnabled"><bool>true</bool></property>
+         <property name="rol" stdset="0"><string>busqueda</string></property>
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listaAlumnos"/>
+        <widget class="QListWidget" name="listaAlumnos">
+         <property name="minimumHeight"><number>300</number></property>
+         <property name="horizontalScrollBarPolicy"><enum>Qt::ScrollBarAlwaysOff</enum></property>
+         <property name="verticalScrollMode"><enum>QAbstractItemView::ScrollPerPixel</enum></property>
+         <property name="rol" stdset="0"><string>opciones</string></property>
+        </widget>
        </item>
       </layout>
      </item>
-
      <item>
       <layout class="QVBoxLayout" name="columnaLibro">
-       <property name="spacing"><number>8</number></property>
+       <property name="spacing"><number>10</number></property>
        <item>
         <widget class="QLabel" name="etiquetaLibro">
          <property name="text"><string>2. ¿Qué libro?</string></property>
+         <property name="rol" stdset="0"><string>paso</string></property>
         </widget>
        </item>
        <item>
         <widget class="QLineEdit" name="campoBuscarLibro">
-         <property name="placeholderText">
-          <string>Título o autor</string>
-         </property>
-         <property name="minimumHeight"><number>34</number></property>
+         <property name="minimumSize"><size><width>200</width><height>44</height></size></property>
+         <property name="placeholderText"><string>Título o autor</string></property>
          <property name="clearButtonEnabled"><bool>true</bool></property>
+         <property name="rol" stdset="0"><string>busqueda</string></property>
         </widget>
        </item>
        <item>
-        <widget class="QListWidget" name="listaLibros"/>
+        <widget class="QListWidget" name="listaLibros">
+         <property name="minimumHeight"><number>300</number></property>
+         <property name="horizontalScrollBarPolicy"><enum>Qt::ScrollBarAlwaysOff</enum></property>
+         <property name="verticalScrollMode"><enum>QAbstractItemView::ScrollPerPixel</enum></property>
+         <property name="rol" stdset="0"><string>opciones</string></property>
+        </widget>
        </item>
       </layout>
      </item>
-
     </layout>
    </item>
-
    <item>
-    <widget class="QFrame" name="marcoResumen">
-     <property name="frameShape"><enum>QFrame::StyledPanel</enum></property>
-     <layout class="QVBoxLayout" name="disposicionResumen">
+    <layout class="QVBoxLayout" name="cierre">
+     <property name="spacing"><number>4</number></property>
+     <item>
+      <widget class="QLabel" name="etiquetaResumen">
+       <property name="text"><string>Elige un alumno y un libro.</string></property>
+       <property name="wordWrap"><bool>true</bool></property>
+       <property name="rol" stdset="0"><string>resumenPrestamo</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="etiquetaPlazo">
+       <property name="text"><string/></property>
+       <property name="wordWrap"><bool>true</bool></property>
+       <property name="rol" stdset="0"><string>notaCampo</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QFrame" name="cajaError">
+     <layout class="QHBoxLayout" name="disposicionError">
       <property name="leftMargin"><number>14</number></property>
       <property name="topMargin"><number>12</number></property>
       <property name="rightMargin"><number>14</number></property>
       <property name="bottomMargin"><number>12</number></property>
-      <property name="spacing"><number>4</number></property>
-      <item>
-       <widget class="QLabel" name="etiquetaResumen">
-        <property name="text">
-         <string>Elige un alumno y un libro.</string>
-        </property>
-        <property name="wordWrap"><bool>true</bool></property>
+      <property name="spacing"><number>10</number></property>
+      <item alignment="Qt::AlignTop">
+       <widget class="QLabel" name="iconoError">
+        <property name="minimumSize"><size><width>20</width><height>20</height></size></property>
+        <property name="maximumSize"><size><width>20</width><height>20</height></size></property>
+        <property name="text"><string/></property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="etiquetaPlazo">
+       <widget class="QLabel" name="etiquetaError">
         <property name="text"><string/></property>
+        <property name="wordWrap"><bool>true</bool></property>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
-
-   <item>
-    <widget class="QLabel" name="etiquetaError">
-     <property name="text"><string/></property>
-     <property name="wordWrap"><bool>true</bool></property>
-     <property name="minimumHeight"><number>34</number></property>
-    </widget>
-   </item>
-
    <item>
     <layout class="QHBoxLayout" name="filaBotones">
+     <property name="spacing"><number>10</number></property>
      <item>
       <spacer name="espacioBotones">
        <property name="orientation"><enum>Qt::Horizontal</enum></property>
-       <property name="sizeHint" stdset="0">
-        <size><width>40</width><height>20</height></size>
-       </property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
       </spacer>
      </item>
      <item>
       <widget class="QPushButton" name="botonCancelar">
        <property name="text"><string>Cancelar</string></property>
-       <property name="minimumHeight"><number>34</number></property>
+       <property name="minimumHeight"><number>44</number></property>
+       <property name="secundario" stdset="0"><bool>true</bool></property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="botonPrestar">
        <property name="text"><string>Prestar</string></property>
-       <property name="minimumHeight"><number>34</number></property>
+       <property name="minimumHeight"><number>44</number></property>
        <property name="enabled"><bool>false</bool></property>
-       <property name="default"><bool>true</bool></property>
       </widget>
      </item>
     </layout>
    </item>
-
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>campoBuscarAlumno</tabstop>
+  <tabstop>listaAlumnos</tabstop>
+  <tabstop>campoBuscarLibro</tabstop>
+  <tabstop>listaLibros</tabstop>
+  <tabstop>botonPrestar</tabstop>
+  <tabstop>botonCancelar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

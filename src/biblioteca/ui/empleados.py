@@ -3,13 +3,14 @@
 Sustituye a las ventanas de empleados del sistema Java. El requisito pide
 que el alta de personal quede "restringida a personal con permisos
 administrativos"; esa restriccion la aplican las politicas RLS de Postgres,
-y aqui se anticipa para explicar por que el boton esta apagado en lugar de
-dejar que el usuario llene un formulario que va a ser rechazado.
+y aqui se anticipa para explicar por que el perfil de acceso esta bloqueado
+en lugar de dejar que el usuario llene un formulario que va a ser rechazado.
 """
 
 from __future__ import annotations
 
 from PySide6.QtCore import Qt, QTimer
+from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import (
     QHeaderView,
     QMessageBox,
@@ -21,9 +22,21 @@ from biblioteca.core.errores import mensaje as mensaje_de_error
 from biblioteca.core.sesion import sesion_actual
 from biblioteca.modelos.persona import Empleado, Rol
 from biblioteca.repositorios import personas as repo_personas
-from biblioteca.ui.estilo import COLOR_ALERTA, COLOR_PRINCIPAL, COLOR_TENUE
+from biblioteca.ui.apariencia import icono
+from biblioteca.ui.componentes import DelegadoFilaElegida, fuente_mono, poner_icono
+from biblioteca.ui.estilo import (
+    GRIS,
+    TENUE,
+    TEXTO,
+    repulir,
+    rotular,
+    rotular_encabezados,
+)
+from biblioteca.ui.formato import fecha_corta, iniciales, plural
 from biblioteca.ui.formulario_empleado import FormularioEmpleado
 from biblioteca.ui.generado.ui_empleados import Ui_PantallaEmpleados
+
+NOMBRE_DEL_PERFIL = {Rol.ADMINISTRADOR: "Administrador", Rol.BIBLIOTECARIO: "Bibliotecario"}
 
 
 class PantallaEmpleados(QWidget):
@@ -33,16 +46,32 @@ class PantallaEmpleados(QWidget):
         self.ui.setupUi(self)
 
         self._empleados: list[Empleado] = []
-        self._es_administrador = sesion_actual().perfil.rol == Rol.ADMINISTRADOR
+        perfil = sesion_actual().perfil
+        self._es_administrador = perfil.rol == Rol.ADMINISTRADOR
+        self._yo = perfil.id
 
+        self._preparar_aspecto()
         self._preparar_tabla()
         self._preparar_permisos()
 
         self.ui.tablaEmpleados.itemSelectionChanged.connect(self._cambio_seleccion)
+        self.ui.tablaEmpleados.itemDoubleClicked.connect(lambda _: self._modificar())
         self.ui.botonNuevo.clicked.connect(self._registrar)
         self.ui.botonEditar.clicked.connect(self._modificar)
 
         self.recargar()
+
+    def _preparar_aspecto(self) -> None:
+        ui = self.ui
+        poner_icono(ui.botonNuevo, "mas", TEXTO)
+        poner_icono(ui.botonEditar, "editar", TEXTO)
+        ui.iconoAviso.setPixmap(icono("escudo", GRIS, 18).pixmap(18, 18))
+        rotular(ui.etiquetaPanel)
+        rotular_encabezados(ui.tablaEmpleados)
+        ui.tablaEmpleados.horizontalHeader().setDefaultAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter)
+        ui.tablaEmpleados.setItemDelegate(DelegadoFilaElegida(ui.tablaEmpleados))
+        ui.etiquetaVacio.hide()
 
     def _preparar_tabla(self) -> None:
         cabecera = self.ui.tablaEmpleados.horizontalHeader()
@@ -50,22 +79,19 @@ class PantallaEmpleados(QWidget):
             cabecera.setSectionResizeMode(columna, QHeaderView.ResizeMode.Stretch)
         for columna in (0, 2, 4):
             cabecera.setSectionResizeMode(columna, QHeaderView.ResizeMode.ResizeToContents)
-        self.ui.etiquetaResumen.setStyleSheet(f"color: {COLOR_TENUE};")
 
     def _preparar_permisos(self) -> None:
-        """Dice de entrada quien puede dar de alta, en vez de fallar al final."""
+        """Dice de entrada quien puede hacer que, en vez de fallar al final."""
         if self._es_administrador:
             self.ui.etiquetaAviso.setText(
                 "Como administrador puedes registrar personal y cambiar su "
                 "perfil de acceso."
             )
-            self.ui.etiquetaAviso.setStyleSheet(f"color: {COLOR_PRINCIPAL};")
         else:
             self.ui.etiquetaAviso.setText(
                 "Puedes registrar y modificar personal. Cambiar el perfil de "
                 "acceso de alguien queda reservado al administrador."
             )
-            self.ui.etiquetaAviso.setStyleSheet(f"color: {COLOR_TENUE};")
 
     # ------------------------------------------------------------------
     # Datos
@@ -88,27 +114,36 @@ class PantallaEmpleados(QWidget):
         tabla.setSortingEnabled(False)
         tabla.setRowCount(len(self._empleados))
 
+        negrita = QFont(tabla.font())
+        negrita.setWeight(QFont.Weight.DemiBold)
+        mono = fuente_mono(tabla.font())
+
         for fila, empleado in enumerate(self._empleados):
+            nombre = empleado.nombre_completo
+            if empleado.id == self._yo:
+                nombre += " (tú)"
             celdas = [
-                empleado.codigo,
-                empleado.nombre_completo,
-                empleado.tipo_empleado or "—",
-                empleado.correo or "Sin correo",
-                empleado.rol.value.capitalize(),
+                QTableWidgetItem(empleado.codigo),
+                QTableWidgetItem(nombre),
+                QTableWidgetItem(empleado.tipo_empleado or "—"),
+                QTableWidgetItem(empleado.correo or "Sin correo"),
+                QTableWidgetItem(NOMBRE_DEL_PERFIL.get(empleado.rol, empleado.rol.value)),
             ]
-            for columna, texto in enumerate(celdas):
-                celda = QTableWidgetItem(texto)
-                if columna in (0, 4):
-                    celda.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                if columna == 1:
-                    celda.setData(Qt.ItemDataRole.UserRole, fila)
-                if columna == 4 and empleado.rol == Rol.ADMINISTRADOR:
-                    celda.setForeground(Qt.GlobalColor.darkYellow)
-                if columna == 3 and not empleado.correo:
-                    celda.setForeground(Qt.GlobalColor.darkRed)
+            celdas[1].setData(Qt.ItemDataRole.UserRole, fila)
+            celdas[1].setFont(negrita)
+            celdas[0].setFont(mono)
+            celdas[3].setFont(mono)
+            if not empleado.correo:
+                celdas[3].setForeground(QColor(TENUE))
+            if empleado.rol == Rol.ADMINISTRADOR:
+                celdas[4].setFont(negrita)
+            for columna, celda in enumerate(celdas):
                 tabla.setItem(fila, columna, celda)
 
         tabla.setSortingEnabled(True)
+        hay = bool(self._empleados)
+        tabla.setVisible(hay)
+        self.ui.etiquetaVacio.setVisible(not hay)
         self._actualizar_resumen()
         self._cambio_seleccion()
 
@@ -116,13 +151,13 @@ class PantallaEmpleados(QWidget):
         total = len(self._empleados)
         admins = sum(1 for e in self._empleados if e.rol == Rol.ADMINISTRADOR)
 
-        partes = [f"{total} persona{'s' if total != 1 else ''} en la plantilla"]
+        partes = [f"{plural(total, 'persona')} en la plantilla"]
         if admins:
             partes.append(f"{admins} con perfil de administrador")
-        self.ui.etiquetaResumen.setText("   ·   ".join(partes))
+        self.ui.etiquetaResumen.setText(" · ".join(partes))
 
     # ------------------------------------------------------------------
-    # Acciones
+    # Seleccion y panel
     # ------------------------------------------------------------------
 
     def _seleccionado(self) -> Empleado | None:
@@ -136,7 +171,32 @@ class PantallaEmpleados(QWidget):
         return self._empleados[indice] if indice is not None else None
 
     def _cambio_seleccion(self) -> None:
-        self.ui.botonEditar.setEnabled(self._seleccionado() is not None)
+        empleado = self._seleccionado()
+        self.ui.botonEditar.setEnabled(empleado is not None)
+        self._mostrar_panel(empleado)
+
+    def _mostrar_panel(self, empleado: Empleado | None) -> None:
+        ui = self.ui
+        ui.etiquetaPanelVacio.setHidden(empleado is not None)
+        ui.fichaEmpleado.setHidden(empleado is None)
+        if empleado is None:
+            return
+
+        ui.avatar.setText(iniciales(empleado.nombre, empleado.apellido))
+        ui.etiquetaNombre.setText(empleado.nombre_completo)
+        ui.etiquetaDetalle.setText(f"{empleado.tipo_empleado or '—'} · {empleado.codigo}")
+        ui.valorCorreo.setText(empleado.correo or "Sin correo")
+        ui.valorPerfil.setText(NOMBRE_DEL_PERFIL.get(empleado.rol, empleado.rol.value))
+        ui.valorTelefono.setText(empleado.telefono or "—")
+        ui.valorTelefono.setProperty("mono", bool(empleado.telefono))
+        repulir(ui.valorTelefono)
+        ui.valorDireccion.setText(empleado.direccion or "—")
+        ui.valorIngreso.setText(
+            fecha_corta(empleado.fecha_ingreso) if empleado.fecha_ingreso else "—")
+
+    # ------------------------------------------------------------------
+    # Acciones
+    # ------------------------------------------------------------------
 
     def _registrar(self) -> None:
         formulario = FormularioEmpleado(self)
@@ -154,12 +214,13 @@ class PantallaEmpleados(QWidget):
             self._avisar(f"Se actualizaron los datos de {empleado.nombre_completo}.")
 
     def _avisar(self, mensaje: str) -> None:
+        """Confirmacion discreta en la linea de resumen, sin cuadros de dialogo."""
         self.ui.etiquetaResumen.setText(mensaje)
-        self.ui.etiquetaResumen.setStyleSheet(f"color: {COLOR_ALERTA}; font-weight: 600;")
-        QTimer.singleShot(
-            3000,
-            lambda: (
-                self.ui.etiquetaResumen.setStyleSheet(f"color: {COLOR_TENUE};"),
-                self._actualizar_resumen(),
-            ),
-        )
+        self.ui.etiquetaResumen.setProperty("aviso", True)
+        repulir(self.ui.etiquetaResumen)
+        QTimer.singleShot(3000, self, self._quitar_aviso)
+
+    def _quitar_aviso(self) -> None:
+        self.ui.etiquetaResumen.setProperty("aviso", False)
+        repulir(self.ui.etiquetaResumen)
+        self._actualizar_resumen()

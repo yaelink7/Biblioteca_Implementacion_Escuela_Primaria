@@ -49,6 +49,51 @@ class Deudor:
         return f"{d} día{'s' if d != 1 else ''}"
 
 
+@dataclass
+class DetallePrestamo:
+    """Lo que el panel de Prestamos muestra y la vista v_prestamos no trae."""
+
+    codigo_alumno: str | None = None
+    telefono_tutor: str | None = None
+    autor: str | None = None
+    registro: str | None = None   # quien lo registro, por su nombre
+
+
+# prestamos tiene dos llaves hacia perfiles —el alumno y quien registro—, asi
+# que cada una se nombra por su restriccion para que PostgREST sepa cual es.
+_DETALLE = (
+    "id, libros(autor), "
+    "alumno:perfiles!prestamos_usuario_id_fkey(codigo, telefono), "
+    "registro:perfiles!prestamos_registrado_por_fkey(nombre, apellido)"
+)
+
+
+def detalles(ids: list[int]) -> dict[int, DetallePrestamo]:
+    """El detalle de varios prestamos en una sola consulta, por su id.
+
+    Sirve al panel de Prestamos: el telefono del tutor y quien registro el
+    prestamo, que aprobo Yael el 8 de noviembre. Los prestamos cargados a
+    mano no tienen registrado_por y su registro queda vacio.
+    """
+    if not ids:
+        return {}
+    filas = obtener_cliente().table(TABLA).select(_DETALLE).in_("id", ids).execute()
+
+    resultado = {}
+    for fila in filas.data:
+        alumno = fila.get("alumno") or {}
+        libro = fila.get("libros") or {}
+        quien = fila.get("registro") or {}
+        nombre = f"{quien.get('nombre', '')} {quien.get('apellido', '')}".strip()
+        resultado[fila["id"]] = DetallePrestamo(
+            codigo_alumno=alumno.get("codigo"),
+            telefono_tutor=alumno.get("telefono"),
+            autor=libro.get("autor"),
+            registro=nombre or None,
+        )
+    return resultado
+
+
 def registrar(libro_id: int, alumno_id: str, registrado_por: str | None = None) -> Prestamo:
     """Presta un libro a un alumno (REQ-PRE-01, REQ-PRE-02).
 
