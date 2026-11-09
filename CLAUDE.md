@@ -896,7 +896,8 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
   desglosado pantalla por pantalla con captura, descripción y
   funcionalidades. Cuatro capítulos, 14 tablas, 12 capturas, ~5 300 palabras.
   Las cifras no están escritas a mano: salen de correr el sistema y las
-  pruebas contra la base real el 19 de octubre. Ver la sección 11
+  pruebas contra la base real el 19 de octubre. La portada, con los nombres
+  del equipo, la puso David Montes. Ver la sección 11
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
 - `Documentacion/diagramas/` — los entregables gráficos. Un archivo por
@@ -1317,6 +1318,12 @@ Entregado el **19 de octubre de 2026**. Como el Avance 2, lleva solo lo que
 pide la rúbrica. La instrucción del profesor son tres palabras —**Seguridad,
 Implementación, Evaluación**— y el equipo pidió además una sección de
 interfaces desglosada pantalla por pantalla.
+
+**Hay dos versiones en la historia del repositorio, y vale la de David.** El
+mismo día, David Montes subió el documento a `main` directamente (`a21f50a`)
+con una portada nueva: los nombres del equipo, la materia y la escuela. Fuera
+de la portada el texto es idéntico al de este PR y lleva las mismas 12
+capturas, así que al integrar el #87 se conservó su versión.
 
 Hay una guía en `Downloads/Guía para el Avance 3.md` que propone siete
 secciones. **No se siguió**, por decisión de la Scrum Master: es una
