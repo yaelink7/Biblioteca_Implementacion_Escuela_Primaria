@@ -211,7 +211,7 @@ class PantallaEmpleados(QWidget):
         formulario = FormularioEmpleado(self, empleado=empleado)
         if formulario.exec() and formulario.guardado:
             self.recargar()
-            self._avisar(f"Se actualizaron los datos de {empleado.nombre_completo}.")
+            self._avisar(f"Se actualizaron los datos de {formulario.guardado.nombre_completo}.")
 
     def _avisar(self, mensaje: str) -> None:
         """Confirmacion discreta en la linea de resumen, sin cuadros de dialogo."""

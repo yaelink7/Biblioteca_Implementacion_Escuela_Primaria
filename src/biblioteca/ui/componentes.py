@@ -325,6 +325,19 @@ def mostrar_caja(caja: QWidget, icono_caja: QLabel, titulo: QLabel, texto: QLabe
         repulir(widget)
 
 
+def volver_a_elegir(tabla, columna: int, es_el_elegido) -> None:
+    """Despues de repintar, vuelve a elegir el renglon que estaba elegido.
+
+    Qt conserva la seleccion por numero de renglon: al filtrar o recargar,
+    el panel pasaba a mostrar otro registro sin que nadie lo eligiera.
+    """
+    for fila in range(tabla.rowCount()):
+        celda = tabla.item(fila, columna)
+        if celda is not None and es_el_elegido(celda.data(Qt.ItemDataRole.UserRole)):
+            tabla.selectRow(fila)
+            return
+
+
 def fuente_mono(base: QFont, tamano: int = 13) -> QFont:
     """La letra de maquina para codigos, salones, fechas y telefonos."""
     fuente = QFont(base)

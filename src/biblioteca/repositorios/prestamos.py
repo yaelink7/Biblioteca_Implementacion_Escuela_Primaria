@@ -57,13 +57,15 @@ class DetallePrestamo:
     telefono_tutor: str | None = None
     autor: str | None = None
     registro: str | None = None   # quien lo registro, por su nombre
+    nombre_alumno: str | None = None
+    apellido_alumno: str | None = None
 
 
 # prestamos tiene dos llaves hacia perfiles —el alumno y quien registro—, asi
 # que cada una se nombra por su restriccion para que PostgREST sepa cual es.
 _DETALLE = (
     "id, libros(autor), "
-    "alumno:perfiles!prestamos_usuario_id_fkey(codigo, telefono), "
+    "alumno:perfiles!prestamos_usuario_id_fkey(codigo, telefono, nombre, apellido), "
     "registro:perfiles!prestamos_registrado_por_fkey(nombre, apellido)"
 )
 
@@ -90,6 +92,8 @@ def detalles(ids: list[int]) -> dict[int, DetallePrestamo]:
             telefono_tutor=alumno.get("telefono"),
             autor=libro.get("autor"),
             registro=nombre or None,
+            nombre_alumno=alumno.get("nombre"),
+            apellido_alumno=alumno.get("apellido"),
         )
     return resultado
 

@@ -11,7 +11,7 @@ escuela (#74 a #76): la CURP, el maestro del salon y el telefono del tutor.
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt, QTimer
+from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QFont
 from PySide6.QtWidgets import (
     QHeaderView,
@@ -33,6 +33,7 @@ from biblioteca.ui.componentes import (
     fuente_mono,
     mostrar_caja,
     poner_icono,
+    volver_a_elegir,
 )
 from biblioteca.ui.estilo import (
     MARCADOR,
@@ -53,6 +54,9 @@ MS_ANTES_DE_BUSCAR = 250
 
 
 class PantallaAlumnos(QWidget):
+    # El telefono o el salon de un alumno tambien se ven en Prestamos y Deudores
+    alumnos_cambiaron = Signal()
+
     def __init__(self, padre: QWidget | None = None) -> None:
         super().__init__(padre)
         self.ui = Ui_PantallaAlumnos()
@@ -103,6 +107,8 @@ class PantallaAlumnos(QWidget):
             cabecera.setSectionResizeMode(columna, QHeaderView.ResizeMode.Stretch)
         for columna in (0, 2, 3):
             cabecera.setSectionResizeMode(columna, QHeaderView.ResizeMode.ResizeToContents)
+        # Por nombre, como el prototipo
+        cabecera.setSortIndicator(1, Qt.SortOrder.AscendingOrder)
 
     # ------------------------------------------------------------------
     # Datos
@@ -131,7 +137,10 @@ class PantallaAlumnos(QWidget):
         self._pintar()
 
     def _pintar(self) -> None:
+        anterior = self._seleccionado()
         tabla = self.ui.tablaAlumnos
+        tabla.blockSignals(True)
+        tabla.clearSelection()
         tabla.setSortingEnabled(False)
         tabla.setRowCount(len(self._alumnos))
 
@@ -168,6 +177,9 @@ class PantallaAlumnos(QWidget):
                 tabla.setItem(fila, columna, celda)
 
         tabla.setSortingEnabled(True)
+        if anterior is not None:
+            volver_a_elegir(tabla, 1, lambda i: i is not None and self._alumnos[i].id == anterior.id)
+        tabla.blockSignals(False)
         hay = bool(self._alumnos)
         tabla.setVisible(hay)
         self.ui.etiquetaVacio.setVisible(not hay)
@@ -261,6 +273,7 @@ class PantallaAlumnos(QWidget):
             self.ui.campoBusqueda.clear()
             self.recargar()
             self._avisar(f"Se registró a {formulario.guardado.nombre_completo}.")
+            self.alumnos_cambiaron.emit()
 
     def _modificar(self) -> None:
         alumno = self._seleccionado()
@@ -269,7 +282,8 @@ class PantallaAlumnos(QWidget):
         formulario = FormularioAlumno(self, alumno=alumno, maestros=self._maestros)
         if formulario.exec() and formulario.guardado:
             self.recargar()
-            self._avisar(f"Se actualizaron los datos de {alumno.nombre_completo}.")
+            self._avisar(f"Se actualizaron los datos de {formulario.guardado.nombre_completo}.")
+            self.alumnos_cambiaron.emit()
 
     def _ver_historial(self) -> None:
         alumno = self._seleccionado()

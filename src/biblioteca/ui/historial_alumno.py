@@ -96,7 +96,8 @@ class DialogoHistorial(QDialog):
         alto = (tabla.horizontalHeader().sizeHint().height()
                 + len(movimientos) * tabla.verticalHeader().defaultSectionSize() + 4)
         tabla.setFixedHeight(min(alto, ALTO_MAXIMO))
-        self.adjustSize()
+        # Solo el alto: el ancho se queda para que se lean las cinco columnas
+        self.resize(self.width(), self.sizeHint().height())
         self._resumir(movimientos)
 
     def _resumir(self, movimientos: list) -> None:

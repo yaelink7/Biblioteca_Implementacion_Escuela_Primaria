@@ -221,5 +221,5 @@ class PantallaDeudores(QWidget):
         detalle = (f"El más atrasado: <b style='color:{TEXTO}'>"
                    f"{escape(peor.alumno, quote=False)}, {peor.retraso}</b>")
         if criticos:
-            detalle += f" · {criticos} con más de {DIAS_CRITICOS} días"
+            detalle += f" · {criticos} con {DIAS_CRITICOS} días o más"
         ui.etiquetaMasAtrasado.setText(detalle)

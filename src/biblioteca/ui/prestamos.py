@@ -41,6 +41,7 @@ from biblioteca.ui.componentes import (
     DelegadoFilaElegida,
     fuente_mono,
     PestanaVista,
+    volver_a_elegir,
     mostrar_caja,
     poner_icono,
 )
@@ -207,8 +208,12 @@ class PantallaPrestamos(QWidget):
         return resultado
 
     def _pintar(self) -> None:
+        anterior = self._seleccionado()
+        elegido = anterior.id if anterior else None
         self._visibles = self._filtrar()
         tabla = self.ui.tablaPrestamos
+        tabla.blockSignals(True)
+        tabla.clearSelection()
         tabla.setSortingEnabled(False)
         tabla.setRowCount(len(self._visibles))
 
@@ -244,6 +249,9 @@ class PantallaPrestamos(QWidget):
                 tabla.setItem(fila, columna, celda)
 
         tabla.setSortingEnabled(True)
+        if elegido is not None:
+            volver_a_elegir(tabla, 0, lambda i: i is not None and self._visibles[i].id == elegido)
+        tabla.blockSignals(False)
         hay = bool(self._visibles)
         tabla.setVisible(hay)
         self.ui.etiquetaVacio.setVisible(not hay)
@@ -299,8 +307,12 @@ class PantallaPrestamos(QWidget):
 
         detalle = self._detalles.get(p.id or -1, DetallePrestamo())
         nombre = p.nombre_alumno or "—"
-        partes = nombre.split(" ", 1)
-        ui.avatar.setText(iniciales(partes[0], partes[1] if len(partes) > 1 else ""))
+        if detalle.nombre_alumno:
+            # Las mismas iniciales que en Alumnos: nombre y primer apellido
+            ui.avatar.setText(iniciales(detalle.nombre_alumno, detalle.apellido_alumno or ""))
+        else:
+            partes = nombre.split(" ", 1)
+            ui.avatar.setText(iniciales(partes[0], partes[1] if len(partes) > 1 else ""))
         ui.etiquetaNombre.setText(nombre)
         codigo = f" · {detalle.codigo_alumno}" if detalle.codigo_alumno else ""
         ui.etiquetaDetalle.setText(f"{salon(p.grado, p.grupo)}{codigo}")
@@ -335,6 +347,12 @@ class PantallaPrestamos(QWidget):
     def _registrar(self) -> None:
         dialogo = DialogoNuevoPrestamo(self)
         if dialogo.exec() and dialogo.registrado:
+            # Vuelve a «Todos» y sin filtro, para que el prestamo nuevo se vea
+            self.ui.campoFiltro.blockSignals(True)
+            self.ui.campoFiltro.clear()
+            self.ui.campoFiltro.blockSignals(False)
+            self.vistas[TODOS].setChecked(True)
+            self.ui.tablaPrestamos.clearSelection()
             self.recargar()
             self.prestamos_cambiaron.emit()
             self._avisar(
@@ -355,6 +373,7 @@ class PantallaPrestamos(QWidget):
             QMessageBox.warning(self, "No se pudo registrar la devolución", mensaje_de_error(error))
             return
 
+        self.ui.tablaPrestamos.clearSelection()
         self.recargar()
         self.prestamos_cambiaron.emit()
         self._avisar(f"«{prestamo.titulo_libro}» volvió al acervo.")

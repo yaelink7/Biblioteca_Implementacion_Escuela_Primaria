@@ -388,7 +388,7 @@ Los `.ui` de `ui/disenos/` se editan en Qt Designer; los `ui_*.py` de
 
 | Correo | Contraseña | Perfil |
 |---|---|---|
-| `bibliotecaria@demo.com` | `123456` | administrador |
+| `bibliotecaria@demo.com` | `12345` | administrador |
 | `auxiliar@demo.com` | `Auxiliar2026!` | bibliotecario |
 | `alumno.prueba@demo.com` | `AlumnoPrueba2026!` | alumno |
 
@@ -480,6 +480,8 @@ y tarda unos tres minutos en armarse.
 | #89 | Ejecutable de Windows, para abrir la biblioteca sin VS Code (ver 5) |
 | #90 | Propuestas de diseño del 27 de octubre y prototipos navegables (ver 12) |
 | #91 | Migración 11 registrada en el repositorio; este archivo al día (ver 14 y 7.0) |
+| — | `diseno/pantallas-restantes`: pantallas restantes del diseño «Lápiz» y el logo; PR pendiente de que entre el #92 (ver 13) |
+| — | `docs/manual-de-usuario`: manual de usuario en Word (`DOC-04`, #42) |
 | #92 | Capa de datos de los campos de la escuela, el traductor al día con las migraciones 10 y 11, y las decisiones de Yael del 8 de noviembre (ver 14 y 7.0) |
 
 ## La migración del Java está terminada
@@ -719,12 +721,16 @@ En este orden:
    el #92**, rama `datos/campos-de-la-escuela`, esperando revisión. Modelos,
    repositorios, validadores y traductor ya conocen colección, asignatura,
    CURP y maestros de grupo; la suite queda en 819. Detalle en la sección 14.
-2. **Las pantallas que faltan del diseño «Lápiz»** (sección 13), con
-   `Prototipo_mostaza.html` como referencia: Préstamos, Alumnos —con el
-   diálogo «Maestros de grupo»—, Deudores, Empleados y sus diálogos. El
-   Catálogo y el formulario de libro ganan colección y asignatura; el de
-   alumno, la CURP y los datos del tutor, y pierde el correo. Depende del
-   punto 1: su PR se abre cuando el de la capa de datos ya esté en `main`.
+2. **Las pantallas que faltan del diseño «Lápiz»**: **hechas** en la rama
+   `diseno/pantallas-restantes` (sección 13), con el logo de la escuela y las
+   cuatro funciones aprobadas. Su PR se abre cuando el #92 esté en `main`.
+   **Las pruebas de interfaz no se pusieron al día**, por decisión de Yael del
+   9 de noviembre: unas 34 describen las pantallas viejas y fallan, y
+   `tests/interfaz/test_acciones.py` se queda colgado porque «Registrar
+   devolución» abre ahora un diálogo propio y no el `QMessageBox` que la
+   prueba sustituye. Está pendiente.
+   El **manual de usuario** (`DOC-04`, #42) está en
+   `Documentacion/Manual_de_usuario.docx`, rama `docs/manual-de-usuario`.
 3. **Lo que quedó decidido el 8 de noviembre.** Este punto juntaba las
    preguntas que la regla 7 había dejado pendientes, y Yael las contestó:
    - **Entran a la aplicación las cuatro funciones de las maquetas** que
@@ -1672,9 +1678,30 @@ La base que usan todas las pantallas, más la primera pantalla completa:
 
 ## Lo que sigue
 
-Préstamos, Alumnos, Deudores y Empleados, con sus diálogos, van en entregas
-siguientes. Mientras tanto ya usan la paleta y las letras nuevas, pero
-conservan su acomodo anterior: sin título y sin panel de detalle.
+**Entregado el 9 de noviembre** (rama `diseno/pantallas-restantes`):
+Préstamos con sus vistas Todos, Por vencer y Vencidos y su panel; Alumnos con
+su panel y el diálogo «Maestros de grupo»; Deudores como hoja de reporte;
+Empleados con su aviso de permisos y su panel; los diálogos de préstamo,
+devolución, historial, alumno, empleado y libro. El Catálogo cambió «Tipo» y
+«Año» por colección y asignatura. Las capturas se compararon contra el
+prototipo y una revisión de cuatro agentes encontró 16 defectos; se
+corrigieron los que afectan el uso (la selección que saltaba de renglón al
+filtrar, las pantallas que no se refrescaban entre sí, el alto del historial).
+
+- **El logo es provisional** (lo entregó Yael el 8 de noviembre):
+  `ui/recursos/logo/escuela.jpg`. La columna de iconos usa el árbol recortado
+  (`RECORTE_ARBOL` en `apariencia.py`) y la ficha de entrada, el logo entero.
+- **«Por vencer»** son tres días o menos, con `dias_restantes` de la base
+  (`DIAS_POR_VENCER` en `modelos/prestamo.py`).
+- **El número junto a Deudores** son las filas de `v_deudores`; Préstamos
+  avisa a Deudores, Alumnos y Catálogo cuando presta o recibe un libro.
+- **El panel del préstamo** lee código, teléfono del tutor, autor y quién lo
+  registró con `repositorios.prestamos.detalles()`, una sola consulta.
+- **Quién registró** lo escribe el cliente (`registrado_por`): la base no lo
+  sella. Hacerlo en la base sería una migración nueva; no se propuso aplicar.
+- **El formulario de libro ya no pide «tipo o género»**, pero conserva el que
+  tenga un libro al modificarlo; el de alumno tampoco borra un correo viejo.
+- Los `.ui` se escribieron con un generador y se abren normal en Designer.
 
 **Quedaban fuera hasta que se aprobaran** (regla 7) el criterio «por vencer»
 de tres días con su conteo, el contador de deudores junto al menú y, en el

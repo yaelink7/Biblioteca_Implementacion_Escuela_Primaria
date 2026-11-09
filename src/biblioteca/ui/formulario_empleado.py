@@ -47,10 +47,9 @@ class FormularioEmpleado(QDialog):
         titulo = "Registrar empleado" if self.es_alta else "Modificar empleado"
         self.setWindowTitle(titulo)
         self.ui.etiquetaEncabezado.setText(titulo)
-        self.ui.etiquetaSubtitulo.setText(
-            "Con el correo que escribas, la persona inicia sesión."
-            if self.es_alta else empleado.nombre_completo
-        )
+        # En el alta no lleva subtitulo, como el prototipo
+        self.ui.etiquetaSubtitulo.setText("" if self.es_alta else empleado.nombre_completo)
+        self.ui.etiquetaSubtitulo.setVisible(not self.es_alta)
         self.ui.cajaError.hide()
 
         self.ui.campoPuesto.setEditable(True)

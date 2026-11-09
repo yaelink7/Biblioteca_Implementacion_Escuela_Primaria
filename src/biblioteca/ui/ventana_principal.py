@@ -97,6 +97,10 @@ class VentanaPrincipal(QMainWindow):
         prestamos = self.pantallas["prestamos"]
         prestamos.prestamos_cambiaron.connect(deudores.recargar)
         prestamos.prestamos_cambiaron.connect(self.pantallas["alumnos"].recargar)
+        prestamos.prestamos_cambiaron.connect(self.pantallas["catalogo"].recargar)
+        alumnos = self.pantallas["alumnos"]
+        alumnos.alumnos_cambiaron.connect(prestamos.recargar)
+        alumnos.alumnos_cambiaron.connect(deudores.recargar)
 
     @property
     def secciones(self) -> list[str]:

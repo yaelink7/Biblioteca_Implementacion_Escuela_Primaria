@@ -40,7 +40,7 @@ from biblioteca.ui.ventana_principal import VentanaPrincipal  # noqa: E402
 
 # Uso:  .venv/Scripts/python.exe herramientas/capturar_pantallas.py <carpeta>
 DESTINO = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("capturas")
-CORREO, CONTRASENA = "bibliotecaria@demo.com", "123456"
+CORREO, CONTRASENA = "bibliotecaria@demo.com", "12345"
 
 
 def despeinar(widget: QWidget) -> None:
