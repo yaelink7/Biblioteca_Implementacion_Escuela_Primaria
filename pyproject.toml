@@ -11,6 +11,10 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.packages.find]
 where = ["src"]
 
+# Las letras y los iconos del diseno viajan dentro del paquete
+[tool.setuptools.package-data]
+"biblioteca.ui" = ["recursos/fuentes/*", "recursos/iconos/*"]
+
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
