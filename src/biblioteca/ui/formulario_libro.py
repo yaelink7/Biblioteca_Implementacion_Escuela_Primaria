@@ -15,7 +15,6 @@ from biblioteca.core.errores import causa as causa_del_error
 from biblioteca.modelos.libro import Libro
 from biblioteca.repositorios import libros as repo_libros
 from biblioteca.servicios import validador_libro
-from biblioteca.ui.estilo import COLOR_ERROR
 from biblioteca.ui.generado.ui_formulario_libro import Ui_FormularioLibro
 
 # El QSpinBox usa su valor minimo como "sin especificar"
@@ -35,14 +34,20 @@ class FormularioLibro(QDialog):
         self.es_alta = libro is None
         self.guardado: Libro | None = None
 
-        self.setWindowTitle("Registrar libro" if self.es_alta else "Modificar libro")
+        titulo = "Registrar libro" if self.es_alta else "Modificar libro"
+        self.setWindowTitle(titulo)
+        self.ui.etiquetaEncabezado.setText(titulo)
+        self.ui.etiquetaSubtitulo.setText(
+            "Se agrega al catálogo con los ejemplares que indiques."
+            if self.es_alta
+            else "Los cambios se guardan en el catálogo al pulsar Guardar."
+        )
         self.ui.campoAno.setMaximum(date.today().year)  # D-08: el tope es hoy
-        self.ui.etiquetaError.setStyleSheet(f"color: {COLOR_ERROR};")
+        self.ui.cajaError.hide()
 
         if libro is not None:
             self._cargar(libro)
 
-        self.ui.botonCancelar.setProperty("secundario", True)
         self.ui.botonGuardar.clicked.connect(self._guardar)
         self.ui.botonCancelar.clicked.connect(self.reject)
         self.ui.campoTitulo.setFocus()
@@ -71,6 +76,12 @@ class FormularioLibro(QDialog):
             num_paginas=None if paginas == SIN_PAGINAS else paginas,
         )
 
+    def _mostrar_error(self, titulo: str, texto: str) -> None:
+        """El recuadro rojo de arriba: que paso y que corregir."""
+        self.ui.tituloError.setText(titulo)
+        self.ui.etiquetaError.setText(texto)
+        self.ui.cajaError.show()
+
     def _guardar(self) -> None:
         libro = self._recoger()
 
@@ -78,7 +89,7 @@ class FormularioLibro(QDialog):
         # errores juntos en lugar de uno por intento, como en el Java.
         revision = validador_libro.validar(libro, es_alta=self.es_alta)
         if not revision.es_valido:
-            self.ui.etiquetaError.setText(revision.mensaje)
+            self._mostrar_error("Revisa estos datos:", revision.mensaje)
             return
 
         self.ui.botonGuardar.setEnabled(False)
@@ -90,7 +101,7 @@ class FormularioLibro(QDialog):
         except Exception as error:
             # Cualquier fallo, no solo el que rechaza la base: sin esto
             # un corte de red se leia como «la base rechazo la operacion».
-            self.ui.etiquetaError.setText(causa_del_error(error))
+            self._mostrar_error("No se pudo guardar:", causa_del_error(error))
             self.ui.botonGuardar.setEnabled(True)
             return
 

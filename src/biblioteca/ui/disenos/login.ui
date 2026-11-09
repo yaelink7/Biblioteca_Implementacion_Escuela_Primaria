@@ -6,92 +6,210 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>420</width>
-    <height>380</height>
+    <width>980</width>
+    <height>720</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Iniciar sesión</string>
   </property>
   <layout class="QVBoxLayout" name="disposicion">
-   <property name="leftMargin"><number>36</number></property>
-   <property name="topMargin"><number>36</number></property>
-   <property name="rightMargin"><number>36</number></property>
-   <property name="bottomMargin"><number>36</number></property>
-   <property name="spacing"><number>12</number></property>
-   <item>
-    <widget class="QLabel" name="etiquetaTitulo">
-     <property name="text">
-      <string>Biblioteca Escolar</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="etiquetaEscuela">
-     <property name="text">
-      <string>Escuela Primaria Adalberto Tejeda</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
-     </property>
-    </widget>
-   </item>
+   <property name="leftMargin"><number>24</number></property>
+   <property name="topMargin"><number>24</number></property>
+   <property name="rightMargin"><number>24</number></property>
+   <property name="bottomMargin"><number>24</number></property>
    <item>
     <spacer name="espacioSuperior">
      <property name="orientation"><enum>Qt::Vertical</enum></property>
-     <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
      <property name="sizeHint" stdset="0">
-      <size><width>20</width><height>24</height></size>
+      <size><width>20</width><height>20</height></size>
      </property>
     </spacer>
    </item>
    <item>
-    <widget class="QLabel" name="etiquetaCorreo">
-     <property name="text"><string>Correo electrónico</string></property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="campoCorreo">
-     <property name="placeholderText">
-      <string>usuario@ejemplo.com</string>
-     </property>
-     <property name="minimumHeight"><number>34</number></property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="etiquetaContrasena">
-     <property name="text"><string>Contraseña</string></property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="campoContrasena">
-     <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-     <property name="minimumHeight"><number>34</number></property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="etiquetaError">
-     <property name="text"><string/></property>
-     <property name="wordWrap"><bool>true</bool></property>
-     <property name="alignment"><set>Qt::AlignCenter</set></property>
-     <property name="minimumHeight"><number>34</number></property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QPushButton" name="botonEntrar">
-     <property name="text"><string>Entrar</string></property>
-     <property name="minimumHeight"><number>38</number></property>
-     <property name="default"><bool>true</bool></property>
-    </widget>
+    <layout class="QHBoxLayout" name="centro">
+     <item>
+      <spacer name="espacioIzquierdo">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0">
+        <size><width>20</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QFrame" name="ficha">
+       <property name="minimumWidth"><number>440</number></property>
+       <property name="maximumWidth"><number>500</number></property>
+       <layout class="QVBoxLayout" name="disposicionFicha">
+        <property name="leftMargin"><number>0</number></property>
+        <property name="topMargin"><number>0</number></property>
+        <property name="rightMargin"><number>0</number></property>
+        <property name="bottomMargin"><number>0</number></property>
+        <property name="spacing"><number>0</number></property>
+        <item>
+         <widget class="QFrame" name="franjaFicha">
+          <property name="minimumHeight"><number>8</number></property>
+          <property name="maximumHeight"><number>8</number></property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="cuerpoFicha">
+          <property name="leftMargin"><number>38</number></property>
+          <property name="topMargin"><number>30</number></property>
+          <property name="rightMargin"><number>38</number></property>
+          <property name="bottomMargin"><number>18</number></property>
+          <property name="spacing"><number>10</number></property>
+          <item>
+           <widget class="QLabel" name="etiquetaRotulo">
+            <property name="text"><string>Iniciar sesión</string></property>
+            <property name="rol" stdset="0"><string>rotuloFicha</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="espacioRotulo">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+            <property name="sizeHint" stdset="0">
+             <size><width>20</width><height>8</height></size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="marca">
+            <property name="spacing"><number>14</number></property>
+            <item>
+             <widget class="QLabel" name="logoFicha">
+              <property name="minimumSize"><size><width>54</width><height>54</height></size></property>
+              <property name="maximumSize"><size><width>54</width><height>54</height></size></property>
+              <property name="text"><string>LOGO</string></property>
+              <property name="alignment"><set>Qt::AlignCenter</set></property>
+             </widget>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="nombreEscuela">
+              <property name="spacing"><number>2</number></property>
+              <item>
+               <widget class="QLabel" name="etiquetaTitulo">
+                <property name="text"><string>Biblioteca Escolar</string></property>
+                <property name="rol" stdset="0"><string>tituloFicha</string></property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLabel" name="etiquetaEscuela">
+                <property name="text"><string>Escuela Primaria Adalberto Tejeda</string></property>
+                <property name="rol" stdset="0"><string>escuelaFicha</string></property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="espacioMarca">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+            <property name="sizeHint" stdset="0">
+             <size><width>20</width><height>8</height></size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QFrame" name="rayaFicha">
+            <property name="minimumHeight"><number>4</number></property>
+            <property name="maximumHeight"><number>4</number></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="espacioRaya">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+            <property name="sizeHint" stdset="0">
+             <size><width>20</width><height>12</height></size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="etiquetaCorreo">
+            <property name="text"><string>Correo electrónico</string></property>
+            <property name="rol" stdset="0"><string>rotuloCampo</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="campoCorreo">
+            <property name="placeholderText"><string>usuario@ejemplo.com</string></property>
+            <property name="rol" stdset="0"><string>campoFicha</string></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="espacioCorreo">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+            <property name="sizeHint" stdset="0">
+             <size><width>20</width><height>6</height></size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="etiquetaContrasena">
+            <property name="text"><string>Contraseña</string></property>
+            <property name="rol" stdset="0"><string>rotuloCampo</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="campoContrasena">
+            <property name="echoMode"><enum>QLineEdit::Password</enum></property>
+            <property name="rol" stdset="0"><string>campoFicha</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="etiquetaError">
+            <property name="text"><string/></property>
+            <property name="wordWrap"><bool>true</bool></property>
+            <property name="minimumHeight"><number>34</number></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="botonEntrar">
+            <property name="text"><string>Entrar</string></property>
+            <property name="default"><bool>true</bool></property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="espacioBoton">
+            <property name="orientation"><enum>Qt::Vertical</enum></property>
+            <property name="sizeType"><enum>QSizePolicy::Fixed</enum></property>
+            <property name="sizeHint" stdset="0">
+             <size><width>20</width><height>20</height></size>
+            </property>
+           </spacer>
+          </item>
+          <item alignment="Qt::AlignHCenter">
+           <widget class="QLabel" name="perforacion">
+            <property name="minimumSize"><size><width>18</width><height>18</height></size></property>
+            <property name="maximumSize"><size><width>18</width><height>18</height></size></property>
+            <property name="text"><string/></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item>
+      <spacer name="espacioDerecho">
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0">
+        <size><width>20</width><height>20</height></size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
    <item>
     <spacer name="espacioInferior">
      <property name="orientation"><enum>Qt::Vertical</enum></property>
      <property name="sizeHint" stdset="0">
-      <size><width>20</width><height>10</height></size>
+      <size><width>20</width><height>20</height></size>
      </property>
     </spacer>
    </item>

@@ -28,7 +28,7 @@ from biblioteca.ui.alumnos import PantallaAlumnos  # noqa: E402
 from biblioteca.ui.catalogo import PantallaCatalogo  # noqa: E402
 from biblioteca.ui.deudores import PantallaDeudores  # noqa: E402
 from biblioteca.ui.empleados import PantallaEmpleados  # noqa: E402
-from biblioteca.ui.estilo import HOJA_DE_ESTILO  # noqa: E402
+from biblioteca.ui.estilo import aplicar_apariencia  # noqa: E402
 from biblioteca.ui.formulario_alumno import FormularioAlumno  # noqa: E402
 from biblioteca.ui.formulario_empleado import FormularioEmpleado  # noqa: E402
 from biblioteca.ui.formulario_libro import FormularioLibro  # noqa: E402
@@ -77,7 +77,8 @@ def main() -> int:
 
     app = QApplication(sys.argv[:1])
     app.setApplicationName("Biblioteca Escolar Adalberto Tejeda")
-    app.setStyleSheet(HOJA_DE_ESTILO)
+    # Letras, paleta y hoja de estilo del diseño «Lápiz», igual que main.py.
+    aplicar_apariencia(app)
 
     # 1. El login, antes de entrar: es lo primero que ve el usuario.
     print("Capturando:")
@@ -92,19 +93,20 @@ def main() -> int:
     sesion = iniciar_sesion(CORREO, CONTRASENA)
     print(f"  (sesion iniciada: {sesion.saludo})")
 
-    # 3. La ventana completa, con sus cinco pestanas.
+    # 3. La ventana completa, con la columna de iconos y sus cinco secciones,
+    #    al tamano con que abre la aplicacion (el minimo es 1024 x 640).
     ventana = VentanaPrincipal(sesion)
-    retratar(app, ventana, "02_ventana_principal", 1000, 640)
+    retratar(app, ventana, "02_ventana_principal", 1280, 800)
 
-    # 4. Cada pestana por separado, para poder describirla aparte.
-    pestanas = [
+    # 4. Cada seccion por separado, para poder describirla aparte.
+    secciones = [
         ("03_catalogo", PantallaCatalogo),
         ("04_prestamos", PantallaPrestamos),
         ("05_alumnos", PantallaAlumnos),
         ("06_deudores", PantallaDeudores),
         ("07_empleados", PantallaEmpleados),
     ]
-    for nombre, clase in pestanas:
+    for nombre, clase in secciones:
         retratar(app, clase(), nombre, 980, 560)
 
     # 5. El dialogo de prestamo, con alumno y libro ya elegidos: asi se ve el
