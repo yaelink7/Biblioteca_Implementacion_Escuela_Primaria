@@ -13,3 +13,7 @@ pytest-cov>=5.0
 
 # --- Estilo de codigo ---
 ruff>=0.6
+
+# --- Ejecutable de Windows (herramientas/empaquetar.py) ---
+# Solo para armar el .exe; la aplicacion no lo necesita para correr.
+pyinstaller>=6.22
