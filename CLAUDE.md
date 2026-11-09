@@ -6,8 +6,9 @@ continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
 **Última actualización:** 8 de noviembre de 2026 — la capa de datos de
 colección, asignatura, CURP y maestros de grupo, en el #92 (sección 14), sobre
-la migración 11, que corre en Supabase desde el 3 de noviembre. **Lo que
-sigue está en 7.0.** El mismo día entraron a `main` el Avance 3 (sección 11),
+la migración 11, que corre en Supabase desde el 3 de noviembre, y las cuatro
+decisiones de Yael del mismo día sobre lo que la regla 7 había dejado
+pendiente (7.0, punto 3). **Lo que sigue está en 7.0.** El mismo día entraron a `main` el Avance 3 (sección 11),
 las propuestas de diseño del 27 de octubre (12), el diseño «Lápiz» (13) y el
 ejecutable de Windows (sección 5).
 
@@ -479,7 +480,7 @@ y tarda unos tres minutos en armarse.
 | #89 | Ejecutable de Windows, para abrir la biblioteca sin VS Code (ver 5) |
 | #90 | Propuestas de diseño del 27 de octubre y prototipos navegables (ver 12) |
 | #91 | Migración 11 registrada en el repositorio; este archivo al día (ver 14 y 7.0) |
-| #92 | Capa de datos de los campos de la escuela, y el traductor al día con las migraciones 10 y 11 (ver 14) |
+| #92 | Capa de datos de los campos de la escuela, el traductor al día con las migraciones 10 y 11, y las decisiones de Yael del 8 de noviembre (ver 14 y 7.0) |
 
 ## La migración del Java está terminada
 
@@ -724,15 +725,20 @@ En este orden:
    Catálogo y el formulario de libro ganan colección y asignatura; el de
    alumno, la CURP y los datos del tutor, y pierde el correo. Depende del
    punto 1: su PR se abre cuando el de la capa de datos ya esté en `main`.
-3. **Lo que tiene que decidir el Product Owner** (regla 7):
-   - las tres piezas de las maquetas que son funciones nuevas: «por vencer»,
-     el contador de deudores, y el panel del préstamo con el teléfono del
-     tutor y quién lo registró;
-   - los supuestos del prototipo que la migración 11 ya aplica: CURP
-     opcional, teléfono del tutor obligatorio, colección y asignatura
-     opcionales;
-   - desde cuándo un libro no devuelto se vuelve adeudo (`PRE-08`, #77), y si
-     siguen valiendo el límite de un libro y el plazo de siete días
+3. **Lo que quedó decidido el 8 de noviembre.** Este punto juntaba las
+   preguntas que la regla 7 había dejado pendientes, y Yael las contestó:
+   - **Entran a la aplicación las cuatro funciones de las maquetas** que
+     estaban fuera: «por vencer» —tres días o menos— con su conteo y su
+     filtro en Préstamos; el contador de deudores junto al icono de Deudores;
+     y en el panel del préstamo, el teléfono del tutor y quién lo registró.
+     Van con el punto 2 y no piden migración.
+   - **Se quedan las reglas del prototipo** que la migración 11 ya aplica:
+     CURP opcional, con el formato oficial y sin repetirse; teléfono del
+     tutor obligatorio; colección y asignatura opcionales.
+   - **Un libro no devuelto se vuelve adeudo cuando la bibliotecaria lo marca
+     como perdido**; nada automático. Es `PRE-08` (#77) y no se implementa
+     ahora.
+   - **Siguen el límite de un libro por alumno y el plazo de siete días**
      (sección 9).
 4. **El cierre**: la sesión de aceptación con el docente (`QA-04`, #41), los
    manuales (`DOC-04`, #42) y el aviso de privacidad (`DOC-02`, #20). **Sin
@@ -960,7 +966,7 @@ empezara.
 | #59 a #66 | `DIA-01` a `DIA-08` | Hechos en `Documentacion/diagramas/`; faltan capturas de algunos criterios, y `DIA-05` a `DIA-07` son de antes de la migración 11 |
 | #67 | Reunión | Los acuerdos se documentaron en el #80; falta ajustar los hitos |
 | #72 a #76 | `LIB-06`, `LIB-07`, `USU-07` a `USU-09` | La base ya los tiene (migración 11, sección 14); faltan la capa de datos y las pantallas |
-| #77 a #79 | `PRE-08`, `REP-04`, `REP-05` | Sin empezar; `PRE-08` espera saber desde cuándo un libro no devuelto es adeudo |
+| #77 a #79 | `PRE-08`, `REP-04`, `REP-05` | Sin empezar. `PRE-08` ya tiene su regla —un libro es adeudo cuando la bibliotecaria lo marca como perdido, nada automático; Yael, 8 de noviembre— y no se implementa ahora |
 
 ## Lo más rápido de cerrar
 
@@ -1080,21 +1086,24 @@ más y quién cumple mejor. Salen de datos que `prestamos` ya guarda.
 **El adeudo es dinero.** Confirmado con la Scrum Master: es el costo del libro
 no devuelto. Eso invalida una exclusión que el Avance 1.2 declara —«Cobro de
 multas por retraso: la escuela no cobra multas a los alumnos»— y hay que
-quitarla del siguiente avance. **Falta preguntar a la escuela desde cuándo un
-libro no devuelto se vuelve deuda**: un niño con tres días de retraso no debe
-el costo del libro; uno que lo perdió en marzo sí.
+quitarla del siguiente avance. **Desde cuándo un libro no devuelto se vuelve
+deuda lo decidió Yael el 8 de noviembre:** cuando la bibliotecaria lo marca
+como perdido, nunca de forma automática. Un niño con tres días de retraso no
+debe el costo del libro; uno que lo perdió en marzo sí, y quien distingue un
+caso del otro es la bibliotecaria. Es `PRE-08` (#77), que no se implementa
+todavía.
 
 **El CURP sube la sensibilidad del padrón.** Es un identificador nacional
 único de un menor. Refuerza lo que ya estaba acordado: no cargar datos reales
 hasta que el aviso de privacidad esté firmado (`DOC-02`, #20).
 
-### Lo que sigue sin confirmarse
+### El límite y el plazo, decididos el 8 de noviembre
 
-De los cuatro puntos que la reunión debía resolver, dos siguen abiertos: si el
-límite de un libro por alumno corresponde a su práctica real, y si el plazo de
-siete días es el que aplican hoy. Ambos están implementados como reglas en la
-base. **Conviene saberlo antes de darlos por definitivos**, porque cambiarlos
-después cuesta más.
+De los cuatro puntos que la reunión debía resolver, dos se quedaron abiertos
+hasta el 8 de noviembre: si el límite de un libro por alumno corresponde a su
+práctica real, y si el plazo de siete días es el que aplican hoy. **Yael
+decidió que los dos siguen.** Las reglas de la base que los aplican —el índice
+único parcial de `prestamos` y `calcular_fecha_limite`— no cambian.
 
 ---
 
@@ -1580,7 +1589,8 @@ este semestre.
   Owner (regla 7): el criterio «por vencer» con su conteo y su filtro —el
   umbral de tres días lo propusieron las maquetas, no la escuela—, el contador
   de deudores junto al menú, y el panel de detalle de D con el teléfono del
-  tutor (depende de `USU-08`, #75) y quién registró el préstamo.
+  tutor (depende de `USU-08`, #75) y quién registró el préstamo. *Yael las
+  aprobó el 8 de noviembre (7.0, punto 3).*
 - **Lo demás ya existe**: el buscador de Préstamos es `campoFiltro` y el
   resumen es `etiquetaResumen`. La paginación de las maquetas solo está para
   que quepan en la imagen.
@@ -1621,13 +1631,13 @@ cambia cómo se dibuja cada pantalla. Cada HTML lleva su código legible dentro.
 - El inicio de sesión tiene botones para entrar como administrador o como
   bibliotecario con un clic. **Es solo para el prototipo**: no pasa a la app.
 
-**Supuestos del prototipo, por confirmar con el Product Owner:** la CURP es
+**Supuestos del prototipo, que Yael confirmó el 8 de noviembre:** la CURP es
 opcional, pero si se escribe se valida el formato y no puede repetirse; el
 teléfono del tutor es obligatorio porque queda como único contacto; la
-colección y la asignatura son opcionales. El criterio «por vencer» (tres días)
-sigue siendo una propuesta, igual que en las maquetas. El 3 de noviembre Yael
-pidió aplicar en la base estos supuestos tal cual (migración 11, sección 14);
-la confirmación del Product Owner sigue pendiente (7.0).
+colección y la asignatura son opcionales. El 3 de noviembre Yael pidió
+aplicarlos en la base tal cual (migración 11, sección 14), y el 8 decidió que
+se quedan. El criterio «por vencer» de tres días, que aquí era una propuesta
+de las maquetas, quedó aprobado ese mismo día para la aplicación (7.0).
 
 ---
 
@@ -1666,10 +1676,11 @@ Préstamos, Alumnos, Deudores y Empleados, con sus diálogos, van en entregas
 siguientes. Mientras tanto ya usan la paleta y las letras nuevas, pero
 conservan su acomodo anterior: sin título y sin panel de detalle.
 
-**Quedan fuera hasta que el Product Owner las apruebe** (regla 7) el criterio
-«por vencer» de tres días con su conteo, el contador de deudores junto al
-menú y, en el panel del préstamo, el teléfono del tutor (depende de
-`USU-08`, #75) y quién registró el préstamo.
+**Quedaban fuera hasta que se aprobaran** (regla 7) el criterio «por vencer»
+de tres días con su conteo, el contador de deudores junto al menú y, en el
+panel del préstamo, el teléfono del tutor (depende de `USU-08`, #75) y quién
+registró el préstamo. Yael las aprobó el 8 de noviembre, y van con las
+pantallas que faltan (7.0, puntos 2 y 3).
 
 **Los campos que pidió la escuela** (#72 a #76) ya están en la base desde la
 migración 11 (sección 14), pero todavía no en la aplicación: el Catálogo
@@ -1808,5 +1819,6 @@ siguen siendo las dos de `formulario_empleado.py`.
 - **Los diagramas `DIA-05`, `DIA-06` y `DIA-07`** dibujan la base de antes,
   sin colección, asignatura, CURP ni `maestros_de_grupo`. Es lo que 7.1
   advertía: dibujar antes de migrar obliga a redibujar.
-- **Las reglas siguen siendo supuestos del prototipo** hasta que el Product
-  Owner las confirme (sección 12).
+- ~~Las reglas siguen siendo supuestos del prototipo~~ — Yael las confirmó el
+  8 de noviembre: CURP opcional, teléfono del tutor obligatorio, colección y
+  asignatura opcionales (sección 12 y 7.0).
