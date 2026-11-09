@@ -18,13 +18,20 @@ desde las reglas declaradas, sin mirar la implementación: cada una entra por
 
 from __future__ import annotations
 
+import re
 from datetime import date
+from pathlib import Path
 
 import pytest
 
-from biblioteca.modelos.libro import Libro
+from biblioteca.modelos.libro import ASIGNATURAS, COLECCIONES, Libro
 from biblioteca.servicios import validador_libro
 from biblioteca.servicios.validador_libro import ANO_MINIMO
+
+MIGRACION_11 = (
+    Path(__file__).resolve().parents[2]
+    / "database" / "migraciones" / "11_datos_que_pidio_la_escuela.sql"
+)
 
 
 def validar(libro, es_alta=True):
@@ -245,6 +252,79 @@ def test_la_disponibilidad_no_se_puede_forzar():
 
     with pytest.raises(AttributeError):
         libro.disponible = True
+
+
+# ===========================================================================
+# LIB-06 y LIB-07 · colección de Libros del Rincón y asignatura
+# ===========================================================================
+
+class TestColeccionYAsignatura:
+    """Las listas de la migración 11, o nada: un libro sin clasificar todavía
+    se registra igual."""
+
+    def test_sin_coleccion_ni_asignatura_pasa(self, libro_valido):
+        assert (libro_valido.coleccion, libro_valido.asignatura) == (None, None)
+        assert validar(libro_valido).es_valido
+
+    @pytest.mark.parametrize("coleccion", list(COLECCIONES))
+    def test_cada_coleccion_de_libros_del_rincon_pasa(self, libro_valido, coleccion):
+        libro_valido.coleccion = coleccion
+        assert validar(libro_valido).es_valido
+
+    @pytest.mark.parametrize("asignatura", ASIGNATURAS)
+    def test_cada_asignatura_de_la_lista_pasa(self, libro_valido, asignatura):
+        libro_valido.asignatura = asignatura
+        assert validar(libro_valido).es_valido
+
+    def test_una_coleccion_inventada_se_rechaza_y_se_nombra(self, libro_valido):
+        libro_valido.coleccion = "Cuentos de hadas"
+
+        r = validar(libro_valido)
+
+        assert not r.es_valido
+        assert any("«Cuentos de hadas»" in e and "Libros del Rincón" in e
+                   for e in r.errores)
+
+    def test_una_asignatura_inventada_se_rechaza_y_se_nombra(self, libro_valido):
+        libro_valido.asignatura = "Computación"
+
+        r = validar(libro_valido)
+
+        assert not r.es_valido
+        assert any("«Computación»" in e for e in r.errores)
+
+    def test_la_coleccion_se_compara_tal_cual(self, libro_valido):
+        """La restricción de la base compara el texto exacto: «astrolabio» en
+        minúsculas no pasaría allá, así que tampoco aquí."""
+        libro_valido.coleccion = "astrolabio"
+
+        assert not validar(libro_valido).es_valido
+
+    def test_cada_coleccion_dice_sus_grados(self):
+        """Los grados que acordó la escuela, para sugerir libros por grado."""
+        assert COLECCIONES == {
+            "Al sol solito": "1.º",
+            "Pasos de luna": "1.º y 2.º",
+            "Astrolabio": "3.º y 4.º",
+            "Espejo de Urania": "5.º y 6.º",
+            "Cometas convidados": "sin grado asignado",
+        }
+
+
+def _lista_de_la_restriccion(nombre: str) -> set[str]:
+    sql = MIGRACION_11.read_text(encoding="utf-8")
+    cuerpo = re.search(rf"{nombre} check \(\w+ in \((.*?)\)\)", sql, re.S).group(1)
+    return set(re.findall(r"'([^']*)'", cuerpo))
+
+
+@pytest.mark.parametrize("nombre,lista", [
+    ("libros_coleccion_valida", set(COLECCIONES)),
+    ("libros_asignatura_valida", set(ASIGNATURAS)),
+])
+def test_las_listas_son_las_de_la_base(nombre, lista):
+    """Copiadas de la migración 11. Agregar un valor aquí sin agregarlo allá
+    lo deja pasar el validador y lo rechaza la base, o al revés."""
+    assert lista == _lista_de_la_restriccion(nombre)
 
 
 # ===========================================================================

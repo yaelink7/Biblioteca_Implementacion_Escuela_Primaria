@@ -73,16 +73,17 @@ def test_buscar_sin_texto_cae_en_listar(monkeypatch, cliente_falso, texto):
     assert "or_" not in cliente.consulta.nombres()
 
 
-def test_buscar_con_texto_interroga_los_tres_campos(monkeypatch, cliente_falso):
+def test_buscar_con_texto_interroga_los_cinco_campos(monkeypatch, cliente_falso):
+    """Título, autor y tipo, más colección y asignatura desde la migración 11:
+    «astro» trae la colección Astrolabio entera."""
     cliente = cliente_falso(monkeypatch, libros, respuesta=[FILA])
 
     libros.buscar("prin")
 
     filtro = cliente.consulta.argumentos_de("or_")[0][0]
-    assert filtro.count("ilike") == 3
-    assert "titulo.ilike" in filtro
-    assert "autor.ilike" in filtro
-    assert "tipo_libro.ilike" in filtro
+    assert filtro.count("ilike") == 5
+    for columna in ("titulo", "autor", "tipo_libro", "coleccion", "asignatura"):
+        assert f"{columna}.ilike" in filtro
 
 
 def test_buscar_recorta_los_espacios_de_los_extremos(monkeypatch, cliente_falso):
@@ -96,17 +97,17 @@ def test_buscar_recorta_los_espacios_de_los_extremos(monkeypatch, cliente_falso)
 def test_buscar_una_coma_no_parte_el_filtro(monkeypatch, cliente_falso):
     """El defecto de la auditoría, visto desde el repositorio.
 
-    Dentro de `or_` la coma separa condiciones: «Momo, la niña» armaba cuatro
-    condiciones en lugar de tres y PostgREST rechazaba la consulta. Como la
-    búsqueda se dispara sola a los 250 ms, el error salía mientras la persona
-    seguía escribiendo.
+    Dentro de `or_` la coma separa condiciones: «Momo, la niña» armaba una
+    condición de más y PostgREST rechazaba la consulta. Como la búsqueda se
+    dispara sola a los 250 ms, el error salía mientras la persona seguía
+    escribiendo. Son cinco columnas, así que deben ser cinco condiciones.
     """
     cliente = cliente_falso(monkeypatch, libros, respuesta=[])
 
     libros.buscar("Momo, la niña")
 
     filtro = cliente.consulta.argumentos_de("or_")[0][0]
-    assert filtro.count("ilike") == 3, "la coma volvió a partir el filtro"
+    assert filtro.count("ilike") == 5, "la coma volvió a partir el filtro"
 
 
 def test_buscar_tambien_excluye_las_bajas(monkeypatch, cliente_falso):

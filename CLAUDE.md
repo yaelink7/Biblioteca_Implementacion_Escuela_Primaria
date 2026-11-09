@@ -4,12 +4,12 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 8 de noviembre de 2026 — queda registrada la
-migración 11, que corre en Supabase desde el 3 de noviembre: colección,
-asignatura, CURP y maestros de grupo (sección 14). **Lo que sigue está en
-7.0.** El mismo día entraron a `main` el Avance 3 (sección 11), las propuestas
-de diseño del 27 de octubre (12), el diseño «Lápiz» (13) y el ejecutable de
-Windows (sección 5).
+**Última actualización:** 8 de noviembre de 2026 — la capa de datos de
+colección, asignatura, CURP y maestros de grupo, en el #92 (sección 14), sobre
+la migración 11, que corre en Supabase desde el 3 de noviembre. **Lo que
+sigue está en 7.0.** El mismo día entraron a `main` el Avance 3 (sección 11),
+las propuestas de diseño del 27 de octubre (12), el diseño «Lápiz» (13) y el
+ejecutable de Windows (sección 5).
 
 ---
 
@@ -240,7 +240,7 @@ herramientas/
   capturar_pantallas.py    fotografía las pantallas contra la base real (sección 11)
   empaquetar.py            arma el .exe de Windows con PyInstaller (sección 5)
 database/migraciones/      11 migraciones, ya aplicadas en Supabase
-tests/                     719 pruebas con pytest, en los cuatro grupos que
+tests/                     819 pruebas con pytest, en los cuatro grupos que
   conftest.py              tenía la suite JUnit del sistema Java
   caja_negra/              las reglas, sin leer la implementación
   caja_blanca/             las ramas del código, con dobles del cliente
@@ -372,7 +372,7 @@ políticas RLS. Lo que nunca debe salir del panel de Supabase es la llave
 
 ```bash
 .venv/Scripts/python.exe main.py                        # ejecutar
-.venv/Scripts/python.exe -m pytest tests/ -v            # 719 pruebas, ~6 s
+.venv/Scripts/python.exe -m pytest tests/ -v            # 819 pruebas, ~7 s
 .venv/Lib/site-packages/PySide6/designer.exe            # editar pantallas
 .venv/Scripts/python.exe herramientas/compilar_ui.py    # recompilar los .ui
 ```
@@ -479,6 +479,7 @@ y tarda unos tres minutos en armarse.
 | #89 | Ejecutable de Windows, para abrir la biblioteca sin VS Code (ver 5) |
 | #90 | Propuestas de diseño del 27 de octubre y prototipos navegables (ver 12) |
 | #91 | Migración 11 registrada en el repositorio; este archivo al día (ver 14 y 7.0) |
+| #92 | Capa de datos de los campos de la escuela, y el traductor al día con las migraciones 10 y 11 (ver 14) |
 
 ## La migración del Java está terminada
 
@@ -713,21 +714,10 @@ entrega. Los hitos de GitHub todavía se llaman «Por definir tras la reunión»
 
 En este orden:
 
-1. **La capa de datos de lo que pidió la escuela** (#72 a #76). La base ya lo
-   tiene (sección 14). El código va a medias en la rama
-   `datos/campos-de-la-escuela`, sin PR todavía: los modelos y los
-   repositorios ya leen y escriben colección, asignatura y CURP, y
-   `validador_persona.py` exige el teléfono del tutor y revisa la CURP. Falta:
-   - arreglar **18 pruebas que fallan** porque describen las reglas
-     anteriores: el correo como contacto suficiente, consultas sin `curp`, la
-     búsqueda sin CURP;
-   - que `validador_libro.py` revise colección y asignatura contra sus listas;
-   - que `core/errores.py` reconozca las restricciones nuevas. Hoy una CURP
-     mal escrita, una colección inventada o un maestro vacío llegan como «La
-     operación no se pudo completar», y una CURP repetida como «Ya existe un
-     registro con ese identificador». Va junto el mensaje de la migración 10
-     que el Avance 3 encontró sin traducir (sección 11);
-   - pruebas de todo lo anterior, y su sección en este archivo.
+1. **La capa de datos de lo que pidió la escuela** (#72 a #76): **lista en
+   el #92**, rama `datos/campos-de-la-escuela`, esperando revisión. Modelos,
+   repositorios, validadores y traductor ya conocen colección, asignatura,
+   CURP y maestros de grupo; la suite queda en 819. Detalle en la sección 14.
 2. **Las pantallas que faltan del diseño «Lápiz»** (sección 13), con
    `Prototipo_mostaza.html` como referencia: Préstamos, Alumnos —con el
    diálogo «Maestros de grupo»—, Deudores, Empleados y sus diálogos. El
@@ -1517,12 +1507,14 @@ qué hizo mal.
 
 No es un fallo de seguridad —el rechazo ocurre igual— pero incumple
 `RNF-USA-03`. Se corrige agregando una entrada a `REGLAS_DE_LA_BASE`.
-**Pendiente, sin tocar.**
+**Corregido en el #92**, junto con otros tres mensajes de la misma migración
+que tampoco estaban (sección 14).
 
 Es exactamente el mismo patrón que la auditoría de septiembre ya había
 encontrado: se agrega un mensaje en una migración y nadie lo da de alta en el
-traductor. `tests/test_mensajes_de_la_base.py` existe para atraparlo, pero
-solo cubre los mensajes que alguien recordó copiar.
+traductor. `tests/test_mensajes_de_la_base.py` existía para atraparlo, pero
+solo cubría los mensajes que alguien recordó copiar. Desde el #92 también lee
+los `raise exception` de las migraciones mismas.
 
 ## Cambios de estado de los requisitos
 
@@ -1775,11 +1767,44 @@ también deshechas:
 El 8 de noviembre se volvió a leer el esquema: 8 tablas con RLS, 4 vistas, 18
 políticas, 9 disparadores y 18 funciones.
 
+## La capa de datos — #92
+
+Lo que la aplicación necesita para leer, escribir y explicar los campos
+nuevos, sin tocar pantallas:
+
+- **Modelos.** `Libro` lleva `coleccion` y `asignatura`; `COLECCIONES` dice
+  los grados de cada colección y `ASIGNATURAS` es la lista de la escuela.
+  `Alumno` lleva `curp`, que va a `usuarios` con el grado y el grupo.
+- **Repositorios.**
+  - La búsqueda del catálogo también encuentra por colección y asignatura:
+    «astro» trae la colección Astrolabio.
+  - La búsqueda de alumnos también encuentra por CURP. La CURP vive en
+    `usuarios` y PostgREST no la mezcla en el mismo `.or_()` con las columnas
+    de `perfiles`, así que va en una segunda consulta; quien ya apareció por
+    su nombre no se repite, y un alumno dado de baja no aparece.
+  - El alta y la modificación del alumno mandan `p_curp`.
+  - `listar_maestros()` y `guardar_maestros()` leen y escriben
+    `maestros_de_grupo`: un nombre vacío quita al maestro del salón.
+- **Validadores.** El teléfono del tutor es obligatorio y el correo ya no
+  cuenta como contacto; la CURP, si se escribe, va con el formato oficial;
+  colección y asignatura, si se escriben, tienen que estar en sus listas.
+- **Traductor de errores.** Reconoce las siete restricciones de la migración
+  11 —«Ya hay un alumno registrado con esa CURP», por ejemplo—, y los cuatro
+  mensajes de la migración 10 que no tenía.
+
+**Tres pruebas comparan el código con la migración**, para que no se
+desfasen en silencio: las listas de colecciones y asignaturas contra las
+restricciones, la expresión de la CURP contra `usuarios_curp_formato`, y cada
+`raise exception` de `database/migraciones/` contra el traductor. Esta última
+es la que encontró los tres mensajes de la 10 que faltaban.
+
+La suite pasó de 719 a 819: pasan 818 y TC-06 falla como se espera. Todas las
+sentencias se recorren; las únicas ramas parciales fuera del código generado
+siguen siendo las dos de `formulario_empleado.py`.
+
 ## Lo que falta
 
-- **La capa de datos** está a medias en la rama `datos/campos-de-la-escuela`,
-  y **las pantallas** todavía no muestran nada de esto (7.0, puntos 1 y 2).
-- **El traductor de errores** no conoce las restricciones nuevas (7.0).
+- **Las pantallas** todavía no muestran nada de esto (7.0, punto 2).
 - **Los diagramas `DIA-05`, `DIA-06` y `DIA-07`** dibujan la base de antes,
   sin colección, asignatura, CURP ni `maestros_de_grupo`. Es lo que 7.1
   advertía: dibujar antes de migrar obliga a redibujar.

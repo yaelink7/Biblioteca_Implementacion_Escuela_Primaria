@@ -109,6 +109,21 @@ REGLAS_DE_LA_BASE = (
     ("no se encontro el alumno",
      "Ese alumno ya no existe en el padrón.",
      "Puede que alguien lo haya dado de baja. Actualiza la pantalla."),
+    # database/migraciones/10 — correcciones de la auditoria. Van antes que
+    # las de la 09: «puede cambiar la cuenta de acceso» tambien contiene
+    # «puede cambiar», y la primera señal que coincide es la que responde.
+    ("solo un administrador puede registrar a otro administrador",
+     "Solo un administrador puede registrar a otro administrador.",
+     "Regístralo como bibliotecario, o pídele a un administrador que lo registre."),
+    ("solo un administrador puede cambiar la cuenta de acceso",
+     "Solo un administrador cambia la cuenta de acceso de una persona.",
+     "Pídele a un administrador que haga el cambio."),
+    ("no se encontro el empleado",
+     "Ese empleado ya no existe en la plantilla.",
+     "Puede que alguien lo haya dado de baja. Actualiza la pantalla."),
+    ("no tiene ficha de empleado",
+     "Esa persona no tiene ficha de empleado.",
+     "Avisa al equipo: el perfil quedó sin su ficha y hay que revisarlo."),
     # database/migraciones/09 — proteccion del perfil de acceso
     ("tu propio perfil de acceso",
      "No puedes cambiar tu propio perfil de acceso.",
@@ -116,6 +131,30 @@ REGLAS_DE_LA_BASE = (
     ("solo un administrador puede cambiar",
      "Solo un administrador cambia el perfil de acceso de alguien.",
      "Pídele a un administrador que haga el cambio."),
+    # database/migraciones/11 — los campos que pidio la escuela. Son
+    # restricciones, no disparadores: la señal es su nombre. La de la CURP
+    # repetida va antes que el «duplicate key» generico de abajo.
+    ("usuarios_curp_key",
+     "Ya hay un alumno registrado con esa CURP.",
+     "Revisa que esté bien escrita: la CURP es única para cada persona."),
+    ("usuarios_curp_formato",
+     "La CURP no tiene el formato oficial.",
+     "Son 18 caracteres, como CURV200412MVZRMLA4. Revísala o déjala vacía."),
+    ("libros_coleccion_valida",
+     "Esa colección no es de Libros del Rincón.",
+     "Elige una de la lista, o deja el libro sin colección."),
+    ("libros_asignatura_valida",
+     "Esa asignatura no está en la lista de la escuela.",
+     "Elige una de la lista, o deja el libro sin asignatura."),
+    ("maestros_de_grupo_grado_check",
+     "Ese grado no existe en la primaria.",
+     "El grado va del 1 al 6."),
+    ("maestros_de_grupo_grupo_check",
+     "El grupo de ese salón no es válido.",
+     "Escribe el grupo con una letra, como A o B."),
+    ("maestros_de_grupo_maestro_check",
+     "Falta el nombre del maestro.",
+     "Escribe su nombre, o deja el salón vacío para quitarle el maestro."),
     # Restricciones genericas
     ("perfiles_codigo_key",
      "Ya existe una persona registrada con ese código.",

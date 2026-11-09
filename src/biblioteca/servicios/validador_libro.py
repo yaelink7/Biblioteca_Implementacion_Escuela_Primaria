@@ -19,7 +19,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date
 
-from biblioteca.modelos.libro import Libro
+from biblioteca.modelos.libro import ASIGNATURAS, COLECCIONES, Libro
 
 ANO_MINIMO = 1400
 
@@ -87,5 +87,19 @@ def validar(libro: Libro, es_alta: bool = True) -> Resultado:
             r.errores.append(
                 f"El año de publicación debe ser posterior a {ANO_MINIMO}."
             )
+
+    # LIB-06 y LIB-07: las mismas listas que aceptan libros_coleccion_valida y
+    # libros_asignatura_valida en la migracion 11. Vacias tambien pasan: un
+    # libro todavia sin clasificar se puede registrar igual.
+    if libro.coleccion and libro.coleccion not in COLECCIONES:
+        r.errores.append(
+            f"La colección «{libro.coleccion}» no es de Libros del Rincón: "
+            "elige una de la lista o deja el libro sin colección."
+        )
+    if libro.asignatura and libro.asignatura not in ASIGNATURAS:
+        r.errores.append(
+            f"La asignatura «{libro.asignatura}» no está en la lista de la "
+            "escuela: elige una o deja el libro sin asignatura."
+        )
 
     return r

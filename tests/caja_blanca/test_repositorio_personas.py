@@ -23,6 +23,30 @@ import pytest
 from biblioteca.modelos.persona import Alumno, Empleado, Perfil, Rol
 from biblioteca.repositorios import personas
 from biblioteca.repositorios.personas import ErrorDePersona
+from tests.conftest import ClienteFalso, ConsultaFalsa, RespuestaFalsa
+
+
+class ConsultaEnSecuencia(ConsultaFalsa):
+    """Una respuesta distinta en cada `execute()`, en el orden en que se piden.
+
+    `buscar_alumnos` hace dos consultas —nombre y código en `perfiles`, CURP
+    en `usuarios`— y el doble común les contesta lo mismo a las dos, así que
+    no deja ver qué pasa cuando un alumno aparece solo por su CURP.
+    """
+
+    def __init__(self, *respuestas):
+        super().__init__()
+        self.pendientes = list(respuestas)
+
+    def execute(self):
+        self.llamadas.append(("execute", (), {}))
+        return RespuestaFalsa(self.pendientes.pop(0))
+
+
+def instalar_en_secuencia(monkeypatch, *respuestas) -> ClienteFalso:
+    cliente = ClienteFalso(ConsultaEnSecuencia(*respuestas))
+    monkeypatch.setattr(personas, "obtener_cliente", lambda: cliente)
+    return cliente
 
 # Fabricas y no constantes: `_aplanar` saca la tabla anidada con `fila.pop()`,
 # de modo que consume el diccionario que recibe. Una fila compartida entre dos
@@ -69,12 +93,21 @@ def test_listar_alumnos_filtra_por_rol_y_por_activo(monkeypatch, cliente_falso):
 
 
 def test_listar_alumnos_pide_la_tabla_anidada(monkeypatch, cliente_falso):
-    """Grado y grupo viven en `usuarios`: sin el anidado no llegan."""
+    """Grado, grupo y CURP viven en `usuarios`: sin el anidado no llegan."""
     cliente = cliente_falso(monkeypatch, personas, respuesta=[])
 
     personas.listar_alumnos()
 
-    assert "usuarios(grado, grupo)" in cliente.consulta.argumentos_de("select")[0][0]
+    seleccion = cliente.consulta.argumentos_de("select")[0][0]
+    assert "usuarios(grado, grupo, curp)" in seleccion
+
+
+def test_listar_alumnos_trae_la_curp_al_modelo(monkeypatch, cliente_falso):
+    fila = fila_alumno(usuarios={"grado": 4, "grupo": "B",
+                                 "curp": "CURV200412MVZRMLA4"})
+    cliente_falso(monkeypatch, personas, respuesta=[fila])
+
+    assert personas.listar_alumnos()[0].curp == "CURV200412MVZRMLA4"
 
 
 # ===========================================================================
@@ -171,6 +204,164 @@ def test_buscar_un_apellido_con_coma_no_parte_el_filtro(monkeypatch, cliente_fal
 
 
 # ===========================================================================
+# buscar_alumnos() · la CURP, en una segunda consulta (USU-07)
+# ===========================================================================
+
+class TestBuscarPorCurp:
+    """La CURP también encuentra al alumno, como en el prototipo.
+
+    Vive en `usuarios`, y PostgREST no la puede mezclar en el mismo `.or_()`
+    con las columnas de `perfiles`: va en una segunda consulta, y quien ya
+    apareció por su nombre no se repite.
+    """
+
+    def _por_curp(self, **cambios):
+        perfil = {"id": "a-2", "codigo": "A-002", "nombre": "Luis",
+                  "apellido": "Bravo", "rol": "alumno", "activo": True}
+        perfil.update(cambios)
+        return {"grado": 2, "grupo": "A", "curp": "BALU180303HVZRSSA1",
+                "perfiles": perfil}
+
+    def test_la_curp_se_busca_en_usuarios(self, monkeypatch):
+        cliente = instalar_en_secuencia(monkeypatch, [], [])
+
+        personas.buscar_alumnos("vzr")
+
+        assert cliente.tablas == ["perfiles", "usuarios"]
+        assert ("curp", "%vzr%") in cliente.consulta.argumentos_de("ilike")
+
+    def test_quien_aparece_solo_por_su_curp_llega_completo(self, monkeypatch):
+        instalar_en_secuencia(monkeypatch, [], [self._por_curp()])
+
+        resultado = personas.buscar_alumnos("BALU18")
+
+        assert [a.codigo for a in resultado] == ["A-002"]
+        assert resultado[0].curp == "BALU180303HVZRSSA1"
+        assert resultado[0].salon == "2A"
+
+    def test_quien_ya_aparecio_por_su_nombre_no_se_repite(self, monkeypatch):
+        por_nombre = fila_alumno(id="a-2", codigo="A-002", nombre="Luis",
+                                 apellido="Bravo")
+        instalar_en_secuencia(monkeypatch, [por_nombre], [self._por_curp()])
+
+        assert [a.id for a in personas.buscar_alumnos("Luis")] == ["a-2"]
+
+    def test_los_que_llegan_por_curp_se_ordenan_con_los_demas(self, monkeypatch):
+        """La base ordenó la primera consulta; la mezcla se ordena aquí."""
+        por_nombre = fila_alumno(id="a-1", apellido="Martínez")
+        instalar_en_secuencia(monkeypatch, [por_nombre], [self._por_curp()])
+
+        apellidos = [a.apellido for a in personas.buscar_alumnos("a")]
+
+        assert apellidos == ["Bravo", "Martínez"]
+
+    def test_sin_alumnos_nuevos_queda_el_orden_de_la_base(self, monkeypatch):
+        """No se reordena si la CURP no agregó a nadie: el orden ya es el de
+        la consulta, y reordenar en Python podría contradecirla."""
+        filas = [fila_alumno(id="a-9", apellido="Zúñiga"),
+                 fila_alumno(id="a-1", apellido="Bravo")]
+        instalar_en_secuencia(monkeypatch, filas, [])
+
+        apellidos = [a.apellido for a in personas.buscar_alumnos("a")]
+
+        assert apellidos == ["Zúñiga", "Bravo"]
+
+    def test_un_alumno_dado_de_baja_no_aparece_por_su_curp(self, monkeypatch):
+        """El mismo filtro que la búsqueda por salón: sin él, la CURP
+        mostraría a quien su nombre ya no muestra."""
+        instalar_en_secuencia(monkeypatch, [], [self._por_curp(activo=False)])
+
+        assert personas.buscar_alumnos("BALU") == []
+
+
+# ===========================================================================
+# listar_maestros() y guardar_maestros() · el maestro de cada salón (USU-09)
+# ===========================================================================
+
+class TestMaestrosDeGrupo:
+    """Se asigna una vez por salón y lo heredan sus alumnos.
+
+    Al empezar otro ciclo escolar se corrige aquí, sin tocar la ficha de
+    ningún niño. Un nombre vacío quita la asignación.
+    """
+
+    def _llamadas(self, cliente, nombre):
+        return [(a, k) for n, a, k in cliente.consulta.llamadas if n == nombre]
+
+    def test_listar_devuelve_el_maestro_de_cada_salon(self, monkeypatch, cliente_falso):
+        cliente = cliente_falso(monkeypatch, personas, respuesta=[
+            {"grado": 4, "grupo": "B", "maestro": "Mtro. Felipe Navarro"},
+            {"grado": 1, "grupo": "A", "maestro": "Mtra. Laura Méndez"},
+        ])
+
+        maestros = personas.listar_maestros()
+
+        assert maestros == {(4, "B"): "Mtro. Felipe Navarro",
+                            (1, "A"): "Mtra. Laura Méndez"}
+        assert cliente.tablas == ["maestros_de_grupo"]
+
+    def test_sin_maestros_devuelve_un_diccionario_vacio(self, monkeypatch, cliente_falso):
+        cliente_falso(monkeypatch, personas, respuesta=[])
+
+        assert personas.listar_maestros() == {}
+
+    def test_asignar_es_un_upsert_por_salon(self, monkeypatch, cliente_falso):
+        """`on_conflict` por grado y grupo: guardar dos veces no duplica."""
+        cliente = cliente_falso(monkeypatch, personas)
+
+        personas.guardar_maestros({(4, "B"): "  Mtro. Felipe Navarro  "})
+
+        [(argumentos, opciones)] = self._llamadas(cliente, "upsert")
+        assert argumentos[0] == [{"grado": 4, "grupo": "B",
+                                  "maestro": "Mtro. Felipe Navarro"}]
+        assert opciones == {"on_conflict": "grado,grupo"}
+        assert not self._llamadas(cliente, "delete")
+
+    @pytest.mark.parametrize("vacio", ["", "   ", None])
+    def test_un_nombre_vacio_quita_al_maestro_del_salon(
+        self, monkeypatch, cliente_falso, vacio
+    ):
+        """La base rechaza un maestro en blanco: vacío significa quitarlo."""
+        cliente = cliente_falso(monkeypatch, personas)
+
+        personas.guardar_maestros({(6, "B"): vacio})
+
+        assert not self._llamadas(cliente, "upsert")
+        assert len(self._llamadas(cliente, "delete")) == 1
+        filtros = cliente.consulta.argumentos_de("eq")
+        assert ("grado", 6) in filtros
+        assert ("grupo", "B") in filtros
+
+    def test_asignar_y_quitar_en_una_sola_llamada(self, monkeypatch, cliente_falso):
+        """Un upsert con todos los nombres, y un borrado por cada salón vacío."""
+        cliente = cliente_falso(monkeypatch, personas)
+
+        personas.guardar_maestros({(4, "B"): "Mtro. Felipe Navarro",
+                                   (5, "A"): "Mtra. Irma Castillo",
+                                   (6, "B"): ""})
+
+        [(argumentos, _)] = self._llamadas(cliente, "upsert")
+        assert len(argumentos[0]) == 2
+        assert len(self._llamadas(cliente, "delete")) == 1
+        assert cliente.tablas == ["maestros_de_grupo"] * 2
+
+    def test_sin_cambios_no_toca_la_base(self, monkeypatch, cliente_falso):
+        cliente = cliente_falso(monkeypatch, personas)
+
+        personas.guardar_maestros({})
+
+        assert cliente.tablas == []
+
+    def test_el_rechazo_de_la_base_llega_traducido(self, monkeypatch, cliente_falso):
+        cliente_falso(monkeypatch, personas, error=Exception(
+            'new row for relation "maestros_de_grupo" violates check '
+            'constraint "maestros_de_grupo_grado_check"'))
+
+        with pytest.raises(ErrorDePersona, match="grado no existe"):
+            personas.guardar_maestros({(7, "A"): "Alguien"})
+
+
+# ===========================================================================
 # buscar_alumnos_o_salon() · la bifurcación que decide el tipo de búsqueda
 # ===========================================================================
 
@@ -219,7 +410,11 @@ class TestBuscarPorSalonOPorNombre:
 
         personas.buscar_alumnos_o_salon(texto)
 
-        assert cliente.tablas == ["perfiles"]
+        # Nombre y código se buscan en `perfiles`; la CURP, en `usuarios`.
+        # Lo que no cambia: nunca se filtra por grado y grupo como un salón.
+        assert cliente.tablas == ["perfiles", "usuarios"]
+        filtrados = {columna for columna, _ in cliente.consulta.argumentos_de("eq")}
+        assert not filtrados & {"grado", "grupo"}
 
 
 # ===========================================================================
@@ -310,6 +505,47 @@ def test_el_alta_de_alumno_manda_los_datos_de_las_dos_tablas(
     assert parametros["p_codigo"] == "A-001"       # va a perfiles
     assert parametros["p_grado"] == 4              # va a usuarios
     assert parametros["p_grupo"] == "B"
+
+
+def test_el_alta_de_alumno_manda_la_curp(monkeypatch, cliente_falso, alumno_valido):
+    cliente = cliente_falso(monkeypatch, personas, respuesta="a-nuevo")
+    alumno_valido.curp = "CURV200412MVZRMLA4"
+
+    personas.dar_de_alta_alumno(alumno_valido)
+
+    assert cliente.rpc_llamadas[0][1]["p_curp"] == "CURV200412MVZRMLA4"
+
+
+def test_el_alta_de_alumno_coincide_con_la_firma_de_la_migracion_11(
+    monkeypatch, cliente_falso, alumno_valido
+):
+    """La lista está copiada de `11_datos_que_pidio_la_escuela.sql`.
+
+    `p_curp` es el último parámetro y tiene valor por omisión, así que la
+    base aceptaría una llamada sin él: la CURP se perdería en silencio. Por
+    eso se comprueba aquí que la aplicación la manda.
+    """
+    cliente = cliente_falso(monkeypatch, personas, respuesta="a-nuevo")
+
+    personas.dar_de_alta_alumno(alumno_valido)
+
+    assert set(cliente.rpc_llamadas[0][1]) == {
+        "p_codigo", "p_nombre", "p_apellido", "p_grado", "p_grupo", "p_correo",
+        "p_telefono", "p_calle", "p_colonia", "p_codigo_postal", "p_numero",
+        "p_curp",
+    }
+
+
+def test_la_curp_repetida_se_explica(monkeypatch, cliente_falso, alumno_valido):
+    """Que no se repita lo decide la base: el validador no ve el padrón."""
+    cliente_falso(
+        monkeypatch, personas,
+        error=Exception('duplicate key value violates unique constraint '
+                        '"usuarios_curp_key"'),
+    )
+
+    with pytest.raises(ErrorDePersona, match="esa CURP"):
+        personas.dar_de_alta_alumno(alumno_valido)
 
 
 def test_el_alta_de_alumno_devuelve_el_id_que_asigno_la_base(
@@ -407,6 +643,24 @@ def test_actualizar_un_alumno_va_por_la_funcion_de_la_base(
     assert cliente.tablas == []
     assert cliente.rpc_llamadas[0][0] == "actualizar_alumno"
     assert cliente.rpc_llamadas[0][1]["p_id"] == "a-1"
+
+
+def test_actualizar_un_alumno_coincide_con_la_firma_de_la_migracion_11(
+    monkeypatch, cliente_falso, alumno_valido
+):
+    """Como en el alta: sin `p_curp`, cambiar la CURP no guardaría nada."""
+    cliente = cliente_falso(monkeypatch, personas)
+    alumno_valido.curp = "CURV200412MVZRMLA4"
+
+    personas.actualizar_alumno(alumno_valido)
+
+    parametros = cliente.rpc_llamadas[0][1]
+    assert set(parametros) == {
+        "p_id", "p_nombre", "p_apellido", "p_grado", "p_grupo", "p_correo",
+        "p_telefono", "p_calle", "p_colonia", "p_codigo_postal", "p_numero",
+        "p_curp",
+    }
+    assert parametros["p_curp"] == "CURV200412MVZRMLA4"
 
 
 def test_actualizar_un_alumno_traduce_el_no_encontrado(
