@@ -10,6 +10,29 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Any, Self
 
+# Colecciones de Libros del Rincon, con los grados que acordo la escuela
+# (LIB-06). Son las mismas que acepta la restriccion libros_coleccion_valida
+# de la migracion 11: agregar una aqui sin agregarla alla no la deja guardar.
+COLECCIONES: dict[str, str] = {
+    "Al sol solito": "1.º",
+    "Pasos de luna": "1.º y 2.º",
+    "Astrolabio": "3.º y 4.º",
+    "Espejo de Urania": "5.º y 6.º",
+    "Cometas convidados": "sin grado asignado",
+}
+
+# Asignaturas tradicionales (LIB-07), las de libros_asignatura_valida
+ASIGNATURAS: tuple[str, ...] = (
+    "Español",
+    "Matemáticas",
+    "Ciencias Naturales",
+    "Historia",
+    "Geografía",
+    "Formación Cívica y Ética",
+    "Artes",
+    "Inglés",
+)
+
 
 @dataclass
 class Publicacion:
@@ -36,6 +59,8 @@ class Libro(Publicacion):
     tipo_libro: str | None = None
     editorial: str | None = None
     num_paginas: int | None = None
+    coleccion: str | None = None
+    asignatura: str | None = None
 
     activo: bool = True
     motivo_baja: str | None = None
@@ -67,6 +92,8 @@ class Libro(Publicacion):
             tipo_libro=fila.get("tipo_libro"),
             editorial=fila.get("editorial"),
             num_paginas=fila.get("num_paginas"),
+            coleccion=fila.get("coleccion"),
+            asignatura=fila.get("asignatura"),
             activo=fila.get("activo", True),
             motivo_baja=fila.get("motivo_baja"),
             dado_baja_en=date.fromisoformat(baja[:10]) if baja else None,
@@ -82,6 +109,8 @@ class Libro(Publicacion):
             "existencias": self.existencias,
             "ano_publicacion": self.ano_publicacion,
             "num_paginas": self.num_paginas,
+            "coleccion": self.coleccion,
+            "asignatura": self.asignatura,
         }
         if self.id is not None:
             fila["id"] = self.id

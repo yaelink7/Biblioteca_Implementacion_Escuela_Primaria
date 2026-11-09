@@ -16,9 +16,14 @@ nadie actualiza el traductor, la prueba correspondiente falla. Esa es toda su
 razon de ser.
 """
 
+import re
+from pathlib import Path
+
 import pytest
 
 from biblioteca.core.errores import causa, explicar, mensaje
+
+MIGRACIONES = Path(__file__).resolve().parents[1] / "database" / "migraciones"
 
 
 class ErrorDePrestamo(Exception):
@@ -44,6 +49,30 @@ MENSAJES_REALES = [
      "tu propio perfil"),
     ("Solo un administrador puede cambiar el perfil de acceso.",
      "administrador"),
+    # 10_correcciones_de_la_auditoria.sql. La primera la encontró el Avance 3
+    # sin traducir; las otras tres, la prueba de abajo que lee las migraciones.
+    ("Solo un administrador puede registrar a otro administrador.",
+     "registrar a otro administrador"),
+    ("Solo un administrador puede cambiar la cuenta de acceso de un perfil.",
+     "cuenta de acceso"),
+    ("No se encontró el empleado indicado.", "plantilla"),
+    ("Ese perfil no tiene ficha de empleado. Avisa al equipo.",
+     "ficha de empleado"),
+    # 11_datos_que_pidio_la_escuela.sql: restricciones, no disparadores
+    ('duplicate key value violates unique constraint "usuarios_curp_key"',
+     "esa CURP"),
+    ('new row for relation "usuarios" violates check constraint '
+     '"usuarios_curp_formato"', "formato oficial"),
+    ('new row for relation "libros" violates check constraint '
+     '"libros_coleccion_valida"', "Libros del Rincón"),
+    ('new row for relation "libros" violates check constraint '
+     '"libros_asignatura_valida"', "asignatura"),
+    ('new row for relation "maestros_de_grupo" violates check constraint '
+     '"maestros_de_grupo_grado_check"', "grado"),
+    ('new row for relation "maestros_de_grupo" violates check constraint '
+     '"maestros_de_grupo_grupo_check"', "grupo"),
+    ('new row for relation "maestros_de_grupo" violates check constraint '
+     '"maestros_de_grupo_maestro_check"', "maestro"),
     # Restricciones e indices
     ('duplicate key value violates unique constraint "prestamo_unico_activo_por_usuario"',
      "préstamo activo"),
@@ -71,6 +100,43 @@ def test_cada_mensaje_de_la_base_se_traduce(texto, fragmento):
 def test_ningun_mensaje_de_la_base_llega_crudo(texto, _):
     """El sintoma que se quiere evitar: Postgres hablandole al bibliotecario."""
     assert "La base de datos rechazó la operación" not in mensaje(Exception(texto))
+
+
+def _raise_de_las_migraciones() -> list[tuple[str, str]]:
+    """Cada `raise exception '...'` de las migraciones, con su archivo.
+
+    Los `%` del texto son los huecos que Postgres llena con un valor; aqui se
+    llenan con uno cualquiera. El `\\s+` deja pasar el que esta partido en dos
+    lineas, como el de `validar_baja_de_libro`.
+    """
+    patron = re.compile(r"raise exception\s+'((?:[^']|'')*)'", re.IGNORECASE)
+    hallados = []
+    for archivo in sorted(MIGRACIONES.glob("*.sql")):
+        for texto in patron.findall(archivo.read_text(encoding="utf-8")):
+            hallados.append((archivo.name, texto.replace("''", "'").replace("%", "7")))
+    return hallados
+
+
+def test_la_lectura_de_las_migraciones_encuentra_mensajes():
+    """Que la prueba de abajo no pase en vacio si alguien mueve la carpeta."""
+    archivos = {archivo for archivo, _ in _raise_de_las_migraciones()}
+    assert len(archivos) >= 7
+    assert "10_correcciones_de_la_auditoria.sql" in archivos
+
+
+@pytest.mark.parametrize("archivo,texto", _raise_de_las_migraciones())
+def test_todo_mensaje_de_una_migracion_tiene_traduccion(archivo, texto):
+    """El defecto que se repetia: una migracion agrega un mensaje y nadie lo
+    da de alta en el traductor. Paso con la 10, y el Avance 3 lo encontro a
+    mano. MENSAJES_REALES solo cubre lo que alguien recordo copiar; esta
+    prueba lee las migraciones mismas, asi que una migracion nueva con un
+    mensaje sin traducir falla aqui antes de llegar a la escuela."""
+    explicacion = explicar(Exception(texto))
+
+    assert explicacion.tipo == "regla", (
+        f"{archivo}: «{texto}» no esta en REGLAS_DE_LA_BASE; "
+        f"el bibliotecario leeria: {explicacion.causa}"
+    )
 
 
 # --------------------------------------------------------------------------

@@ -100,11 +100,15 @@ class Alumno(Perfil):
     """Alumno lector. Migra Usuario.java del sistema Java.
 
     grado y grupo permiten la busqueda "por nombre o grupo" que exige la
-    Factibilidad Operativa del Avance 1.
+    Factibilidad Operativa del Avance 1. La CURP (USU-07) es opcional.
+
+    El telefono y la direccion de Perfil son los del tutor (USU-08): en una
+    primaria es a quien se avisa de un prestamo vencido.
     """
 
     grado: int | None = None
     grupo: str | None = None
+    curp: str | None = None
 
     def __post_init__(self) -> None:
         self.rol = Rol.ALUMNO
@@ -120,11 +124,12 @@ class Alumno(Perfil):
         alumno = cls(**_campos_de_perfil(fila))
         alumno.grado = fila.get("grado")
         alumno.grupo = fila.get("grupo")
+        alumno.curp = fila.get("curp")
         return alumno
 
     def datos_propios(self) -> dict[str, Any]:
         """Columnas de la tabla usuarios (las que no van en perfiles)."""
-        return {"grado": self.grado, "grupo": self.grupo}
+        return {"grado": self.grado, "grupo": self.grupo, "curp": self.curp}
 
 
 @dataclass

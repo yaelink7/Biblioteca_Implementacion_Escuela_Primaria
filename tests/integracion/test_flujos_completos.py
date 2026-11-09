@@ -486,5 +486,6 @@ def test_un_texto_corriente_no_rompe_la_busqueda(base, app, texto):
 
     cliente = clientes["biblioteca.repositorios.libros"]
     filtro = cliente.consulta.argumentos_de("or_")[0][0]
-    assert filtro.count("ilike") == 3, "el texto partió el filtro en dos"
+    # Una condición por columna: título, autor, tipo, colección y asignatura.
+    assert filtro.count("ilike") == 5, "el texto partió el filtro en dos"
     assert catalogo.ui.tablaLibros.rowCount() == 1

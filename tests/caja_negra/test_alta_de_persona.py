@@ -14,13 +14,22 @@ declarada, más las combinaciones que la operación real produce.
 
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 import pytest
 
 from biblioteca.modelos.persona import Alumno, Empleado, Perfil
 from biblioteca.servicios.validador_persona import (
+    PATRON_CURP,
     validar_alumno,
     validar_empleado,
     validar_perfil,
+)
+
+MIGRACION_11 = (
+    Path(__file__).resolve().parents[2]
+    / "database" / "migraciones" / "11_datos_que_pidio_la_escuela.sql"
 )
 
 
@@ -222,32 +231,43 @@ class TestGradoYGrupoVanJuntos:
 
 
 class TestContactoDelTutor:
-    """Sin contacto no hay forma de avisar de un préstamo vencido."""
+    """USU-08: el único contacto que cuenta es el teléfono del tutor.
+
+    La escuela confirmó en la reunión que el correo no funciona con las
+    familias, así que sin teléfono no hay forma de avisar de un préstamo
+    vencido. Hasta la migración 11 bastaba con cualquiera de los dos.
+    """
 
     def test_con_telefono_basta(self, alumno_valido):
         alumno_valido.correo = None
         assert validar_alumno(alumno_valido).es_valido
 
-    def test_con_correo_basta(self, alumno_valido):
+    def test_el_correo_ya_no_basta(self, alumno_valido):
         alumno_valido.telefono = None
         alumno_valido.correo = "tutor@escuela.mx"
 
-        assert validar_alumno(alumno_valido).es_valido
+        r = validar_alumno(alumno_valido)
 
-    def test_sin_ninguno_de_los_dos_se_rechaza(self, alumno_valido):
+        assert not r.es_valido
+        assert any("teléfono del tutor" in e for e in r.errores)
+
+    def test_sin_telefono_se_rechaza(self, alumno_valido):
         alumno_valido.telefono = None
         alumno_valido.correo = None
 
         r = validar_alumno(alumno_valido)
 
         assert not r.es_valido
-        assert any("contacto del tutor" in e.lower() for e in r.errores)
+        assert any("teléfono del tutor" in e for e in r.errores)
 
-    def test_un_telefono_corto_falla_por_dos_motivos_a_la_vez(self, alumno_valido):
-        """Está incompleto, y al estar incompleto no deja de contar como contacto.
+    def test_un_telefono_corto_falla_por_incompleto_y_no_por_faltante(
+        self, alumno_valido
+    ):
+        """Está incompleto, y al estar incompleto no deja de contar como dado.
 
-        La regla mira si el campo trae algo, no si es utilizable. Queda
-        anotado: el aviso de teléfono incompleto es el que informa de verdad.
+        La regla de obligatorio mira si el campo trae algo, no si es
+        utilizable. Queda anotado: el aviso de teléfono incompleto es el que
+        informa de verdad.
         """
         alumno_valido.correo = None
         alumno_valido.telefono = "228"
@@ -256,7 +276,56 @@ class TestContactoDelTutor:
 
         assert not r.es_valido
         assert any("incompleto" in e.lower() for e in r.errores)
-        assert not any("contacto del tutor" in e.lower() for e in r.errores)
+        assert not any("registra el teléfono" in e.lower() for e in r.errores)
+
+
+class TestCurp:
+    """USU-07: opcional, pero si se escribe tiene que ser una CURP de verdad.
+
+    Que no se repita no lo puede saber el validador, que no ve el padrón: lo
+    decide la base con `usuarios_curp_key` (ver test_repositorio_personas).
+    """
+
+    VALIDA = "CURV200412MVZRMLA4"   # el ejemplo del prototipo y del mensaje
+
+    def test_sin_curp_pasa(self, alumno_valido):
+        alumno_valido.curp = None
+        assert validar_alumno(alumno_valido).es_valido
+
+    def test_una_curp_valida_pasa(self, alumno_valido):
+        alumno_valido.curp = self.VALIDA
+        assert validar_alumno(alumno_valido).es_valido
+
+    @pytest.mark.parametrize("curp", [
+        "CURV200412MVZRMLA",     # 17 caracteres
+        "CURV200412MVZRMLA45",   # 19
+        "curv200412mvzrmla4",    # minúsculas: la base guarda mayúsculas
+        "CURV201312MVZRMLA4",    # mes 13
+        "CURV200432MVZRMLA4",    # día 32
+        "CURV200412XVZRMLA4",    # sexo que no es H ni M
+        "CURV200412MXXRMLA4",    # entidad que no existe
+        "CURV200412MVZAMLA4",    # vocal donde va una consonante interna
+        "C4RV200412MVZRMLA4",    # número donde va la vocal del apellido
+    ])
+    def test_otro_formato_se_rechaza_y_dice_cual_es(self, alumno_valido, curp):
+        alumno_valido.curp = curp
+
+        r = validar_alumno(alumno_valido)
+
+        assert not r.es_valido
+        assert any("formato oficial" in e and self.VALIDA in e for e in r.errores)
+
+    def test_es_la_misma_regla_que_la_de_la_base(self):
+        """La expresión se copió de `usuarios_curp_formato`. Si una cambia y la
+        otra no, el validador deja pasar lo que la base rechaza, o al revés."""
+        sql = MIGRACION_11.read_text(encoding="utf-8")
+        cuerpo = re.search(
+            r"usuarios_curp_formato check \(curp ~ \((.*?)\)\);", sql, re.S
+        ).group(1)
+        # Postgres une las cadenas contiguas: '...' '...' es una sola.
+        de_la_base = "".join(re.findall(r"'([^']*)'", cuerpo))
+
+        assert PATRON_CURP.pattern == de_la_base
 
 
 def test_el_alumno_arrastra_las_reglas_del_perfil(alumno_valido):

@@ -111,8 +111,40 @@ def test_el_personal_se_distingue_del_alumno_por_el_perfil():
 # TC-11, TC-12 · cada clase escribe lo suyo
 # ===========================================================================
 
-def test_tc11_el_alumno_aporta_grado_y_grupo(alumno_valido):
-    assert alumno_valido.datos_propios() == {"grado": 4, "grupo": "B"}
+def test_tc11_el_alumno_aporta_grado_grupo_y_curp(alumno_valido):
+    """Lo que va a la tabla `usuarios`. La CURP llegó con la migración 11
+    (USU-07) y es opcional: un alumno sin ella la manda vacía."""
+    assert alumno_valido.datos_propios() == {"grado": 4, "grupo": "B", "curp": None}
+
+    alumno_valido.curp = "CURV200412MVZRMLA4"
+
+    assert alumno_valido.datos_propios()["curp"] == "CURV200412MVZRMLA4"
+
+
+def test_la_curp_llega_desde_la_fila():
+    alumno = Alumno.desde_fila({"codigo": "A-1", "nombre": "Ana", "apellido": "Ruiz",
+                                "grado": 1, "grupo": "A",
+                                "curp": "CURV200412MVZRMLA4"})
+
+    assert alumno.curp == "CURV200412MVZRMLA4"
+
+
+def test_el_libro_lleva_coleccion_y_asignatura_de_ida_y_vuelta():
+    """LIB-06 y LIB-07: lo que se lee de la base vuelve igual al guardar."""
+    libro = Libro.desde_fila({"id": 7, "titulo": "Momo", "autor": "Michael Ende",
+                              "coleccion": "Astrolabio", "asignatura": "Español"})
+
+    assert (libro.coleccion, libro.asignatura) == ("Astrolabio", "Español")
+    fila = libro.a_fila()
+    assert (fila["coleccion"], fila["asignatura"]) == ("Astrolabio", "Español")
+
+
+def test_un_libro_sin_clasificar_manda_coleccion_y_asignatura_vacias():
+    """Las columnas son opcionales: NULL pasa las dos restricciones."""
+    fila = Libro(titulo="Momo", autor="Michael Ende", existencias=1).a_fila()
+
+    assert fila["coleccion"] is None
+    assert fila["asignatura"] is None
 
 
 def test_tc12_el_empleado_aporta_puesto_y_fecha_de_ingreso(empleado_valido):
