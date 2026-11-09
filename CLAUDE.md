@@ -4,12 +4,12 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 8 de noviembre de 2026 — entra a `main` el diseño
-«Lápiz», hecho el 3 de noviembre: base, inicio de sesión y Catálogo
-(sección 13). Antes: el 27 de octubre, las cuatro propuestas de diseño y los
-prototipos navegables (sección 12); el 19 de octubre, el Avance 3, con la
-seguridad verificada contra la base real (sección 11), y la suite de pruebas
-rehecha sobre la del sistema Java (sección 6.4).
+**Última actualización:** 8 de noviembre de 2026 — queda registrada la
+migración 11, que corre en Supabase desde el 3 de noviembre: colección,
+asignatura, CURP y maestros de grupo (sección 14). **Lo que sigue está en
+7.0.** El mismo día entraron a `main` el Avance 3 (sección 11), las propuestas
+de diseño del 27 de octubre (12), el diseño «Lápiz» (13) y el ejecutable de
+Windows (sección 5).
 
 ---
 
@@ -179,7 +179,9 @@ que viva solo en el cliente **no es una regla, es una sugerencia**.
 | Fecha de devolución | Disparador `sellar_devolucion` | — |
 | Solo admin cambia perfiles de acceso | Disparador `proteger_rol` | — |
 | Altas y cambios atómicos de personas | Funciones `registrar_*`, `actualizar_alumno` | — |
-| Acceso por perfil | 16 políticas RLS sobre las 7 tablas | Factibilidad Legal |
+| Colección de Libros del Rincón y asignatura válidas | Restricciones `libros_coleccion_valida` y `libros_asignatura_valida` | `LIB-06`, `LIB-07` |
+| CURP con el formato oficial y sin repetirse | Restricciones `usuarios_curp_formato` y `usuarios_curp_key` | `USU-07` |
+| Acceso por perfil | 18 políticas RLS sobre las 8 tablas | Factibilidad Legal |
 
 **Corolario 1.** Antes de escribir una regla de negocio, pregúntate si puede
 vivir en la base. Los repositorios de Python solo invocan y traducen el error
@@ -235,7 +237,9 @@ src/biblioteca/
     empleados.py           + formulario_empleado.py
 herramientas/
   compilar_ui.py           convierte los .ui en módulos de Python
-database/migraciones/      10 migraciones, ya aplicadas en Supabase
+  capturar_pantallas.py    fotografía las pantallas contra la base real (sección 11)
+  empaquetar.py            arma el .exe de Windows con PyInstaller (sección 5)
+database/migraciones/      11 migraciones, ya aplicadas en Supabase
 tests/                     719 pruebas con pytest, en los cuatro grupos que
   conftest.py              tenía la suite JUnit del sistema Java
   caja_negra/              las reglas, sin leer la implementación
@@ -261,23 +265,24 @@ Equivalencias con el sistema Java, por si hay que consultar el original:
 
 # 4. Base de datos
 
-## 7 tablas
+## 8 tablas
 
 | Tabla | Qué guarda |
 |---|---|
 | `perfiles` | Datos comunes de toda persona. `auth_id` opcional: un alumno puede tener ficha sin cuenta |
-| `usuarios` | Lo propio del alumno: grado y grupo |
+| `usuarios` | Lo propio del alumno: grado, grupo y CURP (opcional; si se escribe, con el formato oficial y sin repetirse) |
 | `empleados` | Lo propio del empleado: tipo y fecha de ingreso |
-| `libros` | Catálogo, con baja lógica (`activo`, `motivo_baja`, `dado_baja_en`) |
+| `libros` | Catálogo, con baja lógica (`activo`, `motivo_baja`, `dado_baja_en`), colección de Libros del Rincón y asignatura |
 | `prestamos` | Con `ON DELETE RESTRICT`, no CASCADE (REQ-PRE-03) |
 | `bitacora_libros` | Trazabilidad — **la tabla existe pero nada escribe en ella** (`LIB-04`) |
 | `notificaciones` | Avisos por correo — **vacía**, falta `NOT-01` |
+| `maestros_de_grupo` | El maestro de cada salón (grado y grupo), que heredan sus alumnos — **vacía**, falta su pantalla (sección 14) |
 
 ## 4 vistas
 
 | Vista | Para qué |
 |---|---|
-| `v_catalogo` | Catálogo con disponibilidad deducida de las existencias |
+| `v_catalogo` | Catálogo con disponibilidad deducida de las existencias; desde la migración 11, también colección y asignatura |
 | `v_prestamos` | Préstamos con `dias_restantes` calculado por la base |
 | `v_deudores` | Reporte de deudores, con contacto del tutor |
 | `v_libros_faltantes` | Libros dados de baja — **existe pero no hay pantalla** (`REP-02`) |
@@ -296,10 +301,16 @@ Todas con `security_invoker = on`, para que respeten las políticas RLS.
 **que devuelve la fecha en el huso de Veracruz**. La base corre en UTC: todo
 cálculo de fechas pasa por `hoy()`, nunca por `current_date`.
 
-## 8 disparadores · 16 políticas RLS
+Desde la migración 11, `registrar_alumno` y `actualizar_alumno` reciben la
+CURP en un último parámetro, `p_curp`, con valor por omisión: una llamada que
+no la manda sigue funcionando igual.
 
-RLS activa en las 7 tablas. Un alumno autenticado solo alcanza su propio
+## 9 disparadores · 18 políticas RLS
+
+RLS activa en las 8 tablas. Un alumno autenticado solo alcanza su propio
 perfil y sus propios préstamos; lo verificamos con una cuenta real.
+`maestros_de_grupo` sigue el patrón del padrón: el personal lee y escribe, y
+un alumno no ve ninguna fila.
 
 ## Migraciones
 
@@ -314,10 +325,14 @@ perfil y sus propios préstamos; lo verificamos con una cuenta real.
 08_fecha_de_devolucion_desde_la_base     disparador sellar_devolucion
 09_permisos_de_bibliotecario_y_proteccion_de_rol
 10_correcciones_de_la_auditoria          reloj, escalada, inventario, puesto
+11_datos_que_pidio_la_escuela            colección, asignatura, CURP, maestros de grupo
 ```
 
 **Para cambiar el esquema se crea una migración nueva**, nunca se edita una
-anterior: los archivos son el registro de lo que ya corrió en Supabase.
+anterior: los archivos son el registro de lo que ya corrió en Supabase. En el
+registro de Supabase la 10 quedó sin su número, como
+`correcciones_de_la_auditoria`; las demás llevan el mismo nombre que su
+archivo.
 
 ---
 
@@ -333,6 +348,13 @@ python -m venv .venv
 
 El último paso es necesario: hace que `import biblioteca` funcione. **No viene
 de `requirements.txt`**, así que quien lo omita tendrá `ModuleNotFoundError`.
+
+**Si la carpeta del proyecto cambia de nombre o de lugar, hay que repetirlo.**
+La instalación editable guarda la ruta de `src/` en un archivo `.pth` del
+`.venv`. Con la ruta vieja, `python main.py` da `ModuleNotFoundError` aunque
+las pruebas pasen —`pyproject.toml` les agrega `src` por su cuenta— y aunque
+F5 funcione, porque `launch.json` pone `PYTHONPATH`. Pasó el 8 de noviembre:
+la carpeta se había renombrado de `7mo semetre` a `7mo_semetre`.
 
 Hace falta un `.env` en la raíz, que **no está en el repositorio**:
 
@@ -385,6 +407,14 @@ y seis dígitos no los cumplen con datos de menores de por medio.
 10 libros apropiados para una primaria, 6 alumnos, 2 empleados y 4 préstamos
 —dos vencidos a propósito, para que el reporte de deudores tenga qué mostrar.
 Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
+
+Al 8 de noviembre la base tiene 10 libros activos y 2 dados de baja, los
+mismos 6 alumnos y 2 empleados, y 8 préstamos: 4 devueltos y 4 abiertos,
+todos ya pasados de su fecha límite. Dos de esos cuatro siguen marcados
+`activo` porque nadie llama a `marcar_prestamos_vencidos` (`PRE-05`, #33);
+`v_prestamos` y el reporte de deudores los cuentan bien porque calculan los
+días en cada consulta. Ningún alumno tiene CURP ni maestro de grupo, y ningún
+libro tiene colección.
 
 ## Abrir la aplicación sin VS Code
 
@@ -443,7 +473,12 @@ y tarda unos tres minutos en armarse.
 | #83 | PR de rescate: integró a `main` la migración 10 y `actualizar_empleado` |
 | #84 | Avance 2 con los ocho criterios de la rúbrica; regla 4 ampliada |
 | #85 | Suite de pruebas rehecha sobre la del sistema Java (ver 6.4) |
+| #86 | Historial de PR al día, que se había quedado en el #71 |
+| #87 | Avance 3: seguridad, implementación y evaluación (ver 11) |
 | #88 | Diseño «Lápiz», mostaza: base, inicio de sesión y Catálogo (ver 13) |
+| #89 | Ejecutable de Windows, para abrir la biblioteca sin VS Code (ver 5) |
+| #90 | Propuestas de diseño del 27 de octubre y prototipos navegables (ver 12) |
+| #91 | Migración 11 registrada en el repositorio; este archivo al día (ver 14 y 7.0) |
 
 ## La migración del Java está terminada
 
@@ -564,7 +599,7 @@ quedaron intactos —7 préstamos, 21 ejemplares, 8 perfiles, 1 administrador—
 **Aviso del revisor de Supabase que NO hay que "corregir":** marca
 `es_personal`, `es_administrador`, `mi_perfil` y `mi_rol` como funciones
 `security definer` invocables por `authenticated`. Es intencional y necesario:
-las 16 políticas RLS las evalúan como el invocador, así que revocarles
+las políticas RLS las evalúan como el invocador, así que revocarles
 `execute` rompería el control de acceso entero. Solo devuelven información que
 el propio usuario ya tiene sobre sí mismo.
 
@@ -670,7 +705,60 @@ suite se colgaba **después de la última prueba**, sin mensaje.
 
 # 7. LO SIGUIENTE QUE SE DEBE HACER
 
-El sistema funciona; lo que estaba desalineado eran los entregables. De las
+## 7.0 Al 8 de noviembre
+
+**El calendario manda.** El Sprint 4 terminó el 8 de noviembre y el 9 empieza
+el cierre, hasta el 28: aceptación con el docente, correcciones, manuales y
+entrega. Los hitos de GitHub todavía se llaman «Por definir tras la reunión».
+
+En este orden:
+
+1. **La capa de datos de lo que pidió la escuela** (#72 a #76). La base ya lo
+   tiene (sección 14). El código va a medias en la rama
+   `datos/campos-de-la-escuela`, sin PR todavía: los modelos y los
+   repositorios ya leen y escriben colección, asignatura y CURP, y
+   `validador_persona.py` exige el teléfono del tutor y revisa la CURP. Falta:
+   - arreglar **18 pruebas que fallan** porque describen las reglas
+     anteriores: el correo como contacto suficiente, consultas sin `curp`, la
+     búsqueda sin CURP;
+   - que `validador_libro.py` revise colección y asignatura contra sus listas;
+   - que `core/errores.py` reconozca las restricciones nuevas. Hoy una CURP
+     mal escrita, una colección inventada o un maestro vacío llegan como «La
+     operación no se pudo completar», y una CURP repetida como «Ya existe un
+     registro con ese identificador». Va junto el mensaje de la migración 10
+     que el Avance 3 encontró sin traducir (sección 11);
+   - pruebas de todo lo anterior, y su sección en este archivo.
+2. **Las pantallas que faltan del diseño «Lápiz»** (sección 13), con
+   `Prototipo_mostaza.html` como referencia: Préstamos, Alumnos —con el
+   diálogo «Maestros de grupo»—, Deudores, Empleados y sus diálogos. El
+   Catálogo y el formulario de libro ganan colección y asignatura; el de
+   alumno, la CURP y los datos del tutor, y pierde el correo. Depende del
+   punto 1: su PR se abre cuando el de la capa de datos ya esté en `main`.
+3. **Lo que tiene que decidir el Product Owner** (regla 7):
+   - las tres piezas de las maquetas que son funciones nuevas: «por vencer»,
+     el contador de deudores, y el panel del préstamo con el teléfono del
+     tutor y quién lo registró;
+   - los supuestos del prototipo que la migración 11 ya aplica: CURP
+     opcional, teléfono del tutor obligatorio, colección y asignatura
+     opcionales;
+   - desde cuándo un libro no devuelto se vuelve adeudo (`PRE-08`, #77), y si
+     siguen valiendo el límite de un libro y el plazo de siete días
+     (sección 9).
+4. **El cierre**: la sesión de aceptación con el docente (`QA-04`, #41), los
+   manuales (`DOC-04`, #42) y el aviso de privacidad (`DOC-02`, #20). **Sin
+   aviso firmado no se cargan datos reales**, y antes de cargarlos hay que
+   cambiar las contraseñas de las cuentas de demostración.
+5. **Issues terminados que siguen abiertos**: `DOC-01` (#9), `QA-02` (#19) y
+   los diagramas (`DOC-03` #28, y #59 a #66, a los que les faltan capturas de
+   algunos criterios). `DIA-05`, `DIA-06` y `DIA-07` además dibujan la base de
+   antes de la migración 11. Los acuerdos del #67 se documentaron en el #80;
+   falta ajustar los hitos.
+
+Después de cada cambio de código hay que volver a armar el ejecutable
+(sección 5): el acceso directo abre la versión con que se armó.
+
+**Lo que sigue en 7.1 a 7.3 es el plan de septiembre**, que se conserva como
+historia. El sistema funciona; lo que estaba desalineado eran los entregables. De las
 tres tareas que esta sección listaba, **dos ya se cerraron**: el cronograma
 se rehízo (7.1) y los requerimientos se completaron en el Avance 1.2 (7.2).
 Lo que queda abierto son **los ocho diagramas** (7.3) —el contenido del
@@ -840,15 +928,17 @@ diagramas y el profesor pide ocho entregables.
 
 # 8. Estado del backlog
 
-**27 de 60 historias cerradas** al 20 de septiembre de 2026, sobre 261 puntos
-estimados. El total subió de 43 a 60 en tres pasos: los ocho diagramas se
-abrieron como historias propias, la reunión dejó un issue de seguimiento, y
-los acuerdos de la escuela agregaron ocho historias más.
+**28 de 60 historias cerradas** al 8 de noviembre de 2026, sobre 261 puntos
+estimados. Desde el 20 de septiembre solo se cerró `INF-02` (#3), aunque
+varias de las abiertas ya están hechas (7.0, punto 5). El total subió de 43 a
+60 en tres pasos: los ocho diagramas se abrieron como historias propias, la
+reunión dejó un issue de seguimiento, y los acuerdos de la escuela agregaron
+ocho historias más.
 
 | Hito | Cerradas | Abiertas |
 |---|---|---|
 | Trabajo preliminar — Migración a Python | 27 | 0 |
-| Sprint 1 — Diagramas y diseño | 0 | 22 |
+| Sprint 1 — Diagramas y diseño | 1 | 21 |
 | Sprint 2 — Por definir | 0 | 4 |
 | Sprint 3 — Por definir | 0 | 5 |
 | Sprint 4 — Por definir | 0 | 0 |
@@ -858,18 +948,17 @@ Todo lo terminado quedó agrupado en el hito de trabajo preliminar: es la
 migración completa del sistema Java, concluida antes de que el Sprint 1
 empezara.
 
-## Las 33 historias abiertas
+## Las 32 historias abiertas
 
 | Issue | Historia | Qué falta |
 |---|---|---|
-| #3 | `INF-02` | Confirmar que los cinco integrantes ejecutan el proyecto |
 | #9 | `DOC-01` | Actualizar la Factibilidad Técnica (resuelto en el Avance 1.1 y 1.2, falta cerrar el issue) |
 | #10 | `QA-01` | Acordar la Definición de Terminado del equipo |
 | #13 | `USU-03` | Registro de cuentas con contraseña propia |
 | #19 | `QA-02` | ~~Traducir la suite JUnit a pytest~~ — **hecho**, falta cerrar el issue (ver 6.4) |
 | #20 | `DOC-02` | Aviso de privacidad para tutores |
 | #24 | `LIB-04` | Bitácora de trazabilidad: falta el disparador |
-| #28 | `DOC-03` | Diagramas del sistema |
+| #28 | `DOC-03` | Paraguas de los ocho diagramas, ya hechos |
 | #33 | `PRE-05` | Marcado diario de vencidos: falta programar la tarea |
 | #37 | `REP-02` | Pantalla de libros faltantes |
 | #38 | `REP-03` | Exportación a CSV (cierra D-02, D-04, D-05) |
@@ -878,9 +967,10 @@ empezara.
 | #41 | `QA-04` | Pruebas de aceptación con el docente |
 | #42 | `DOC-04` | Manuales de una página por rol |
 | #43 | `QA-03` | Casos de prueba por módulo |
-| #59 a #66 | `DIA-01` a `DIA-08` | Los ocho entregables gráficos (Sprint 1) |
-| #67 | Reunión | Documentar los acuerdos de la escuela y ajustar los sprints |
-| #72 a #79 | `LIB-06`, `LIB-07`, `USU-07` a `USU-09`, `PRE-08`, `REP-04`, `REP-05` | Lo que pidió la escuela (Sprint 1) |
+| #59 a #66 | `DIA-01` a `DIA-08` | Hechos en `Documentacion/diagramas/`; faltan capturas de algunos criterios, y `DIA-05` a `DIA-07` son de antes de la migración 11 |
+| #67 | Reunión | Los acuerdos se documentaron en el #80; falta ajustar los hitos |
+| #72 a #76 | `LIB-06`, `LIB-07`, `USU-07` a `USU-09` | La base ya los tiene (migración 11, sección 14); faltan la capa de datos y las pantallas |
+| #77 a #79 | `PRE-08`, `REP-04`, `REP-05` | Sin empezar; `PRE-08` espera saber desde cuándo un libro no devuelto es adeudo |
 
 ## Lo más rápido de cerrar
 
@@ -1162,6 +1252,9 @@ escritura**: las tablas existen y nada escribe en ellas (`LIB-04` #24,
 ## 10.5 y 10.6 Modelo de datos · `DIA-05` (#63) y `DIA-06` (#64)
 
 Las 7 tablas con sus columnas reales. **PK** llave primaria, **FK** foránea.
+**Es el modelo de antes de la migración 11**: faltan `libros.coleccion`,
+`libros.asignatura`, `usuarios.curp` y la tabla `maestros_de_grupo`
+(sección 14).
 
 **`perfiles`** — lo común a toda persona
 ```
@@ -1259,6 +1352,10 @@ Cambió el esquema, apareció la capa de servicios y las reglas se movieron a la
 base. Partir de ellos produce un diagrama equivocado.
 
 ## 10.7 Documentación de la base · `DIA-07` (#65)
+
+**Cifras de antes de la migración 11.** Leídas en la base el 8 de noviembre
+son 8 tablas, 4 vistas, 9 disparadores, 18 funciones y 18 políticas RLS
+(sección 4).
 
 **4 vistas**, todas con `security_invoker = on` para que respeten RLS:
 
@@ -1536,7 +1633,9 @@ cambia cómo se dibuja cada pantalla. Cada HTML lleva su código legible dentro.
 opcional, pero si se escribe se valida el formato y no puede repetirse; el
 teléfono del tutor es obligatorio porque queda como único contacto; la
 colección y la asignatura son opcionales. El criterio «por vencer» (tres días)
-sigue siendo una propuesta, igual que en las maquetas.
+sigue siendo una propuesta, igual que en las maquetas. El 3 de noviembre Yael
+pidió aplicar en la base estos supuestos tal cual (migración 11, sección 14);
+la confirmación del Product Owner sigue pendiente (7.0).
 
 ---
 
@@ -1580,9 +1679,10 @@ conservan su acomodo anterior: sin título y sin panel de detalle.
 menú y, en el panel del préstamo, el teléfono del tutor (depende de
 `USU-08`, #75) y quién registró el préstamo.
 
-**Los campos que pidió la escuela** (#72 a #76) necesitan migraciones y no
-son parte del diseño: el Catálogo sigue mostrando «Tipo o género» hasta
-`LIB-06` y `LIB-07`. Las entradas rápidas del prototipo, para entrar con un
+**Los campos que pidió la escuela** (#72 a #76) ya están en la base desde la
+migración 11 (sección 14), pero todavía no en la aplicación: el Catálogo
+sigue mostrando «Tipo o género» hasta que lleguen su capa de datos y sus
+pantallas (7.0). Las entradas rápidas del prototipo, para entrar con un
 clic como administrador o como bibliotecario, no pasan a la aplicación; así
 se decidió desde el 27 de octubre.
 
@@ -1620,3 +1720,68 @@ sesión, la ficha del Catálogo, el recuadro de error y la ficha de entrada. La
 suite queda en 719: pasan 718, y la de TC-06 falla como se espera. Todas las
 sentencias de `biblioteca` se recorren, y fuera del código generado las
 únicas ramas parciales son las dos de siempre, en `formulario_empleado.py`.
+
+---
+
+# 14. Los campos que pidió la escuela — migración 11, 3 de noviembre
+
+`database/migraciones/11_datos_que_pidio_la_escuela.sql`. Yael aprobó
+aplicarla con las reglas del prototipo mostaza (sección 12), y se aplicó en
+Supabase el **3 de noviembre de 2026** (versión `20261103235304`). Su archivo
+entró al repositorio el 8 de noviembre, en el #91. Durante esos cinco días la
+base corrió una migración que `main` no tenía, el mismo riesgo que «Errores
+ya cometidos» cuenta con la 10.
+
+## Qué agrega
+
+| Historia | En la base | Regla |
+|---|---|---|
+| `LIB-06` (#72) | `libros.coleccion` | Una de las cinco colecciones de Libros del Rincón, o vacía (`libros_coleccion_valida`) |
+| `LIB-07` (#73) | `libros.asignatura` | Una de las ocho asignaturas, o vacía (`libros_asignatura_valida`) |
+| `USU-07` (#74) | `usuarios.curp` | Opcional; si se escribe, con el formato oficial (`usuarios_curp_formato`) y sin repetirse (`usuarios_curp_key`) |
+| `USU-09` (#76) | Tabla `maestros_de_grupo` | Un maestro por salón —grado y grupo—, que heredan sus alumnos |
+| `USU-08` (#75) | Nada nuevo | El teléfono y la dirección del tutor ya caben en `perfiles`. Que el teléfono sea obligatorio y el correo desaparezca lo aplican el validador y el formulario |
+
+Las colecciones son *Al sol solito*, *Pasos de luna*, *Astrolabio*, *Espejo de
+Urania* y *Cometas convidados*; las asignaturas, Español, Matemáticas,
+Ciencias Naturales, Historia, Geografía, Formación Cívica y Ética, Artes e
+Inglés. Las listas de `modelos/libro.py` tienen que ser las mismas.
+
+Además:
+
+- `v_catalogo` agrega `coleccion` y `asignatura` al final, para no mover las
+  columnas que ya tenía.
+- `registrar_alumno` y `actualizar_alumno` se recrearon con `p_curp` al final
+  y con valor por omisión, así que la aplicación de `main`, que no lo manda,
+  sigue funcionando. Conservan los permisos de las migraciones 06 y 07.
+- `maestros_de_grupo` tiene RLS con dos políticas, `maestros_lectura` y
+  `maestros_escritura`: el personal lee y escribe, y un alumno no ve nada. Su
+  disparador `maestros_actualizacion` sella `actualizado_en`. Al empezar cada
+  ciclo escolar se corrige ahí, sin tocar la ficha de ningún alumno.
+
+## Cómo se verificó
+
+Primero, un ensayo dentro de una transacción que se deshace sola, con 18
+comprobaciones. Después de aplicarla, las mismas sobre la base ya migrada,
+también deshechas:
+
+- colección y asignatura válidas pasan; las inventadas se rechazan;
+- una CURP válida pasa, una repetida o mal escrita se rechaza y una vacía
+  pasa; la llamada sin `p_curp` funciona, y `actualizar_alumno` la guarda;
+- el personal da de alta y cambia maestros; un alumno ve 0 filas y no puede
+  escribir; sin sesión se ven 0 filas; el grado 7 se rechaza;
+- los permisos de las dos funciones quedaron como estaban.
+
+El 8 de noviembre se volvió a leer el esquema: 8 tablas con RLS, 4 vistas, 18
+políticas, 9 disparadores y 18 funciones.
+
+## Lo que falta
+
+- **La capa de datos** está a medias en la rama `datos/campos-de-la-escuela`,
+  y **las pantallas** todavía no muestran nada de esto (7.0, puntos 1 y 2).
+- **El traductor de errores** no conoce las restricciones nuevas (7.0).
+- **Los diagramas `DIA-05`, `DIA-06` y `DIA-07`** dibujan la base de antes,
+  sin colección, asignatura, CURP ni `maestros_de_grupo`. Es lo que 7.1
+  advertía: dibujar antes de migrar obliga a redibujar.
+- **Las reglas siguen siendo supuestos del prototipo** hasta que el Product
+  Owner las confirme (sección 12).
