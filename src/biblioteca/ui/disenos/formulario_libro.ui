@@ -6,56 +6,111 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>480</width>
-    <height>520</height>
+    <width>580</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Libro</string>
   </property>
   <layout class="QVBoxLayout" name="disposicion">
-   <property name="leftMargin"><number>24</number></property>
-   <property name="topMargin"><number>24</number></property>
-   <property name="rightMargin"><number>24</number></property>
-   <property name="bottomMargin"><number>24</number></property>
-   <property name="spacing"><number>12</number></property>
+   <property name="leftMargin"><number>30</number></property>
+   <property name="topMargin"><number>26</number></property>
+   <property name="rightMargin"><number>30</number></property>
+   <property name="bottomMargin"><number>26</number></property>
+   <property name="spacing"><number>16</number></property>
 
    <item>
-    <layout class="QFormLayout" name="formulario">
-     <property name="horizontalSpacing"><number>14</number></property>
-     <property name="verticalSpacing"><number>10</number></property>
+    <layout class="QVBoxLayout" name="encabezado">
+     <property name="spacing"><number>4</number></property>
+     <item>
+      <widget class="QLabel" name="etiquetaEncabezado">
+       <property name="text"><string>Registrar libro</string></property>
+       <property name="rol" stdset="0"><string>tituloDialogo</string></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="etiquetaSubtitulo">
+       <property name="text"><string/></property>
+       <property name="wordWrap"><bool>true</bool></property>
+       <property name="rol" stdset="0"><string>subtituloDialogo</string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
 
-     <item row="0" column="0">
+   <item>
+    <widget class="QFrame" name="cajaError">
+     <layout class="QVBoxLayout" name="disposicionError">
+      <property name="leftMargin"><number>16</number></property>
+      <property name="topMargin"><number>12</number></property>
+      <property name="rightMargin"><number>16</number></property>
+      <property name="bottomMargin"><number>12</number></property>
+      <property name="spacing"><number>4</number></property>
+      <item>
+       <widget class="QLabel" name="tituloError">
+        <property name="text"><string>Revisa estos datos:</string></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="etiquetaError">
+        <property name="text"><string/></property>
+        <property name="wordWrap"><bool>true</bool></property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <item>
+    <layout class="QGridLayout" name="formulario">
+     <property name="horizontalSpacing"><number>16</number></property>
+     <property name="verticalSpacing"><number>6</number></property>
+
+     <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="etiquetaTitulo">
-       <property name="text"><string>Título *</string></property>
+       <property name="text"><string>Título &lt;span style="color:#A3261B"&gt;*&lt;/span&gt;</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="campoTitulo">
-       <property name="minimumHeight"><number>32</number></property>
-      </widget>
-     </item>
-
-     <item row="1" column="0">
-      <widget class="QLabel" name="etiquetaAutor">
-       <property name="text"><string>Autor *</string></property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLineEdit" name="campoAutor">
-       <property name="minimumHeight"><number>32</number></property>
-      </widget>
+     <item row="1" column="0" colspan="2">
+      <widget class="QLineEdit" name="campoTitulo"/>
      </item>
 
      <item row="2" column="0">
-      <widget class="QLabel" name="etiquetaTipo">
-       <property name="text"><string>Tipo o género</string></property>
+      <widget class="QLabel" name="etiquetaAutor">
+       <property name="text"><string>Autor &lt;span style="color:#A3261B"&gt;*&lt;/span&gt;</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
       </widget>
      </item>
      <item row="2" column="1">
+      <widget class="QLabel" name="etiquetaEditorial">
+       <property name="text"><string>Editorial</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLineEdit" name="campoAutor"/>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLineEdit" name="campoEditorial"/>
+     </item>
+
+     <item row="4" column="0">
+      <widget class="QLabel" name="etiquetaTipo">
+       <property name="text"><string>Tipo o género</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="etiquetaExistencias">
+       <property name="text"><string>Ejemplares &lt;span style="color:#A3261B"&gt;*&lt;/span&gt;</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
+      </widget>
+     </item>
+     <item row="5" column="0">
       <widget class="QComboBox" name="campoTipo">
        <property name="editable"><bool>true</bool></property>
-       <property name="minimumHeight"><number>32</number></property>
        <item><property name="text"><string>Infantil</string></property></item>
        <item><property name="text"><string>Juvenil</string></property></item>
        <item><property name="text"><string>Cuento</string></property></item>
@@ -66,77 +121,52 @@
        <item><property name="text"><string>Consulta</string></property></item>
       </widget>
      </item>
-
-     <item row="3" column="0">
-      <widget class="QLabel" name="etiquetaEditorial">
-       <property name="text"><string>Editorial</string></property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QLineEdit" name="campoEditorial">
-       <property name="minimumHeight"><number>32</number></property>
-      </widget>
-     </item>
-
-     <item row="4" column="0">
-      <widget class="QLabel" name="etiquetaExistencias">
-       <property name="text"><string>Ejemplares *</string></property>
-      </widget>
-     </item>
-     <item row="4" column="1">
+     <item row="5" column="1">
       <widget class="QSpinBox" name="campoExistencias">
+       <property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property>
        <property name="minimum"><number>0</number></property>
        <property name="maximum"><number>9999</number></property>
        <property name="value"><number>1</number></property>
-       <property name="minimumHeight"><number>32</number></property>
-      </widget>
-     </item>
-
-     <item row="5" column="0">
-      <widget class="QLabel" name="etiquetaAno">
-       <property name="text"><string>Año de publicación</string></property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QSpinBox" name="campoAno">
-       <property name="minimum"><number>1399</number></property>
-       <property name="maximum"><number>2026</number></property>
-       <property name="value"><number>1399</number></property>
-       <property name="specialValueText"><string>Sin especificar</string></property>
-       <property name="minimumHeight"><number>32</number></property>
       </widget>
      </item>
 
      <item row="6" column="0">
-      <widget class="QLabel" name="etiquetaPaginas">
-       <property name="text"><string>Número de páginas</string></property>
+      <widget class="QLabel" name="etiquetaAno">
+       <property name="text"><string>Año de publicación</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
       </widget>
      </item>
      <item row="6" column="1">
+      <widget class="QLabel" name="etiquetaPaginas">
+       <property name="text"><string>Número de páginas</string></property>
+       <property name="rol" stdset="0"><string>etiquetaCampo</string></property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QSpinBox" name="campoAno">
+       <property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property>
+       <property name="minimum"><number>1399</number></property>
+       <property name="maximum"><number>2026</number></property>
+       <property name="value"><number>1399</number></property>
+       <property name="specialValueText"><string>Sin especificar</string></property>
+      </widget>
+     </item>
+     <item row="7" column="1">
       <widget class="QSpinBox" name="campoPaginas">
+       <property name="buttonSymbols"><enum>QAbstractSpinBox::NoButtons</enum></property>
        <property name="minimum"><number>0</number></property>
        <property name="maximum"><number>99999</number></property>
        <property name="value"><number>0</number></property>
        <property name="specialValueText"><string>Sin especificar</string></property>
-       <property name="minimumHeight"><number>32</number></property>
       </widget>
      </item>
-
     </layout>
    </item>
 
    <item>
     <widget class="QLabel" name="etiquetaObligatorios">
-     <property name="text"><string>* Campos obligatorios</string></property>
-    </widget>
-   </item>
-
-   <item>
-    <widget class="QLabel" name="etiquetaError">
-     <property name="text"><string/></property>
-     <property name="wordWrap"><bool>true</bool></property>
-     <property name="minimumHeight"><number>44</number></property>
-     <property name="alignment"><set>Qt::AlignTop</set></property>
+     <property name="text"><string>&lt;span style="color:#A3261B"&gt;*&lt;/span&gt; Campos obligatorios</string></property>
+     <property name="rol" stdset="0"><string>notaCampo</string></property>
     </widget>
    </item>
 
@@ -144,13 +174,14 @@
     <spacer name="espacio">
      <property name="orientation"><enum>Qt::Vertical</enum></property>
      <property name="sizeHint" stdset="0">
-      <size><width>20</width><height>10</height></size>
+      <size><width>20</width><height>4</height></size>
      </property>
     </spacer>
    </item>
 
    <item>
     <layout class="QHBoxLayout" name="filaBotones">
+     <property name="spacing"><number>10</number></property>
      <item>
       <spacer name="espacioBotones">
        <property name="orientation"><enum>Qt::Horizontal</enum></property>
@@ -162,13 +193,14 @@
      <item>
       <widget class="QPushButton" name="botonCancelar">
        <property name="text"><string>Cancelar</string></property>
-       <property name="minimumHeight"><number>34</number></property>
+       <property name="minimumHeight"><number>44</number></property>
+       <property name="secundario" stdset="0"><bool>true</bool></property>
       </widget>
      </item>
      <item>
       <widget class="QPushButton" name="botonGuardar">
        <property name="text"><string>Guardar</string></property>
-       <property name="minimumHeight"><number>34</number></property>
+       <property name="minimumHeight"><number>44</number></property>
        <property name="default"><bool>true</bool></property>
       </widget>
      </item>
@@ -177,6 +209,17 @@
 
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>campoTitulo</tabstop>
+  <tabstop>campoAutor</tabstop>
+  <tabstop>campoEditorial</tabstop>
+  <tabstop>campoTipo</tabstop>
+  <tabstop>campoExistencias</tabstop>
+  <tabstop>campoAno</tabstop>
+  <tabstop>campoPaginas</tabstop>
+  <tabstop>botonCancelar</tabstop>
+  <tabstop>botonGuardar</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

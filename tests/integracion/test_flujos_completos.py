@@ -404,20 +404,20 @@ class TestAltaDeAlumnoDePrincipioAFin:
 class TestVentanaPrincipal:
     """Equivale a `VentanaManiTest`, que comprobaba cuatro cosas de la ventana.
 
-    Aquí se comprueba además que las cinco pestañas se construyan contra la
+    Aquí se comprueba además que las cinco secciones se construyan contra la
     base: es el arranque real de la aplicación, y la prueba que falla si
-    cualquiera de las nueve pantallas se rompe.
+    cualquiera de las nueve pantallas se rompe. Desde el diseño «Lápiz» las
+    secciones están en la columna de iconos, no en pestañas.
     """
 
-    def test_la_ventana_abre_con_sus_cinco_pestanas(self, base, sesion_abierta):
+    def test_la_ventana_abre_con_sus_cinco_secciones(self, base, sesion_abierta):
         base(respuesta=[])
 
         ventana = VentanaPrincipal(sesion_abierta)
 
-        assert ventana.pestanas.count() == 5
-        titulos = [ventana.pestanas.tabText(i) for i in range(5)]
-        assert titulos == ["Catálogo", "Préstamos", "Alumnos", "Deudores",
-                           "Empleados"]
+        assert ventana.paginas.count() == 5
+        assert ventana.secciones == ["Catálogo", "Préstamos", "Alumnos",
+                                     "Deudores", "Empleados"]
 
     def test_la_barra_dice_quien_esta_dentro(self, base, sesion_abierta):
         """El sistema Java abría directo en el menú sin validar quién entraba."""
@@ -446,7 +446,7 @@ class TestVentanaPrincipal:
 
         assert modulo_sesion._sesion_actual is None
 
-    def test_las_cinco_pestanas_cargan_sus_datos(self, base, sesion_abierta):
+    def test_las_cinco_secciones_cargan_sus_datos(self, base, sesion_abierta):
         """Un arranque con la base respondiendo: las nueve pantallas a la vez."""
         clientes = base(respuesta=[])
 
