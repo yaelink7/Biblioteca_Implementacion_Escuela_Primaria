@@ -11,6 +11,7 @@ tipografias y el texto saldria como cajas vacias.
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -40,7 +41,9 @@ from biblioteca.ui.ventana_principal import VentanaPrincipal  # noqa: E402
 
 # Uso:  .venv/Scripts/python.exe herramientas/capturar_pantallas.py <carpeta>
 DESTINO = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("capturas")
-CORREO, CONTRASENA = "bibliotecaria@demo.com", "12345"
+# La contrasena no va en el codigo: el repositorio es publico
+CORREO = "bibliotecaria@demo.com"
+CONTRASENA = os.environ.get("BIBLIOTECA_CLAVE", "")
 
 
 def despeinar(widget: QWidget) -> None:

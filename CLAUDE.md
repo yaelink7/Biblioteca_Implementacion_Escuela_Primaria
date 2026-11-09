@@ -386,11 +386,14 @@ Los `.ui` de `ui/disenos/` se editan en Qt Designer; los `ui_*.py` de
 
 ## Cuentas de demostración
 
-| Correo | Contraseña | Perfil |
-|---|---|---|
-| `bibliotecaria@demo.com` | `12345` | administrador |
-| `auxiliar@demo.com` | `Auxiliar2026!` | bibliotecario |
-| `alumno.prueba@demo.com` | `AlumnoPrueba2026!` | alumno |
+| Correo | Perfil |
+|---|---|
+| `bibliotecaria@demo.com` | administrador |
+
+Desde el 9 de noviembre es la única cuenta: las de `auxiliar@demo.com` y
+`alumno.prueba@demo.com` se borraron al limpiar la base (abajo). **Su
+contraseña no se escribe aquí**: el repositorio es público y esta cuenta entra
+a la base real. Pídela a Yael.
 
 Sirven para enseñar que cada perfil ve solo lo suyo. **Cambiarlas antes de
 cargar el padrón real**: el `REQ-USU-01` exige criterios mínimos de seguridad
@@ -405,17 +408,19 @@ y seis dígitos no los cumplen con datos de menores de por medio.
 
 ## Datos cargados
 
-10 libros apropiados para una primaria, 6 alumnos, 2 empleados y 4 préstamos
-—dos vencidos a propósito, para que el reporte de deudores tenga qué mostrar.
-Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
+**El 9 de noviembre de 2026 se limpió la base**, a pedido de Yael: se
+borraron todos los datos de prueba —13 libros, 7 alumnos, 9 préstamos, los
+empleados de prueba y las cuentas `auxiliar@demo.com` y
+`alumno.prueba@demo.com`—. Quedan solo dos fichas de empleado: María
+Hernández (`bibliotecaria@demo.com`, EMP-001, administradora, con su cuenta)
+y Alma Gabriela Hernández Santiago (EMP-005, bibliotecaria), que se registró
+desde la aplicación y **todavía no tiene cuenta de acceso**: se crea en el
+panel de Supabase, Authentication → Users, y luego se liga su `auth_id` a su
+perfil.
 
-Al 8 de noviembre la base tiene 10 libros activos y 2 dados de baja, los
-mismos 6 alumnos y 2 empleados, y 8 préstamos: 4 devueltos y 4 abiertos,
-todos ya pasados de su fecha límite. Dos de esos cuatro siguen marcados
-`activo` porque nadie llama a `marcar_prestamos_vencidos` (`PRE-05`, #33);
-`v_prestamos` y el reporte de deudores los cuentan bien porque calculan los
-días en cada consulta. Ningún alumno tiene CURP ni maestro de grupo, y ningún
-libro tiene colección.
+Antes de borrar se guardó una copia de todo en un archivo JSON fuera del
+repositorio, en la computadora de Yael. El plan gratuito de Supabase no
+guarda respaldos.
 
 ## Abrir la aplicación sin VS Code
 
