@@ -4,10 +4,12 @@ Contexto completo del proyecto. Claude Code lee este archivo automáticamente al
 abrir el repositorio: una sesión nueva en cualquier computadora debe poder
 continuar el trabajo solo con esto y acceso al repositorio, sin preguntar nada.
 
-**Última actualización:** 3 de noviembre de 2026 — la aplicación empieza a
-usar el diseño mostaza, «Lápiz»: base, inicio de sesión y Catálogo
-(sección 11). Antes, el 19 de octubre: suite de pruebas rehecha sobre la del
-sistema Java, con sus cuatro grupos y la medición de cobertura (ver 6.4).
+**Última actualización:** 8 de noviembre de 2026 — entra a `main` el diseño
+«Lápiz», hecho el 3 de noviembre: base, inicio de sesión y Catálogo
+(sección 13). Antes: el 27 de octubre, las cuatro propuestas de diseño y los
+prototipos navegables (sección 12); el 19 de octubre, el Avance 3, con la
+seguridad verificada contra la base real (sección 11), y la suite de pruebas
+rehecha sobre la del sistema Java (sección 6.4).
 
 ---
 
@@ -417,7 +419,7 @@ Sustituyen a los del volcado Java, que no eran presentables ante una escuela.
 | #83 | PR de rescate: integró a `main` la migración 10 y `actualizar_empleado` |
 | #84 | Avance 2 con los ocho criterios de la rúbrica; regla 4 ampliada |
 | #85 | Suite de pruebas rehecha sobre la del sistema Java (ver 6.4) |
-| #88 | Diseño «Lápiz», mostaza: base, inicio de sesión y Catálogo (ver 11) |
+| #88 | Diseño «Lápiz», mostaza: base, inicio de sesión y Catálogo (ver 13) |
 
 ## La migración del Java está terminada
 
@@ -891,11 +893,19 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
 - `Documentacion/Avance_Biblioteca_1.4.docx` — versión del equipo sobre el 1.3,
   con los casos de uso extendidos `CU-01` a `CU-06` y el diagrama de casos de
   uso incrustado. Es el insumo del que salió el Avance 2
-- `Documentacion/Avance_Biblioteca_2.docx` — **la entrega vigente**. Contiene
-  **únicamente los ocho criterios de la rúbrica**, uno por capítulo: requisitos,
-  casos de uso, casos de uso extendidos, proceso, modelado de datos, base de
-  datos, interfaces y trazabilidad. La planeación, el análisis y el estado de
-  avance se quedaron en la serie del Avance 1. Trece figuras, sin pies
+- `Documentacion/Avance_Biblioteca_2.docx` — contiene **únicamente los ocho
+  criterios de la rúbrica**, uno por capítulo: requisitos, casos de uso, casos
+  de uso extendidos, proceso, modelado de datos, base de datos, interfaces y
+  trazabilidad. La planeación, el análisis y el estado de avance se quedaron
+  en la serie del Avance 1. Trece figuras, sin pies
+- `Documentacion/Avance_Biblioteca_3.docx` — **la entrega vigente**. Mismo
+  criterio: solo lo que pide la rúbrica —**Seguridad, Implementación,
+  Evaluación**— más el capítulo de interfaces que pidió el equipo,
+  desglosado pantalla por pantalla con captura, descripción y
+  funcionalidades. Cuatro capítulos, 14 tablas, 12 capturas, ~5 300 palabras.
+  Las cifras no están escritas a mano: salen de correr el sistema y las
+  pruebas contra la base real el 19 de octubre. La portada, con los nombres
+  del equipo, la puso David Montes. Ver la sección 11
 - `Documentacion/Factibilidad.docx`, `Investigación_Equipo_Biblioteca.docx`,
   `Metodologías_Equipo_Biblioteca.docx` — insumos del Avance 1
 - `Documentacion/diagramas/` — los entregables gráficos. Un archivo por
@@ -914,6 +924,13 @@ Tres son casi gratis porque el trabajo pesado ya está en Postgres:
     que convertirlo con un navegador en modo headless
   - `capturas/` — ocho capturas de la aplicación en ejecución contra la base
     real, generadas con un guion que inicia sesión y fotografía cada pantalla
+- `Documentacion/disenos/Propuestas_de_diseno.html` — las cuatro propuestas
+  de diseño visual, en un solo archivo que abre sin internet. Ver la sección 12
+- `Documentacion/disenos/Propuestas_azul_y_mostaza.html` — la misma
+  presentación solo con las propuestas C y D
+- `Documentacion/disenos/Prototipo_azul.html` y `Prototipo_mostaza.html` — la
+  aplicación simulada en el navegador, con cada botón funcionando. Ver la
+  sección 12
 - El **Reporte Técnico de Calidad** del sistema Java (de otra asignatura) vive
   en `NetBeansProjects/BibliotecaIngeSoftware/Documentacion/` y es la fuente
   de los diez defectos
@@ -1310,12 +1327,200 @@ estadísticas. Conviene dibujarlas después de #72–#79, no antes.
 
 ---
 
-# 11. El diseño «Lápiz» en la aplicación — 3 de noviembre
+# 11. Avance 3 — seguridad, implementación y evaluación
+
+Entregado el **19 de octubre de 2026**. Como el Avance 2, lleva solo lo que
+pide la rúbrica. La instrucción del profesor son tres palabras —**Seguridad,
+Implementación, Evaluación**— y el equipo pidió además una sección de
+interfaces desglosada pantalla por pantalla.
+
+**Hay dos versiones en la historia del repositorio, y vale la de David.** El
+mismo día, David Montes subió el documento a `main` directamente (`a21f50a`)
+con una portada nueva: los nombres del equipo, la materia y la escuela. Fuera
+de la portada el texto es idéntico al de este PR y lleva las mismas 12
+capturas, así que al integrar el #87 se conservó su versión.
+
+Hay una guía en `Downloads/Guía para el Avance 3.md` que propone siete
+secciones. **No se siguió**, por decisión de la Scrum Master: es una
+sugerencia de una IA, no la rúbrica, y agregaba introducción, conclusiones y
+anexos que el profesor no pidió y que repetirían el Avance 1.
+
+## Las capturas
+
+`Documentacion/avance3/capturas/` — doce PNG tomados el 19 de octubre con el
+sistema corriendo **contra la base real**, no maquetas. Se regeneran con:
+
+```bash
+.venv/Scripts/python.exe herramientas/capturar_pantallas.py Documentacion/avance3/capturas
+```
+
+**Esas doce son las del documento entregado, con la interfaz de pestañas.**
+Desde el #88 el guion aplica el diseño «Lápiz» con `aplicar_apariencia()`,
+como `main.py`: correrlo sobre esa carpeta reemplazaría la evidencia del
+Avance 3 por pantallas que el documento no describe. Para capturas nuevas,
+dale otra carpeta.
+
+**Dos trampas del guion, que costaron dos intentos cada una:**
+
+1. **No usar `QT_QPA_PLATFORM=offscreen`.** Esa plataforma no trae
+   tipografías y todo el texto sale como cajas vacías. Con la plataforma
+   nativa las ventanas parpadean un instante, que es el precio de que se lea.
+2. **Deseleccionar los campos después de `show()`, no antes.** El foco se
+   reparte al mostrar la ventana, y es el foco el que selecciona el texto:
+   si no, el primer campo de cada formulario sale resaltado en magenta.
+
+## Lo que el Avance 3 verificó contra la base real
+
+El Avance 2 declaró, para cada requisito de seguridad, **cómo** se
+comprobaría. El Avance 3 ejecutó esas comprobaciones:
+
+| Prueba | Resultado |
+|---|---|
+| Consulta sin sesión, con la llave publishable | Las 7 tablas devuelven **0 filas** |
+| La misma consulta con los tres perfiles | Alumno: 1 perfil, 2 préstamos, 0 empleados. Personal: todo |
+| Seis intentos de escalada de privilegios | **Seis rechazos**, padrón intacto |
+| Inspección del repositorio | Ninguna credencial en el código |
+
+Los seis intentos de escalada fueron: el alumno cambiando su propio rol,
+leyendo la plantilla y leyendo préstamos ajenos; el bibliotecario dando de
+alta un perfil administrador, llamando `registrar_empleado` con rol
+administrador, y cambiando su propio rol.
+
+## Un defecto que destapó esa verificación
+
+**`core/errores.py` no traduce un mensaje de la migración 10.** La base
+responde `"Solo un administrador puede registrar a otro administrador."`, y
+el traductor solo reconoce la variante `"solo un administrador puede
+cambiar"`. El bibliotecario lee «La operación no se pudo completar» y no sabe
+qué hizo mal.
+
+No es un fallo de seguridad —el rechazo ocurre igual— pero incumple
+`RNF-USA-03`. Se corrige agregando una entrada a `REGLAS_DE_LA_BASE`.
+**Pendiente, sin tocar.**
+
+Es exactamente el mismo patrón que la auditoría de septiembre ya había
+encontrado: se agrega un mensaje en una migración y nadie lo da de alta en el
+traductor. `tests/test_mensajes_de_la_base.py` existe para atraparlo, pero
+solo cubre los mensajes que alguien recordó copiar.
+
+## Cambios de estado de los requisitos
+
+| Requisito | Antes | Ahora | Por qué |
+|---|---|---|---|
+| `RNF-MAN-01` | Parcial | **Cumplido** | Le faltaban las pruebas automatizadas; la suite las aporta |
+| `RNF-USA-03` | Cumplido | **Parcial** | El mensaje sin traducir de arriba |
+
+Los funcionales no cambiaron: **14 cumplidos, 4 parciales, 3 pendientes**, de
+19. Lo que cambió es que ahora cada uno dice con qué se verificó.
+
+## Lo que el Avance 3 dice que NO se ha evaluado
+
+La sesión de aceptación con el docente (`QA-04`, #41) **sigue abierta**, y el
+documento lo declara sin rodeos en vez de inventarla. Deja el guion de lo que
+hay que medir: cronometrar el préstamo contra `RNF-USA-01`, confirmar el
+límite de un libro y el plazo de siete días, ver si los mensajes de error se
+entienden, y verificar el vocabulario —el sistema dice «tipo o género» donde
+la escuela dice «colección»—.
+
+---
+
+# 12. Propuestas de diseño visual — 27 de octubre
+
+`Documentacion/disenos/Propuestas_de_diseno.html` reúne cuatro direcciones
+visuales para la aplicación de escritorio, con los mismos datos de ejemplo.
+A y B se muestran en Préstamos e Inicio de sesión, como imágenes fijas; C y
+D, en las cinco pestañas más el inicio de sesión, y se navegan como prototipo:
+con un selector o desde el menú de la propia maqueta («Cerrar sesión» lleva
+al inicio y «Entrar» regresa a Préstamos). Abre sin internet: las
+tipografías van incluidas.
+
+**El 3 de noviembre Yael eligió la D, «Lápiz»**, mostaza sobre grafito, con
+los ajustes de su prototipo navegable (abajo). La aplicación empezó a usarla
+en el #88. El resto de esta sección se escribió el 27 de octubre, antes de
+elegir, y se conserva como registro de las cuatro opciones.
+
+`Propuestas_azul_y_mostaza.html`, en la misma carpeta, deja solo C y D y
+agrega una tabla que las compara punto por punto. Sus secciones salen de la
+misma fuente que el archivo de las cuatro, así que no se contradicen.
+
+| Propuesta | Color principal | Navegación | Tipografía | Esfuerzo estimado |
+|---|---|---|---|---|
+| A · Clásica | Rojo oscuro `#7F1D2D` | Barra lateral | Source Serif 4 + Source Sans 3 | 5–6 días |
+| B · Pizarrón | Verde oscuro `#1F4D3A` | Pestañas, como hoy | Lexend + Atkinson Hyperlegible | 3–4 días |
+| C · Luminosa | Azul claro `#7CC6EE` | Barra lateral flotante | Plus Jakarta Sans | 10–12 días |
+| D · Lápiz | Mostaza `#E0A526` y grafito | Columna de iconos | Manrope + IBM Plex Mono | 7–8 días |
+
+Las cifras de C y D son las más firmes porque tienen las cinco pestañas
+diseñadas. C convierte en tarjetas Préstamos, Catálogo y Deudores; D usa en
+todas una tabla con panel de detalle a la derecha.
+
+Las cuatro se implementan con PySide6 y QSS, sin paquetes de Python nuevos:
+tipografías con licencia OFL cargadas con `QFontDatabase.addApplicationFont`,
+iconos SVG de Lucide (licencia ISC) y la paleta reescrita en `ui/estilo.py`.
+El cambio se queda en `ui/`. QML, Flet o pywebview darían mejor acabado, pero
+cuestan de 3 a 6 semanas y obligan a rehacer las pruebas de interfaz: no caben
+este semestre.
+
+**Al implementar la que se elija:**
+
+- **Tres piezas de las maquetas son funciones nuevas** y pasan por el Product
+  Owner (regla 7): el criterio «por vencer» con su conteo y su filtro —el
+  umbral de tres días lo propusieron las maquetas, no la escuela—, el contador
+  de deudores junto al menú, y el panel de detalle de D con el teléfono del
+  tutor (depende de `USU-08`, #75) y quién registró el préstamo.
+- **Lo demás ya existe**: el buscador de Préstamos es `campoFiltro` y el
+  resumen es `etiquetaResumen`. La paginación de las maquetas solo está para
+  que quepan en la imagen.
+- **Pruebas que cambian según la propuesta**: `TestVentanaPrincipal`, en
+  `tests/integracion/`, cuenta las pestañas (A, C y D); una prueba marca
+  `casillaSoloVencidos` (B, C y D); las de devolución seleccionan una fila y
+  pulsan `botonDevolver`, y A, B y C ponen Devolver en cada fila; C cambia
+  por tarjetas `tablaPrestamos`, `tablaLibros` y `tablaDeudores`.
+- **Color**: en A, el rojo de la marca y el de «vencido» son de la misma
+  familia; el azul claro y el mostaza no aguantan texto blanco.
+
+Las maquetas editables viven en un lienzo de diseño privado en claude.ai, en la
+cuenta de Yael. El HTML es una exportación de ese lienzo.
+
+## Prototipos navegables — azul y mostaza
+
+`Documentacion/disenos/Prototipo_azul.html` y `Prototipo_mostaza.html` simulan
+la aplicación completa en el navegador, sin internet ni base de datos. Se
+inicia sesión, se presta, se devuelve, se registran y modifican libros,
+alumnos y empleados, se da de baja, se consulta el historial y el reporte de
+deudores. Cada regla de la base responde con el mismo mensaje que la app
+(`core/errores.py`) y las validaciones son las de `servicios/`. Los datos son
+de ejemplo, viven en memoria y **se reinician al recargar**; las fechas se
+calculan a partir del día en que se abre, así que siempre hay dos vencidos.
+
+Los dos comparten el mismo núcleo de reglas y el mismo controlador; solo
+cambia cómo se dibuja cada pantalla. Cada HTML lleva su código legible dentro.
+
+**Decisiones de Yael para los prototipos (27 de octubre):**
+
+- Los formularios llevan lo que pidió la escuela (#72 a #76): colección de
+  Libros del Rincón con sus grados, asignatura de la lista tradicional
+  (Español, Matemáticas, Ciencias Naturales, Historia, Geografía, Formación
+  Cívica y Ética, Artes e Inglés), CURP, y teléfono y dirección del tutor,
+  sin correo del alumno.
+- El maestro de grupo se asigna **por salón** y lo heredan sus alumnos; se
+  edita desde «Maestros de grupo», en Alumnos.
+- El inicio de sesión tiene botones para entrar como administrador o como
+  bibliotecario con un clic. **Es solo para el prototipo**: no pasa a la app.
+
+**Supuestos del prototipo, por confirmar con el Product Owner:** la CURP es
+opcional, pero si se escribe se valida el formato y no puede repetirse; el
+teléfono del tutor es obligatorio porque queda como único contacto; la
+colección y la asignatura son opcionales. El criterio «por vencer» (tres días)
+sigue siendo una propuesta, igual que en las maquetas.
+
+---
+
+# 13. El diseño «Lápiz» en la aplicación — 3 de noviembre
 
 Yael eligió la propuesta D, mostaza sobre grafito, y pidió llevarla a la
 aplicación. Las cuatro propuestas y los dos prototipos navegables viven en
-`Documentacion/disenos/`, que todavía no está en el repositorio: entran con su
-propio PR de documentación. La referencia para implementar es
+`Documentacion/disenos/` (sección 12, #90). La referencia para implementar es
 `Prototipo_mostaza.html`; cuando el prototipo y esta aplicación no coincidan,
 gana el prototipo.
 
