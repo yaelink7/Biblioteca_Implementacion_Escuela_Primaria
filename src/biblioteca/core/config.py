@@ -41,6 +41,21 @@ def recordar_sesion_permitido(url: str, bandera: str | None) -> bool:
 
 RECORDAR_SESION = recordar_sesion_permitido(SUPABASE_URL, os.getenv("RECORDAR_SESION"))
 
+# Boton «Entrar rapido» de la copia de pruebas. El correo y la contrasena de la
+# cuenta de pruebas los escribe en su .env quien usa esa copia; el repositorio
+# no guarda ninguno. Tampoco aparece contra la base de la escuela.
+PRUEBAS_CORREO = os.getenv("PRUEBAS_CORREO", "").strip()
+PRUEBAS_CONTRASENA = os.getenv("PRUEBAS_CONTRASENA", "")
+
+
+def acceso_de_pruebas_permitido(url: str, correo: str, contrasena: str) -> bool:
+    return bool(correo and contrasena) and PROYECTO_DE_LA_ESCUELA not in url
+
+
+ACCESO_DE_PRUEBAS = acceso_de_pruebas_permitido(
+    SUPABASE_URL, PRUEBAS_CORREO, PRUEBAS_CONTRASENA
+)
+
 # Reglas de negocio del Avance 1
 DIAS_DE_PRESTAMO = 7          # REQ-PRE-02
 LIBROS_POR_USUARIO = 1        # REQ-PRE-01
