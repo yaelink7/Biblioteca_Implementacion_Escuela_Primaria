@@ -446,6 +446,30 @@ y tarda unos tres minutos en armarse.
 - **El ejecutable no está firmado.** Si Windows o el antivirus lo detienen la
   primera vez, es por eso; no hay certificado de firma en el proyecto.
 
+## Copia de pruebas: `Biblioteca_pruebas`
+
+Desde el 25 de noviembre hay un segundo proyecto de Supabase,
+`Biblioteca_pruebas` (`urorpysxbzgzebrdrrtb`, plan gratuito), para capturar y
+sacar métricas sin tocar la base de la escuela. Tiene las 11 migraciones,
+comprobadas una por una contra sus archivos, y datos **ficticios**: 304
+alumnos, 14 salones con maestro, 3 empleados, 194 libros y 6 901 préstamos
+desde septiembre de 2025.
+
+- **El programa de pruebas** vive en `%LOCALAPPDATA%\Programs\Biblioteca
+  Escolar - Pruebas\`, con su propio `.env` que apunta a ese proyecto, y se
+  abre con el acceso directo «Biblioteca Escolar - PRUEBAS». Se arma desde
+  la rama `pruebas/acceso-rapido`.
+- **Acceso rápido.** Con `RECORDAR_SESION=1` en su `.env`, el programa guarda
+  el permiso de renovación de Supabase en `.sesion_recordada`, junto al
+  `.exe`, y al abrirse entra solo. Nunca guarda la contraseña. Cerrar la
+  ventana conserva la sesión; «Cerrar sesión» la olvida. La bandera
+  **no se activa contra la base de la escuela** aunque alguien la copie
+  (`core/config.py`).
+- **Las cuentas de acceso se crean en su propio panel**, como las de la
+  escuela: el usuario en Authentication y su enlace con la ficha de empleado.
+- **Las migraciones nuevas se aplican en las dos bases**, o la copia se queda
+  atrás.
+
 ---
 
 # 6. Qué se ha hecho

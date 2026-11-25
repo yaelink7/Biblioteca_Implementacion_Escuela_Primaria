@@ -175,5 +175,7 @@ class VentanaPrincipal(QMainWindow):
         self.close()
 
     def closeEvent(self, evento) -> None:  # noqa: N802 (lo nombra Qt)
-        cerrar_sesion()
+        # Cerrar la ventana conserva la sesion guardada de la copia de
+        # pruebas; «Cerrar sesión» (salir) la olvida.
+        cerrar_sesion(olvidar=self.cerro_sesion)
         super().closeEvent(evento)

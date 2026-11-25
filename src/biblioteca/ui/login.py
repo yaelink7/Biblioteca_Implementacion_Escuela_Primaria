@@ -21,7 +21,12 @@ from PySide6.QtWidgets import (
 )
 
 from biblioteca.core.errores import causa as causa_del_error
-from biblioteca.core.sesion import ErrorDeAcceso, Sesion, iniciar_sesion
+from biblioteca.core.sesion import (
+    ErrorDeAcceso,
+    Sesion,
+    iniciar_sesion,
+    restaurar_sesion_recordada,
+)
 from biblioteca.ui.apariencia import icono, logo_escuela, marca_escuela
 from biblioteca.ui.estilo import COLOR_ERROR, GRAFITO, GRAFITO_CLARO, TENUE, TEXTO, rotular
 from biblioteca.ui.generado.ui_login import Ui_DialogoLogin
@@ -123,7 +128,13 @@ class DialogoLogin(QDialog):
 
 
 def pedir_sesion(padre: QWidget | None = None) -> Sesion | None:
-    """Muestra el dialogo y devuelve la sesion, o None si se cancelo."""
+    """Muestra el dialogo y devuelve la sesion, o None si se cancelo.
+
+    En la copia de pruebas, primero intenta reanudar la sesion guardada.
+    """
+    recordada = restaurar_sesion_recordada()
+    if recordada is not None:
+        return recordada
     dialogo = DialogoLogin(padre)
     if dialogo.exec() == QDialog.DialogCode.Accepted:
         return dialogo.sesion
