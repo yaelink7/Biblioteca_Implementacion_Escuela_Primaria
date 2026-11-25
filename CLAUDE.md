@@ -451,9 +451,13 @@ y tarda unos tres minutos en armarse.
 Desde el 25 de noviembre hay un segundo proyecto de Supabase,
 `Biblioteca_pruebas` (`urorpysxbzgzebrdrrtb`, plan gratuito), para capturar y
 sacar métricas sin tocar la base de la escuela. Tiene las 11 migraciones,
-comprobadas una por una contra sus archivos, y datos **ficticios**: 304
-alumnos, 14 salones con maestro, 3 empleados, 194 libros y 6 901 préstamos
-desde septiembre de 2025.
+comprobadas una por una contra sus archivos, y datos **ficticios**: 100
+alumnos (74 con CURP) en 24 salones con maestro, 3 empleados, 494 libros
+activos y 8 dados de baja (1 031 ejemplares), y 446 préstamos de septiembre
+de 2024 a hoy: 400 devueltos (125 tarde) y 46 abiertos, de los que 11 ya
+vencieron. El mismo 25 de noviembre se cargaron 530 alumnos y 18 977
+préstamos, y a petición de Yael se redujeron a estas cifras: con tantos
+registros la copia no servía para probar a mano.
 
 - **El programa de pruebas** vive en `%LOCALAPPDATA%\Programs\Biblioteca
   Escolar - Pruebas\`, con su propio `.env` que apunta a ese proyecto, y se
@@ -465,6 +469,14 @@ desde septiembre de 2025.
   ventana conserva la sesión; «Cerrar sesión» la olvida. La bandera
   **no se activa contra la base de la escuela** aunque alguien la copie
   (`core/config.py`).
+- **Botón «Entrar rápido».** Si el `.env` de la copia trae
+  `PRUEBAS_CORREO` y `PRUEBAS_CONTRASENA`, la ficha de entrada muestra la
+  sección «Entrar rápido» del prototipo mostaza con la tarjeta de esa
+  cuenta, y un clic entra por el mismo camino que «Entrar». Los dos valores
+  los escribe en su `.env` quien usa la copia: el repositorio no guarda
+  ninguno. Sin los dos, o contra la base de la escuela, la sección no
+  aparece. La raya punteada se dibuja a mano: con Windows al 125 %, el
+  `border-top: 1px dashed` de la hoja de estilo casi no se ve.
 - **Las cuentas de acceso se crean en su propio panel**, como las de la
   escuela: el usuario en Authentication y su enlace con la ficha de empleado.
 - **Las migraciones nuevas se aplican en las dos bases**, o la copia se queda
